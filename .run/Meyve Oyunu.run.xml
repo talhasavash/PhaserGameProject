@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Meyve Oyunu" type="NodeJSConfigurationType" path-to-js-file="$PROJECT_DIR$/scripts/serve.cjs" working-dir="$PROJECT_DIR$">
+    <envs>
+      <env name="PORT" value="8095" />
+    </envs>
+    <method v="2" />
+  </configuration>
+</component>

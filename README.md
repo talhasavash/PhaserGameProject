@@ -17,6 +17,22 @@ Phaser projede yerel dosya olarak bulunur; oyun harici CDN gerektirmez.
 5. Tarayıcıda http://localhost:8080 adresini açın. Değişiklikleri görmek için sayfayı yenileyin.
 6. Sunucuyu kapatmak için terminalde `Ctrl+C` kullanın.
 
+### IntelliJ Run düğmesi
+
+`.run/Meyve Oyunu.run.xml` paylaşılabilir bir Node.js çalıştırma ayarı içerir.
+Node.js eklentisi etkinse üst araç çubuğundan **Meyve Oyunu** ayarını seçip Run düğmesine basın.
+İlk çalıştırmada **Run → Edit Configurations → Meyve Oyunu → Node runtime** alanından
+bilgisayarınızdaki Node.js kurulumunu seçmeniz gerekebilir.
+Bu ayar 8095 portunu kullanır: http://localhost:8095.
+Sunucuyu IntelliJ'deki Stop düğmesiyle durdurun. Aynı portta ikinci sunucu başlatmayın.
+
+Node.js Run seçeneği bulunmuyorsa terminalde `$env:PORT = '8095'` yazıp
+`node scripts/serve.cjs` çalıştırın. `node` komutu tanınmıyorsa Node.js kurulmalı veya
+IntelliJ terminalinin PATH ayarı güncellenmelidir.
+
+Bu sunucu yalnızca HTML, CSS, JavaScript ve görselleri sunar; oyun mantığı tarayıcıda çalışır.
+Veritabanı ya da ayrı bir oyun backend'i yoktur. Sunucu yalnızca yerel bilgisayardan erişilir.
+
 Sunucu Node.js 18 veya üzerini gerektirir. Ek npm bağımlılığı yoktur; `npm install` gerekmez.
 Node.js/npm kuruluysa alternatif olarak `npm start` kullanılabilir. IntelliJ'nin yerleşik web sunucusu
 üzerinden `index.html` dosyasını tarayıcıda açmak da mümkündür.

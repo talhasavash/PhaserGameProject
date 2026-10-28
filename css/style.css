@@ -1,39 +1,70 @@
-:root {
-    color-scheme: dark;
-    font-family: system-ui, sans-serif;
-    background: #17212b;
-    color: #edf3f8;
-}
-
-body {
-    margin: 0;
-    padding: 24px 12px;
-}
-
-main {
-    max-width: 750px;
-    margin: 0 auto;
-    text-align: center;
-}
-
-h1 {
-    margin: 0 0 16px;
-    font-size: 24px;
-}
-
-#game {
-    width: 100%;
-    aspect-ratio: 5 / 4;
-    overflow: hidden;
-    background: #000;
-}
-
-#game canvas {
-    display: block;
-}
-
-p {
-    font-size: 14px;
-    line-height: 1.5;
-    color: #c1ceda;
-}
+:root { font-family: 'Trebuchet MS', 'Segoe UI', sans-serif; color: #294d46; background: #f5f3e9; color-scheme: light; }
+* { box-sizing: border-box; }
+body { margin: 0; }
+main { width: min(1120px, calc(100% - 48px)); margin: 0 auto; }
+.page-header { display: flex; justify-content: space-between; align-items: center; padding: 25px 0; border-bottom: 1px solid #d8ded0; }
+.brand { color: #294d46; text-decoration: none; font-size: 12px; letter-spacing: 2px; font-weight: 700; display: flex; align-items: center; gap: 12px; }
+.brand-mark { width: 34px; height: 34px; display: grid; place-items: center; font: bold 27px Georgia, serif; color: #fff9e9; background: #476b50; border-radius: 11px 11px 11px 2px; letter-spacing: -2px; padding-right: 3px; }
+.age-tag { font-size: 10px; letter-spacing: 1.5px; color: #67796a; }
+.age-tag span { margin: 0 8px; color: #b4bba9; }
+.intro { display: flex; justify-content: space-between; align-items: center; padding: 32px 0 27px; }
+.eyebrow { font-size: 10px; letter-spacing: 2.5px; font-weight: bold; margin: 0 0 12px; }
+.eyebrow span { margin: 0 8px; color: #a3ac94; }
+h1 { font: 500 clamp(32px, 4vw, 48px)/1.05 Georgia, serif; letter-spacing: -1.6px; margin: 0 0 12px; }
+h1 span { color: #b27a4c; }
+.subtitle { color: #74816f; font-size: 14px; margin: 0; line-height: 1.5; }
+.chapter-stamp { border: 1px solid #c9d0bd; border-radius: 50%; width: 92px; height: 92px; display: flex; flex-direction: column; align-items: center; justify-content: center; transform: rotate(8deg); flex-shrink: 0; }
+.chapter-stamp span { font-size: 8px; letter-spacing: 1px; }
+.chapter-stamp strong { font: 40px Georgia, serif; }
+.game-shell { border: 1px solid #b5c6b2; border-radius: 16px; overflow: hidden; background: #fffcf2; box-shadow: 0 10px 30px #3450410c; }
+.game-toolbar { display: flex; gap: 8px; align-items: center; padding: 11px 17px; font-size: 11px; color: #667d6c; }
+.live-dot { width: 6px; height: 6px; background: #6c9b68; border-radius: 50%; }
+.toolbar-actions { display: flex; gap: 10px; margin-left: auto; }
+button { font: inherit; cursor: pointer; border: 1px solid #c8d1be; border-radius: 6px; background: transparent; color: #3e604d; padding: 6px 10px; }
+button:hover { background: #e8eddf; }
+button:disabled { opacity: 0.45; cursor: default; }
+button:focus-visible, a:focus-visible { outline: 3px solid #b47e47; outline-offset: 3px; }
+.game-stage { position: relative; background: #c6edef; }
+.game-stage.choosing { min-height: 440px; }
+.character-select { position: absolute; inset: 0; display: grid; place-items: center; background: radial-gradient(ellipse at 15% 95%, #b8d6bb 0%, transparent 50%), radial-gradient(ellipse at 95% 5%, #c9e1d4 0%, transparent 50%), #eff3e7; padding: 20px; }
+.character-form { text-align: center; width: min(100%, 460px); }
+.character-form h2 { font: 36px/1.1 Georgia, serif; margin: 0 0 9px; letter-spacing: -1px; }
+.character-form h2 span { color: #b27a4c; }
+.character-subtitle { margin: 0 0 20px; font-size: 14px; color: #6d806b; }
+.character-options { display: flex; justify-content: center; gap: 18px; padding: 0; border: 0; margin: 0 0 22px; }
+.character-option { position: relative; width: 160px; cursor: pointer; }
+.character-option input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.character-card { position: relative; display: flex; flex-direction: column; align-items: center; padding: 14px 12px 16px; border-radius: 16px; border: 2px solid #d3ddca; background: #fffdf3; transition: border-color 120ms, background 120ms; }
+.character-card strong { font-size: 14px; margin-top: 8px; }
+.character-portrait { display: grid; place-items: center; width: 112px; height: 125px; border-radius: 50%; background: radial-gradient(circle, #e6ebd9 58%, transparent 59%); }
+.character-portrait img { display: block; object-fit: contain; }
+.character-check { position: absolute; right: 9px; top: 7px; color: #477b5a; font-size: 18px; visibility: hidden; }
+.character-option input:checked + .character-card { border-color: #5a8766; background: #f3f6e9; }
+.character-option input:checked + .character-card .character-check { visibility: visible; }
+.character-option input:focus-visible + .character-card { outline: 3px solid #b47e47; outline-offset: 4px; }
+#start-button { background: #416a54; color: #fff9e8; padding: 12px 28px; font-size: 14px; border-radius: 8px; }
+#start-button:disabled { background: #8e9d88; }
+.character-note { font-size: 11px; color: #7a8974; margin: 13px 0 0; }
+#game { width: 100%; aspect-ratio: 8/5; max-height: calc(100svh - 140px); overflow: hidden; }
+#game canvas { display: block; }
+.controls { display: flex; align-items: center; justify-content: center; gap: 26px; padding: 15px 12px; flex-wrap: wrap; font-size: 11px; color: #71806c; }
+.controls > div { display: flex; align-items: center; gap: 5px; }
+.controls span:last-child { margin-left: 4px; }
+kbd { border: 1px solid #d3d9c8; border-bottom-width: 2px; border-radius: 4px; min-width: 23px; padding: 4px 6px; text-align: center; background: #f6f5ec; color: #44614d; font: 11px 'Segoe UI', sans-serif; }
+.field-notes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; padding: 27px 0 30px; }
+.field-notes article { display: flex; gap: 13px; }
+.note-number { color: #a0aa91; font: 20px Georgia, serif; padding-top: 1px; }
+.field-notes h2 { font-size: 13px; margin: 0 0 7px; font-weight: 700; }
+.field-notes p { font-size: 12px; color: #77846f; line-height: 1.7; margin: 0; }
+footer { border-top: 1px solid #d8ded0; display: flex; justify-content: space-between; padding: 17px 0 24px; font-size: 8px; letter-spacing: 1.6px; color: #89947f; }
+.result { position: absolute; inset: 0; background: #213f3dcc; display: grid; place-items: center; backdrop-filter: blur(4px); padding: 16px; }
+[hidden] { display: none !important; }
+.result-card { border-radius: 24px; background: #fff9e8; padding: 36px; text-align: center; max-width: 480px; box-shadow: 0 20px 60px #203e3d40; }
+.result h2 { font: 36px Georgia, serif; margin: 15px 0; }
+.result p { font-size: 15px; line-height: 1.7; }
+.result .eyebrow { font-size: 10px; }
+.result-score { color: #a77944; font-weight: bold; }
+.result button { background: #416a54; color: #fff9e8; padding: 13px 20px; }
+.result .result-note { font-size: 11px; color: #8e987d; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+@media (max-width: 640px) { main { width: calc(100% - 24px); } .page-header { padding: 18px 0; } .age-tag { font-size: 8px; letter-spacing: 0; } .brand { font-size: 9px; letter-spacing: 1px; } .intro { padding: 24px 0; } .subtitle { max-width: 260px; font-size: 12px; } .chapter-stamp { width: 65px; height: 65px; } .chapter-stamp strong { font-size: 27px; } .chapter-stamp span { font-size: 6px; } .controls { gap: 10px; } .field-notes { grid-template-columns: 1fr; gap: 18px; } footer { font-size: 7px; letter-spacing: 0.5px; } .result-card { padding: 16px; } .result h2 { font-size: 22px; } .result p { font-size: 12px; margin: 5px; } }

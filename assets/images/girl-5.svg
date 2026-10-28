@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="80" viewBox="0 0 64 80"><g transform="translate(0 0)" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M28 54 L32 69 M35 54 L28 69" stroke="#263e50" stroke-width="9"/>
+      <path d="M29 74h9 M26 74h9" stroke="#e9b754" stroke-width="7"/>
+      <g transform="translate(0 -2)">
+      <rect x="10" y="34" width="18" height="22" rx="6" fill="#d29240" stroke="#8d653e" stroke-width="2"/>
+      <path d="M23 36Q32 33 41 37L45 60Q32 65 18 59Z" fill="#418e91" stroke="#2d6971" stroke-width="2"/>
+      <path d="M23 39L19 52" stroke="#efbb8b" stroke-width="7"/>
+      <path d="M23 38L20 45" stroke="#328e95" stroke-width="9"/>
+      <path d="M39 39L45 49" stroke="#efbb8b" stroke-width="7"/><path d="M39 39L42 44" stroke="#328e95" stroke-width="9"/>
+      <rect x="28" y="28" width="10" height="10" rx="4" fill="#e6a777"/>
+      <path d="M13 25Q10 1 31 1Q54 0 53 26L50 47Q34 55 15 47Z" fill="#b990c0" stroke="#785780" stroke-width="1.5"/><path d="M15 34L12 49L23 54L28 43Z" fill="#aa7db2" stroke="#785780" stroke-width="1"/>
+      <ellipse cx="33" cy="22.5" rx="14.5" ry="16" fill="#f5cda7" stroke="#b48160" stroke-width="1.2"/>
+
+      <path d="M17 20Q16 5 32 4Q49 4 50 21L46 16Q34 9 21 16Z" fill="#b990c0"/><path d="M19 16Q32 6 46 16" fill="none" stroke="#ead3e9" stroke-width="1.5"/><path d="M17 27Q17 37 31 42L23 49L16 44Z" fill="#a177ab"/><path d="M48 27Q47 39 31 42L39 50L49 45Z" fill="#a177ab"/><path d="M19 32Q22 39 32 42M45 33Q41 39 34 42" fill="none" stroke="#d6b4d8" stroke-width="1.3"/><circle cx="39" cy="43" r="1.7" fill="#ead19a"/>
+      <ellipse cx="28.5" cy="23" rx="3.4" ry="4.2" fill="#fff9ed"/>
+      <ellipse cx="39" cy="23" rx="3.4" ry="4.2" fill="#fff9ed"/>
+      <ellipse cx="29.3" cy="23.4" rx="1.9" ry="2.8" fill="#273d42"/>
+      <ellipse cx="39.8" cy="23.4" rx="1.9" ry="2.8" fill="#273d42"/>
+      <circle cx="29.7" cy="22.4" r="0.7" fill="#fff"/>
+      <circle cx="40.2" cy="22.4" r="0.7" fill="#fff"/>
+      <path d="M26 17.5q3-1 5 0 M36.5 17.5q3-1 5 0" fill="none" stroke="#543e34" stroke-width="1.5"/>
+      <path d="M33.5 26v2h2" fill="none" stroke="#c18d65" stroke-width="1.2"/>
+      <path d="M29.5 31q4.5 4 9 0" fill="none" stroke="#8f5f4c" stroke-width="1.6"/>
+
+      </g>
+    </g></svg>

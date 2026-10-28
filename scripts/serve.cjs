@@ -3,13 +3,14 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const root = path.resolve(__dirname, '..');
-const port = Number(process.env.PORT || 8080);
+const port = Number(process.env.PORT || 8095);
 const publicFolders = new Set(['assets', 'css', 'lib', 'src']);
 const contentTypes = {
     '.html': 'text/html; charset=utf-8',
     '.css': 'text/css; charset=utf-8',
     '.js': 'text/javascript; charset=utf-8',
     '.png': 'image/png',
+    '.svg': 'image/svg+xml',
     '.mp3': 'audio/mpeg'
 };
 

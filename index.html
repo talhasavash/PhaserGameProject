@@ -7,14 +7,45 @@
     <link rel="icon" href="data:,">
     <link rel="stylesheet" href="css/style.css">
     <script defer src="lib/phaser.min.js"></script>
-    <script defer src="src/main.js"></script>
+    <script type="module" src="src/game.js"></script>
 </head>
 <body>
     <main>
-        <h1>Meyve Oyunu</h1>
-        <div id="game" aria-label="Meyve toplama platform oyunu"></div>
-        <p>← → Hareket &nbsp; ↑ Zıpla &nbsp; Boşluk: Yeniden başlat</p>
-        <p>Meyveleri topla, anahtarı al ve kapıya ulaş.</p>
+        <header class="page-header">
+            <a class="brand" href="./" aria-label="Meyve Oyunu ana sayfa"><span class="brand-mark" aria-hidden="true">m.</span> MEYVE OYUNU</a>
+            <span class="age-tag">8–10 YAŞ <span> / </span> KEŞFET & ÖĞREN</span>
+        </header>
+        <section class="intro" aria-labelledby="page-title">
+            <div><p class="eyebrow">BÖLÜM 01 <span>—</span> İLK MACERA</p><h1 id="page-title">Meyve Bahçesi<span>.</span></h1><p class="subtitle">Meyveleri topla, iyilikle keşfet ve cami girişine ulaş.</p></div>
+            <div class="chapter-stamp" aria-hidden="true"><span>KEŞİF ROTASI</span><strong>01</strong></div>
+        </section>
+        <section class="game-shell" aria-label="Meyve Bahçesi oyunu">
+            <div class="game-toolbar"><span class="live-dot"></span><span id="toolbar-status">Karakterini seç</span><div class="toolbar-actions"><button id="pause-button" type="button" disabled>Duraklat</button><button id="restart-button" type="button" disabled>Yeniden başla</button></div></div>
+            <div id="game-stage" class="game-stage choosing">
+                <div id="game" role="img" aria-label="Çocuk karakterle oynanan, klavyeyle kontrol edilen platform oyunu"></div>
+                <section id="character-select" class="character-select" aria-labelledby="character-title">
+                    <form id="character-form" class="character-form">
+                        <p class="eyebrow">MACERAN BURADA BAŞLIYOR</p>
+                        <h2 id="character-title">Karakterini seç<span>.</span></h2>
+                        <p class="character-subtitle">Kiminle keşfe çıkmak istersin?</p>
+                        <fieldset class="character-options">
+                            <legend class="sr-only">Oynayacağın karakter</legend>
+                            <label class="character-option"><input type="radio" name="character" value="boy" required><span class="character-card"><span class="character-portrait"><img src="assets/images/child-0.svg" alt="Sırt çantalı erkek çocuk" width="96" height="120"></span><strong>Erkek çocuk</strong><span class="character-check" aria-hidden="true">✓</span></span></label>
+                            <label class="character-option"><input type="radio" name="character" value="girl" required><span class="character-card"><span class="character-portrait"><img src="assets/images/girl-0.svg" alt="Başörtülü, sırt çantalı kız çocuk" width="96" height="120"></span><strong>Kız çocuk</strong><span class="character-check" aria-hidden="true">✓</span></span></label>
+                        </fieldset>
+                        <button id="start-button" type="submit" disabled>Maceraya başla →</button>
+                        <p class="character-note">İki karakter de aynı hareketlere ve özelliklere sahip.</p>
+                    </form>
+                </section>
+                <section id="game-result" class="result" aria-labelledby="result-title" hidden>
+                    <div class="result-card"><p class="eyebrow">İLK KEŞİF TAMAMLANDI</p><h2 id="result-title">Harika bir keşifti!</h2><p>Üç elmayı saydın, anahtarı buldun<br>ve cami girişine ulaştın.</p><p id="result-score" class="result-score"></p><button id="play-again" type="button">Bir kez daha keşfet →</button><p class="result-note">Yeni bölgeler bir sonraki maceramız.</p></div>
+                </section>
+            </div>
+            <div class="controls"><div><kbd>←</kbd><kbd>→</kbd><span>Yürü</span></div><div><kbd>↑</kbd><span>veya</span><kbd>Boşluk</kbd><span>Zıpla</span></div><div><kbd>Esc</kbd><span>Mola</span></div><div><kbd>R</kbd><span>Yeniden başla</span></div></div>
+        </section>
+        <section class="field-notes" aria-label="Keşif ipuçları"><article><span class="note-number">01</span><div><h2>Üç elmanın peşinde</h2><p>Üç elma görevin. Meyveler, tesbih taneleri ve seccadeler bonus puan.</p></div></article><article><span class="note-number">02</span><div><h2>Bak, bekle, zıpla</h2><p>Hayvanlara ve yuvarlanan taşa dokunmadan yolunu bul.</p></div></article><article><span class="note-number">03</span><div><h2>Denemeye devam</h2><p>Abdest alanı bir can yeniler. Bayraktan devam ederken topladıkların sende kalır.</p></div></article></section>
+        <p id="game-status" class="sr-only" role="status" aria-live="polite"></p>
+        <footer><span>KÜÇÜK ADIMLAR, BÜYÜK KEŞİFLER.</span><span>MEYVE OYUNU / 2026</span></footer>
     </main>
 </body>
 </html>

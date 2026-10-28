@@ -2,10 +2,13 @@
   "name": "meyve-oyunu",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "description": "Phaser ile tarayıcıda çalışan meyve toplama platform oyunu",
   "scripts": {
     "start": "node scripts/serve.cjs",
-    "check": "node --check src/main.js && node --check scripts/serve.cjs"
+    "check": "node scripts/check.cjs",
+    "test": "node --test tests/rules.test.js tests/scene-flow.test.js tests/player.test.js",
+    "art": "node scripts/build-art.cjs"
   },
   "engines": {
     "node": ">=18"

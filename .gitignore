@@ -1,0 +1,20 @@
+# Local IDE settings
+.idea/
+*.iml
+*.sublime-workspace
+
+# Operating system metadata
+.DS_Store
+__MACOSX/
+._*
+Thumbs.db
+Desktop.ini
+
+# Dependencies, generated output, and local configuration
+node_modules/
+dist/
+coverage/
+*.log
+.env
+.env.*
+!.env.example

@@ -1,0 +1,39 @@
+:root {
+    color-scheme: dark;
+    font-family: system-ui, sans-serif;
+    background: #17212b;
+    color: #edf3f8;
+}
+
+body {
+    margin: 0;
+    padding: 24px 12px;
+}
+
+main {
+    max-width: 750px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+h1 {
+    margin: 0 0 16px;
+    font-size: 24px;
+}
+
+#game {
+    width: 100%;
+    aspect-ratio: 5 / 4;
+    overflow: hidden;
+    background: #000;
+}
+
+#game canvas {
+    display: block;
+}
+
+p {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #c1ceda;
+}

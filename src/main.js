@@ -2,6 +2,11 @@ var config = {
     type: Phaser.AUTO,
     width: 750,
     height: 600,
+    parent: 'game',
+    scale: {
+        mode: Phaser.Scale.FIT,
+        autoCenter: Phaser.Scale.CENTER_BOTH
+    },
     physics: {
         default: 'arcade',
         arcade: {
@@ -23,6 +28,8 @@ var hits = 0;
 var f=0;
 var health1,health2,health3,k,key,timer,door,door1,door2,door3,door4,cursors,posX,posY,platforms,player,ground,scoreText,fruits,mosque;
 var gameOver = false;
+var gameWon = false;
+var resultText;
 var jumpTimer=0;
 var score = 0;
 var positions = [100,150,250,300,350,400,450,500,550,600];
@@ -33,18 +40,23 @@ var icePlatform;
 
 function preload ()
 {
-  this.load.image('background','image/background1.png');
-  this.load.image('ground','image/ground.png');
-  this.load.image('mosque','image/mosque.png');
-  this.load.spritesheet('fruit', 'image/fruit.png', { frameWidth: 32, frameHeight: 32 });
-  this.load.spritesheet('player', 'image/player.png', { frameWidth: 32, frameHeight: 48 });
-  this.load.spritesheet('stone', 'image/platform.png', { frameWidth: 64, frameHeight: 64 });
+  this.load.image('background','assets/images/background1.png');
+  this.load.image('ground','assets/images/ground.png');
+  this.load.image('mosque','assets/images/mosque.png');
+  this.load.spritesheet('fruit', 'assets/images/fruit.png', { frameWidth: 32, frameHeight: 32 });
+  this.load.spritesheet('player', 'assets/images/player.png', { frameWidth: 32, frameHeight: 48 });
+  this.load.spritesheet('stone', 'assets/images/platform.png', { frameWidth: 64, frameHeight: 64 });
 
 }
 
 function create ()
 {
   score=0;
+  hits=0;
+  jumpTimer=0;
+  gameOver=false;
+  gameWon=false;
+  resultText=null;
   this.add.image(375, 300, 'background');
   scoreText = this.add.text(16, 16, 'Puan: 0', { fontSize: '20px', fill: '#000' });
   this.add.text(500, 16, 'Meyve Oyunu: ' + game.config.gameTitle, { font: '16px Courier', fill: '#000' });
@@ -121,7 +133,6 @@ function create ()
 
     cursors = this.input.keyboard.createCursorKeys();
     this.physics.add.overlap(player, fruits, collectFruit, null, this);
-    this.physics.add.overlap(player, enemy, hitBomb, null, this);
     this.physics.add.overlap(player, fires, hitFire, null, this);
     this.physics.add.overlap(player, key, collectKey, null, this);
     this.physics.add.collider(player, icePlatform,setFriction, null, this);
@@ -230,11 +241,19 @@ function collectFruit (player, fruit)
 
 function update() 
 {
+    if (Phaser.Input.Keyboard.JustDown(cursors.space)) {
+        this.scene.restart();
+        return;
+    }
 
     if (gameOver) {
         player.anims.stop();
-        var over = this.add.text(300, 300, 'Kaybettiniz!', { fontSize: '32px', fill: '#000' });
-        gameOver=false;
+        if (!resultText) {
+            resultText = this.add.text(300, 300, 'Kaybettiniz!', { fontSize: '32px', fill: '#000' });
+        }
+        return;
+    }
+    if (gameWon) {
         return;
     }
 
@@ -249,13 +268,6 @@ function update()
         player.setVelocityX(200);
         player.setBounce(0.4);
         player.anims.play('right', true);
-    }
-    else if (cursors.space.isDown)
-    {
-      hits=0;
-      this.registry.destroy(); // destroy registry
-      this.events.off();
-      this.scene.restart();
     }
     else
     {
@@ -283,9 +295,14 @@ function update()
       jumpTimer = 0;
     }
     if (door3.visible===true && door4.visible===true) {
-      if (player.x > door3.x && player.x > door4.x) {
-          this.add.text(300, 300, 'Kazandınız!', { fontSize: '32px', fill: '#000' });
+      if (Phaser.Geom.Intersects.RectangleToRectangle(player.getBounds(), door3.getBounds()) ||
+          Phaser.Geom.Intersects.RectangleToRectangle(player.getBounds(), door4.getBounds())) {
+          gameWon = true;
+          resultText = this.add.text(300, 300, 'Kazandınız!', { fontSize: '32px', fill: '#000' });
+          player.setVelocity(0, 0);
           player.anims.stop();
+          timer.paused = true;
+          this.physics.pause();
       }
     }
 

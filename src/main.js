@@ -20,7 +20,7 @@ var config = {
         create: create,
         update: update
     },
-    title: 'Meryem Betul'
+    title: 'Meyve Oyunu 2026'
 };
 
 var game = new Phaser.Game(config);
@@ -59,7 +59,7 @@ function create ()
   resultText=null;
   this.add.image(375, 300, 'background');
   scoreText = this.add.text(16, 16, 'Puan: 0', { fontSize: '20px', fill: '#000' });
-  this.add.text(500, 16, 'Meyve Oyunu: ' + game.config.gameTitle, { font: '16px Courier', fill: '#000' });
+  this.add.text(500, 16, game.config.gameTitle, { font: '16px Courier', fill: '#000' });
 
   platforms = this.physics.add.staticGroup();
   icePlatform = this.physics.add.staticGroup();

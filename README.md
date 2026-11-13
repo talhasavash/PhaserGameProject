@@ -76,7 +76,10 @@ PhaserGameProject/
 │   ├── level.js           Platform, meyve ve düşman konumları
 │   ├── rules.js           Puan, can, elma, anahtar ve bitiş kuralları
 │   ├── progress.js        Tarayıcıda açılan bölümleri saklama
-│   ├── fireRain.js        Önceden uyarı veren, tekrar kullanılan ateş topları
+│   ├── fireRain.js        Seyrek düşen ateş topları ve beyaz gölge uyarısı
+│   ├── boss.js            Büyük muhafızların zıplama yayı
+│   ├── chapterScenery.js  Yeni ortamların önbelleğe alınan arka planları
+│   ├── verses.js          Sonuç kartlarındaki ayet alıntıları ve kaynak verileri
 │   └── background.js      Arka plan, ağaç, bulut ve tabela çizimleri
 ├── assets/
 │   ├── images/            Oyunun kullandığı SVG görseller
@@ -160,8 +163,8 @@ HTTP kullan; HTML dosyasını çift tıklayarak açma (oyun ES modülleri kullan
 
 - Oklar veya A/D: yürü. Yukarı ok, W veya Boşluk: zıpla.
 - Esc: mola/devam. R: bölümü baştan başlat.
-- Üç kırmızı elmayı tamamla, ileride çıkan anahtarı al ve cami girişine ulaş.
-- Meyveler ve tesbih taneleri 10, seccadeler 20 bonus puan verir. Kirpiye, salyangoza ve taşa dokunma.
+- Üç altın yıldızı tamamla, ileride çıkan anahtarı al ve açılan cami kapısına ulaş. Elmalar 30 puan verir; anahtarı açmaz.
+- Görev yıldızı 40; diğer meyveler ve tesbih taneleri 10, seccadeler 20 bonus puan verir. Kirpiye, salyangoza ve taşa dokunma.
 - Bayrak kontrol noktasını etkinleştirir ve canları doldurur.
 - Can bitince geri dönülür; toplananlar korunur. R veya sayfa yenileme bütün bölümü sıfırlar.
 - İki yön tuşu birlikte basılıysa son basılan yön önceliklidir; havada da yön değiştirilebilir.
@@ -173,62 +176,71 @@ HTTP kullan; HTML dosyasını çift tıklayarak açma (oyun ES modülleri kullan
 - Dururken sallanma yoktur. Zıplama pozundaki kaldırılmış kol iki karakterde de başın yanında açıkça görünür.
 - Bant sola taşır; bu bir buz sürtünmesi değildir.
 
-## Dört bölümlü akış
+## On bir bölümlü akış
 
-Ana ekranda karakterini ve açılmış numaralı bölümünü seçebilirsin. Başlangıçta yalnızca
-1 açıktır; her bölüm bitince sonraki açılır. Menü `levels` dizisinden üretilir.
-`progress.js` açılan bölüm sayısını `localStorage` içinde saklar. Aynı cihaz ve tarayıcıda
-sayfa yenilenince korunur; tarayıcı verileri silinirse sıfırlanır, cihazlar arasında eşitlenmez.
-Depolama kapalıysa ilerleme yalnızca mevcut oturumda korunur.
-Sağ üstteki ☰ düğmesi ayar panelini açar ve oyunu duraklatır. Panelde ses,
-yeniden başlatma, tam ekran ve bölüm seçimine dönüş bulunur. Devam et veya ☰ ile
-paneli kapatınca oyun devam eder. Alt ortada araç düğmeleri yoktur.
-Menüye dönerken eski Phaser oyunu ve ekran boyutu izleyicisi temizlenir.
+Başlangıçta yalnızca 1 açıktır; her bölüm bitince sonraki açılır. Ana ekranda yalnızca
+numaralar görünür. 11. bölüm altın renkli özel bir çemberdir. Menü `levels` dizisinden
+üretilir. `progress.js` açılan bölüm sayısını `localStorage` içinde saklar. Önceden
+4 bölüm açmış bir tarayıcı yeni sürümde de 4'ten devam eder; kayıt silinmez.
+Tarayıcı verileri silinirse ilerleme sıfırlanır; farklı cihazlara eşitlenmez.
 
-İlk bölümün sabit arka planı `cacheTexture` ile bir kez hazırlanır. Tekrarlanan
-katmanlar `TileSprite` ile çizilir; arka plan nesne sayısı 213'ten 18'e indirilmiştir.
-Bu sayı bir FPS ölçümü değildir; gerçek telefon performansı ayrıca kontrol edilmelidir.
-Önbellekteki görseller bölüm yeniden başlatıldığında tekrar üretilmez.
+| Bölüm | Ortam ve yeni mekanik |
+| --- | --- |
+| 1 | Meyve bahçesi; hareket, yıldızlar, anahtar ve cami kapısı |
+| 2 | Kandilli avlu; yüksek basamaklar, hızlı hayvanlar ve taşlar |
+| 3 | Çöl; palmiye siluetleri ve seyrek rastgele ateş |
+| 4 | Gece bahçesi; daha dar basamaklar, hareketli engeller |
+| 5 | Orman; arılar, tilkiler ve ilk gerçek çukurlar |
+| 6 | Cami içi; halılar, kolonlar, çiçek tabloları, örümcekler ve tekerlekler |
+| 7 | Karlı dağ; penguenler, kuşlar, buz ve yarıklar |
+| 8 | Dere geçitleri; kurbağalar, kaplumbağalar ve su boşlukları |
+| 9 | Kaya vadisi; yarasalar, alçak geçitler, buz ve seyrek ateş |
+| 10 | Bayram bahçesi; önceki engellerin birleşimi ve daralan geçişler |
+| 11 | Boss; büyük zıplayan muhafızların altından geçerek son camiye ulaşma |
 
-Yön düğmeleri birbirine yakın, büyük ve saydam üçgenlerdir; zıplama düğmesi dairedir.
-Görselden daha geniş dikdörtgen dokunma alanları rahat basmayı sağlar.
-Oyun alanında açıklama, yer adı veya
-uyarı yazısı yoktur; can, elma, anahtar ve puan simgeler/sayılarla gösterilir.
+Her bölümde 3 görev yıldızı bulunur. Diğer nesneler sadece puan verir. Anahtar
+alınınca caminin iki kapı kanadı yana açılır ve giriş aydınlanır. Camiye ulaşınca çocuk
+önce 1,2 saniye yıldızlarla parlar, sonra tamamlanma mesajı ve kısa ayet aynı sonuç
+kartında görünür. Ayrı bir okuma ekranı veya görünür kaynak bağlantısı yoktur.
+Kart kendiliğinden kapanmaz; Sonraki bölüm veya Enter ile ilerlenir. 11'in sonunda
+Yeniden oyna görünür. Kaynak ve sure/ayet numaraları denetlenebilmesi için
+`src/verses.js` içinde saklanır; Diyanet meallerinden kısa alıntılar kullanılır.
+Üç nokta ayetin yalnızca bir kısmının alındığını gösterir.
 
-`src/level.js`, `garden` (Meyve Bahçesi), `courtyard` (Kandilli Cami Avlusu),
-`desert` (Hilalli Çöl Yolu), `moonGarden` (Yıldızlı Kubbe Bahçesi)
-verilerini, ayrıca bunları sıraya koyan `levels` dizisini içerir. Dört bölüm aynı `GameScene`
-koduyla çalışır; yeni bölüm eklemek için sahne kodunu kopyalamak gerekmez.
+`GameScene` bütün bölümlerde aynıdır. Phaser `init(data)` ile bölüm numarası ve
+önceki bölümlerden taşınan puanı alır; `scene.restart({ levelIndex, score })` yeni
+bölümü kurar. Karakter ve ses tercihi korunur. Yeni bölümde yıldızlar, anahtar ve
+canlar sıfırlanır. R/Yeniden başla mevcut bölümü tekrar başlatır.
 
-Her bölümde üç elma anahtarı açar. Anahtarla cami girişine gelince oyun durur,
-çocuk gülümseyip 1,2 saniye yıldızlarla parlar. Ardından o bölümün sonuç kartı açılır.
-Sonraki bölüm düğmesine veya Enter'a basılmadan yeni bölüm başlamaz; yeni bölümde
-önceki bitiş mesajı gösterilmez. Karakter, ses tercihi ve toplam puan korunur;
-elmalar, anahtar, kontrol noktası ve canlar yeni bölüm için sıfırlanır.
-Dördüncü cami girişinde aynı kartın final biçimi açılır.
-`background.js` her ortam için ayrı cephe, kubbe, pencere ve minare düzeni çizer.
-R/Yeniden başla mevcut bölümü, finalde Yeniden oyna ise bütün oyunu baştan başlatır;
-açılmış bölüm kilitleri geri kapanmaz.
+Çukurlar sadece bir renk değişikliği değildir: o aralıklarda fizik zemini kurulmaz.
+Karakter gerçekten aşağı düşer; düşerken üzülür ve deneme biter. Yeniden dene,
+**mevcut bölümün başından** başlatır; o bölümde toplananlar da sıfırlanır.
+Önceki bölümlerin toplam puanı ve açılmış bölüm kilitleri korunur. Normal hayvan
+çarpmalarında mevcut can/kontrol noktası kuralları devam eder.
 
-İkinci bölümde kemerli bir avlu, kandiller, basamaklı yüksek platformlar, daha hızlı
-hayvanlar, iki hareketli taş ve daha güçlü bir bant vardır. Yüksek yerlere çıkınca kamera
-karakteri görünürde tutar. Kandil ve hilal-yıldız bonusları 20 puandır; elma görevine sayılmaz.
+Buz açık mavi parlak şeritlerle çizilir. `movePlayer` fonksiyonunun son `grip`
+parametresi buzda 0.14 olur: fren ve yön değiştirme yavaşlar; zıplama kuvveti aynı
+kalır. `bossLift` muhafızın yüksekliğini zamanla hesaplar. Görsel ve fizik gövdesi
+birlikte taşınır; havalanınca altından geçmek mümkündür. Muhafızlara saldırmak
+veya onları yenmek gerekmez; zamanlamayla geçmek yeterlidir.
 
-Phaser `init(data)` ile bölüm numarası ve taşınan puanı alır, sonra `preload/create/update`
-akışına devam eder. Geçiş `scene.restart({ levelIndex, score })` ile aynı sahneyi yeniden kurar.
+Ateş olan bölümlerde aynı anda en çok bir top bulunur. Her top bittikten sonra
+en az 8 saniye beklenir; konum, hız ve süre değişir. Önceden yalnızca parlak,
+beyazımsı elips gölge gösterilir. Ünlem, üçgen ve dikey ışık yoktur. Hedef uyarı
+başladıktan sonra yer değiştirmez. Başlangıç, abdest alanları, kontrol noktaları ve
+çukurlar hedef seçiminde korunur.
 
-Telefonlarda `controls.js`, gerçek dokunma olaylarında her parmağı kimliğiyle izler ve
-yalnızca `changedTouches` listesindeki parmakları günceller. Farede Pointer Events kullanılır.
-Yere inmeden 240 ms önce basılan zıplama hatırlanır; kenardan ayrıldıktan sonra 140 ms tolerans vardır.
-Zıplama yüksekliği basış süresine bağlıdır. Fiziksel telefonla tekrar kontrol edilmelidir.
+Sağ üstteki ☰ ayar panelini açınca oyun duraklar. Ses, tam ekran, yeniden başlatma
+ve bölüm seçimi buradadır. Devam et ile oyun sürer. Yönler saydam üçgen,
+zıplama saydam dairedir. İki parmakla yön ve zıplama bağımsız kullanılabilir.
+Zıplama basış süresine bağlıdır; erken bırakma kısa, basılı tutma yüksek zıplamadır.
 
-Üçüncü bölümde kum tepeleri ve palmiye siluetleri, dördüncüde gece, yıldızlar,
-uzak kubbeler ve kandiller bulunur. Bu iki bölümde ateşler oyuncunun yakınlarında
-rastgele konum, hız ve bekleme süresiyle düşer. `fireRain.js` önce 1,5 saniye
-kırmızı-sarı halka, ünlem ve dikey ışık gösterir. Uyarı başladıktan sonra hedef sabittir.
-Her atış tek bir fizik nesnesini tekrar kullanır; her karede yeni nesne üretilmez.
-Duraklatma döngüyü de durdurur. Başlangıç, kontrol noktası ve abdest alanları düşüş
-noktalarından uzaktadır. Yeni arka planlar da küçük, önbelleğe alınmış dokular kullanır.
+Arka planlar küçük dokulara bir kez çizilir ve `TileSprite` ile tekrarlanır. İlk
+bahçenin arka plan nesne sayısı 213'ten 18'e indirilmiştir; bu bir FPS ölçümü
+değildir. Gerçek telefon performansı ayrıca kontrol edilmelidir. Her bölümün
+camisi ayrı cephe/kubbe/minare düzeni kullanır. Yeni hayvan ve yıldız SVG'leri
+`node scripts/build-chapter-art.cjs` ile üretilir; mevcut karakter ve seccade
+SVG'lerine dokunulmaz.
 
 ## Kontroller ve Git
 

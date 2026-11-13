@@ -22,15 +22,15 @@ button:focus-visible { outline: 3px solid #e5bb6e; outline-offset: 2px; }
 .selection-layout { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 24px; margin: 18px 0; }
 .level-options { border: 0; margin: 0; padding: 0; }
 .level-options legend { width: 100%; margin-bottom: 12px; font-size: 14px; font-weight: bold; }
-.level-grid { display: grid; grid-template-columns: repeat(2, 112px); justify-content: center; gap: 14px 16px; }
-.level-option { position: relative; cursor: pointer; width: 112px; }
+.level-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); justify-content: center; gap: 12px 6px; }
+.level-option { position: relative; cursor: pointer; min-width: 0; }
 .level-option input { position: absolute; opacity: 0; width: 1px; height: 1px; }
-.level-card { display: flex; flex-direction: column; align-items: center; gap: 10px; font-size: 12px; }
-.level-card strong { display: grid; place-items: center; width: 74px; height: 74px; border-radius: 50%; background: #d3dfce; border: 3px solid #fffdf3; color: #416a54; font-size: 32px; box-shadow: 0 3px 0 #a8bca2; }
+.level-card { display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 10px; }
+.level-card strong { position: relative; display: grid; place-items: center; width: 54px; height: 54px; border-radius: 50%; background: #d3dfce; border: 3px solid #fffdf3; color: #416a54; font-size: 25px; box-shadow: 0 3px 0 #a8bca2; }
 .level-option input:checked + .level-card strong { background: #416a54; color: #fff9e8; box-shadow: 0 3px 0 #244d39, 0 0 0 3px #c49c59; }
 .level-option input:focus-visible + .level-card strong { outline: 3px solid #b47e47; outline-offset: 4px; }
 .level-option.locked { cursor: default; opacity: .5; }
-.level-option.locked .level-card strong::after { content: '🔒'; position: absolute; font-size: 14px; margin: 46px 0 0 42px; }
+.level-option.locked .level-card strong::after { content: '🔒'; position: absolute; font-size: 12px; right: -5px; bottom: -4px; }
 .eyebrow { font-size: 10px; letter-spacing: 2.5px; font-weight: bold; margin: 0 0 12px; }
 .character-form h2 { font: 36px/1.1 Georgia, serif; margin: 0 0 9px; }
 .character-form h2 span { color: #b27a4c; }
@@ -78,9 +78,10 @@ button:focus-visible { outline: 3px solid #e5bb6e; outline-offset: 2px; }
     .character-portrait { height: 80px; width: 80px; }
     .character-portrait img { width: 60px; height: 75px; }
     .character-note { margin: 6px 0; }
-    .level-card strong { width: 52px; height: 52px; font-size: 25px; }
+    .level-card strong { width: 40px; height: 40px; font-size: 21px; }
+    .level-card > span { display: none; }
     .level-card { gap: 4px; font-size: 10px; }
-    .level-grid { gap: 8px 10px; }
+    .level-grid { gap: 10px 4px; }
     .level-options legend { margin-bottom: 7px; }
     .result-card { padding: 12px 24px; }
     .result h2 { font-size: 24px; }
@@ -102,4 +103,20 @@ button:focus-visible { outline: 3px solid #e5bb6e; outline-offset: 2px; }
     .jump-button { width: 124px; }
     .selection-layout { margin: 8px 0; gap: 12px; }
     .character-note { display: none; }
+}
+/* Son kapı: kilitliyken de altın çemberiyle ayrı görünür. */
+.boss-level { grid-column: 3; }
+.boss-level .level-card strong { width: 64px; height: 64px; color: #67471b; background: linear-gradient(135deg, #fff4bc, #ddb655 48%, #fff2ac 70%, #bd9141); border: 3px solid #ffe7a0; box-shadow: 0 0 0 3px #aa7b32, 0 4px 12px #95702e55; }
+.boss-level.locked { opacity: .85; }
+.boss-level input:checked + .level-card strong { color: #51391b; background: linear-gradient(135deg, #fff9cf, #f1c754, #fff0a8); box-shadow: 0 0 0 4px #a57b30, 0 0 18px #edc46580; }
+.result-verse { font: 21px/1.4 Georgia, serif; color: #526653; margin: 14px 0; padding: 12px 0; border-top: 1px solid #d5c99d; border-bottom: 1px solid #d5c99d; }
+@media (max-height: 500px) {
+    .boss-level .level-card strong { width: 52px; height: 52px; }
+    .result-verse { font-size: 18px; margin: 8px 0; padding: 8px 0; }
+}
+@media (orientation: landscape) and (max-height: 340px) {
+    .level-card strong { width: 36px; height: 36px; font-size: 19px; }
+    .boss-level .level-card strong { width: 46px; height: 46px; }
+    .level-grid { gap: 8px 4px; }
+    .level-options legend { margin-bottom: 4px; }
 }

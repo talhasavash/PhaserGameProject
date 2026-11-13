@@ -5,6 +5,8 @@ import { createScenery, createMosque, createFountain } from './background.js';
 import { bindTouchControls } from './controls.js';
 import { createFireRain, updateFireRain } from './fireRain.js';
 import { unlockNext } from './progress.js';
+import { verses } from './verses.js';
+import { bossLift } from './boss.js';
 
 const textStyle = { fontFamily: 'Trebuchet MS, sans-serif', color: '#294e4c' };
 const COLLECTIBLE_SCALE = 0.75;
@@ -42,10 +44,16 @@ export class GameScene extends Phaser.Scene {
             }
         }
         this.load.svg('apple', 'assets/images/apple.svg', { width: 40, height: 44 });
+        this.load.svg('star', 'assets/images/star.svg', { width: 44, height: 44 });
         this.load.svg('berry', 'assets/images/berry.svg', { width: 32, height: 36 });
         this.load.svg('hedgehog', 'assets/images/hedgehog.svg', { width: 76, height: 52 });
         this.load.svg('snail', 'assets/images/snail.svg', { width: 76, height: 52 });
         this.load.svg('ball', 'assets/images/ball.svg', { width: 52, height: 52 });
+        this.load.svg('wheel', 'assets/images/wheel.svg', { width: 52, height: 52 });
+        this.load.svg('ogre', 'assets/images/ogre.svg', { width: 96, height: 100 });
+        for (const animal of ['bee', 'fox', 'penguin', 'frog', 'turtle', 'bat', 'bird', 'spider']) {
+            this.load.svg(animal, `assets/images/${animal}.svg`, { width: 76, height: 52 });
+        }
         this.load.svg('key', 'assets/images/key.svg', { width: 64, height: 40 });
         this.load.svg('bead', 'assets/images/bead.svg', { width: 40, height: 44 });
         this.load.svg('mat', 'assets/images/mat.svg', { width: 36, height: 52 });
@@ -64,6 +72,12 @@ export class GameScene extends Phaser.Scene {
         this.knockbackUntil = 0;
         this.paused = false;
         this.resultShown = false;
+        this.lost = false;
+        this.falling = false;
+        document.getElementById('settings-panel').hidden = true;
+        document.getElementById('settings-button').setAttribute('aria-expanded', 'false');
+        document.getElementById('settings-button').setAttribute('aria-label', 'Oyun menüsünü aç');
+        document.getElementById('fall-result').hidden = true;
         document.getElementById('touch-controls').hidden = false;
         this.lastGateHint = -Infinity;
         this.physics.world.setBounds(0, 0, this.level.width, 600);
@@ -101,16 +115,40 @@ export class GameScene extends Phaser.Scene {
             document.getElementById('restart-button').onclick = null;
             document.getElementById('play-again').onclick = null;
             document.getElementById('next-level').onclick = null;
+            document.getElementById('retry-fall').onclick = null;
             document.getElementById('sound-button').onclick = null;
         });
-        this.announce(`${this.levelIndex + 1}. bölüm: ${this.level.name}. Üç elmayı bul, anahtarı al ve camiye ulaş.`);
+        this.announce(`${this.levelIndex + 1}. bölüm: ${this.level.name}. Üç yıldızı bul, anahtarı al ve camiye ulaş.`);
         this.updateHud();
     }
 
     // Zemini ve platformları sabit fizik gövdeleriyle oluştur.
     createTerrain() {
         this.solids = this.physics.add.staticGroup();
-        this.solids.add(this.add.rectangle(this.level.width / 2, 570, this.level.width, 100).setVisible(false));
+        // Çukurlarda fizik zemini yoktur; yalnızca arka planı kapatan boşluk çizilir.
+        let start = 0;
+        for (const gap of [...(this.level.gaps || []), { x: this.level.width, width: 0 }]) {
+            const width = gap.x - start;
+            if (width > 0) this.solids.add(this.add.rectangle(start + width / 2, 570, width, 100).setVisible(false));
+            if (gap.width > 0) {
+                const water = this.level.theme === 'river';
+                this.add.rectangle(gap.x + gap.width / 2, 560, gap.width, 86, water ? 0x397b91 : 0x263342).setDepth(3);
+                this.add.rectangle(gap.x + gap.width / 2, 528, gap.width - 6, 5, water ? 0x82ccd1 : 0x465167).setDepth(4);
+                for (const side of [gap.x - 4, gap.x + gap.width + 4]) this.add.rectangle(side, 560, 8, 80, 0x816e62).setDepth(4);
+            }
+            start = gap.x + gap.width;
+        }
+        for (const passage of this.level.passages || []) {
+            const roof = this.add.rectangle(passage.x + passage.width / 2, passage.y + 12, passage.width, 24, this.level.theme === 'interior' ? 0xb79a79 : 0x8f817b).setDepth(5);
+            this.solids.add(roof);
+            this.add.rectangle(passage.x + passage.width / 2, passage.y, passage.width, 5, 0xd8c59f).setDepth(6);
+        }
+        for (const ice of this.level.ice || []) {
+            this.add.rectangle(ice.x + ice.width / 2, 522, ice.width, 10, 0xbcecf0, 0.95).setDepth(7);
+            for (let x = ice.x + 15; x < ice.x + ice.width; x += 55) {
+                this.add.line(x, 520, 0, 0, 24, -3, 0xffffff, 0.85).setDepth(8);
+            }
+        }
         for (const platform of this.level.platforms) {
             const { x, y, width } = platform;
             const ground = this.add.rectangle(x + width / 2, y + 14, width, 28, 0x9c7653).setDepth(5);
@@ -151,25 +189,40 @@ export class GameScene extends Phaser.Scene {
         for (const enemy of this.level.enemies) {
             this.createHazard(enemy);
         }
-        this.createHazard(this.level.ball);
+        if (this.level.ball) this.createHazard(this.level.ball);
         for (const hazard of this.level.extraHazards || []) this.createHazard(hazard);
     }
 
     createHazard(data) {
         // Küçülünce de ayaklar yerde kalsın. Kutuların alt kenarı zeminle aynı hizada.
         let y = this.level.groundY - 24 * ENEMY_SCALE;
-        if (data.type === 'ball') y = this.level.groundY - 22 * ENEMY_SCALE;
+        if (data.type === 'ball' || data.type === 'wheel') y = this.level.groundY - 22 * ENEMY_SCALE;
+        if (data.y !== undefined) y = data.y;
+        if (data.type === 'ogre') y = this.level.groundY - 44 * data.scale;
         const sprite = this.hazards.create(data.x, y, data.type).setDepth(12);
-        sprite.setScale(ENEMY_SCALE);
+        sprite.setScale(data.scale || ENEMY_SCALE);
         sprite.setData('patrol', {
             minX: data.minX,
             maxX: data.maxX,
             speed: data.speed,
             type: data.type,
+            baseY: y,
+            bob: data.bob || 0,
+            grounded: data.y === undefined,
+            jump: data.jump,
             direction: 1
         });
-        if (data.type === 'ball') {
+        if (data.type === 'spider') {
+            const thread = this.add.line(data.x, 0, 0, 250, 0, 480, 0x9b919f, 0.65).setOrigin(0).setDepth(8);
+            sprite.setData('thread', thread);
+        }
+        if (data.type === 'ogre') {
+            sprite.body.setSize(58, 66).setOffset(19, 28);
+            sprite.setData('shadow', this.add.ellipse(data.x, 517, 76 * data.scale, 12, 0x332d4b, 0.23).setDepth(8));
+        } else if (data.type === 'ball' || data.type === 'wheel') {
             sprite.body.setCircle(22, 4, 4);
+        } else if (data.y !== undefined) {
+            sprite.body.setSize(48, 26).setOffset(14, 16);
         } else {
             sprite.body.setSize(53, 27).setOffset(12, 23);
         }
@@ -220,8 +273,8 @@ export class GameScene extends Phaser.Scene {
         };
         this.hud.add(bg);
         this.heartsText = label(16, 5, '', 16);
-        this.hud.add(this.add.image(92, 14, 'apple').setDisplaySize(13, 15).setScrollFactor(0).setDepth(101));
-        this.appleText = label(108, 6, '', 14);
+        this.hud.add(this.add.image(92, 14, 'star').setDisplaySize(15, 15).setScrollFactor(0).setDepth(101));
+        this.starText = label(108, 6, '', 14);
         this.hud.add(this.add.image(230, 14, 'key').setDisplaySize(21, 13).setScrollFactor(0).setDepth(101));
         this.keyText = label(245, 6, '', 14);
         this.scoreText = label(390, 6, '', 14);
@@ -254,6 +307,7 @@ export class GameScene extends Phaser.Scene {
         };
         document.getElementById('play-again').onclick = () => this.restart(true);
         document.getElementById('next-level').onclick = () => this.continueAfterResult();
+        document.getElementById('retry-fall').onclick = () => this.retryFall();
         const soundButton = document.getElementById('sound-button');
         soundButton.disabled = false;
         this.sound.setMute(this.soundMuted);
@@ -273,7 +327,7 @@ export class GameScene extends Phaser.Scene {
     updateHud() {
         this.heartsText.setText('♥'.repeat(this.gameState.hearts) + '♡'.repeat(3 - this.gameState.hearts));
         this.heartsText.setColor('#bd6959');
-        this.appleText.setText(`${this.gameState.apples}/3`);
+        this.starText.setText(`${this.gameState.stars}/3`);
         this.keyText.setText(this.gameState.hasKey ? '✓' : '—');
         this.scoreText.setText(`☆ ${this.gameState.score}`);
     }
@@ -290,8 +344,8 @@ export class GameScene extends Phaser.Scene {
         this.sound.play('collect', { volume: 0.18 });
         fruit.disableBody(true, true);
         this.tweens.killTweensOf(fruit);
-        if (item.type === 'apple') {
-            this.announce(`${this.gameState.apples} / 3 elma! ${isKeyReady(this.gameState) ? 'Anahtar ileride seni bekliyor.' : 'Keşfetmeye devam et.'}`);
+        if (item.type === 'star') {
+            this.announce(`${this.gameState.stars} / 3 yıldız! ${isKeyReady(this.gameState) ? 'Anahtar ileride seni bekliyor.' : 'Yıldızları aramaya devam et.'}`);
         }
         if (item.type === 'bead') this.announce('Tesbih taneleri buldun! +10 puan.');
         if (item.type === 'mat') this.announce('Bir seccade buldun! +20 puan.');
@@ -307,7 +361,7 @@ export class GameScene extends Phaser.Scene {
         if (!takeKey(this.gameState)) return;
         this.sound.play('key', { volume: 0.20 });
         this.keySprite.disableBody(true, true);
-        this.door.setFillStyle(0x394e49);
+        this.door.open();
         this.announce('Anahtar sende! Şimdi cami girişine ulaş.');
         this.updateHud();
     }
@@ -331,9 +385,8 @@ export class GameScene extends Phaser.Scene {
         this.updateHud();
     }
 
-    respawn() {
-        let point = this.level.spawn;
-        if (this.gameState.checkpointActive) point = this.level.checkpoint;
+    respawn(point = null) {
+        if (!point) point = this.gameState.checkpointActive ? this.level.checkpoint : this.level.spawn;
         this.gameState.hearts = 3;
         this.player.setPosition(point.x, point.y);
         this.player.body.reset(point.x, point.y);
@@ -361,7 +414,7 @@ export class GameScene extends Phaser.Scene {
             this.updateHud();
         } else if (!this.gameState.complete && this.elapsed - this.lastGateHint > 4000) {
             this.lastGateHint = this.elapsed;
-            this.announce(isKeyReady(this.gameState) ? 'Kapı için önce ilerideki altın anahtarı al.' : 'Kapı için üç elmayı tamamla. Geri dönüp keşfedebilirsin.');
+            this.announce(isKeyReady(this.gameState) ? 'Kapı için önce ilerideki altın anahtarı al.' : 'Kapı için üç yıldızı tamamla.');
         }
     }
 
@@ -372,6 +425,7 @@ export class GameScene extends Phaser.Scene {
         document.getElementById('result-eyebrow').textContent = final ? 'OYUN TAMAMLANDI' : 'BÖLÜM TAMAMLANDI';
         document.getElementById('result-title').textContent = final ? 'Tebrikler!' : `${this.levelIndex + 1}. bölümü bitirdiniz!`;
         document.getElementById('result-message').textContent = final ? 'Bütün bölümleri bitirdiniz.' : `${this.levelIndex + 2}. bölüm artık açık.`;
+        document.getElementById('result-verse').textContent = verses[this.levelIndex].text;
         document.getElementById('result-score').textContent = `${this.gameState.score} puan`;
         document.getElementById('next-level').hidden = final;
         document.getElementById('play-again').hidden = !final;
@@ -390,7 +444,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     togglePause() {
-        if (this.gameState.complete) return;
+        if (this.gameState.complete || this.lost) return;
         this.touchControls.reset();
         this.paused = !this.paused;
         if (this.paused) {
@@ -422,14 +476,17 @@ export class GameScene extends Phaser.Scene {
             if (Phaser.Input.Keyboard.JustDown(this.player.keys.ENTER)) this.continueAfterResult();
             return;
         }
+        if (this.lost) return;
         if (this.paused) return;
         this.elapsed += delta;
         updateFireRain(this);
         const onBelt = this.player.x >= this.level.belt.x && this.player.x <= this.level.belt.x + this.level.belt.width && this.player.body.bottom >= this.level.groundY - 3;
         let conveyorSpeed = 0;
         if (onBelt) conveyorSpeed = this.level.belt.speed;
-        if (this.elapsed > this.knockbackUntil) {
-            movePlayer(this.player, this.elapsed, delta, conveyorSpeed);
+        const onIce = this.player.body.bottom >= this.level.groundY - 3 &&
+            (this.level.ice || []).some(ice => this.player.x >= ice.x && this.player.x <= ice.x + ice.width);
+        if (this.elapsed > this.knockbackUntil && !this.falling) {
+            movePlayer(this.player, this.elapsed, delta, conveyorSpeed, onIce ? 0.14 : 1);
         }
         const recovering = this.elapsed < this.player.recoveryUntil;
         const protectedFromDamage = this.elapsed < this.hurtUntil;
@@ -446,10 +503,22 @@ export class GameScene extends Phaser.Scene {
         camera.scrollY += (top - camera.scrollY) * Math.min(delta / 100, 1);
         for (const hazard of this.hazards.getChildren()) {
             const patrol = hazard.getData('patrol');
+            if (patrol.jump) {
+                // Gövde ve görsel birlikte taşınır; hava boşluğunda görünmez çarpışma kalmaz.
+                hazard.body.reset(hazard.x, patrol.baseY - bossLift(this.elapsed, patrol.jump));
+                hazard.getData('shadow').setPosition(hazard.x, 517);
+            }
             if (hazard.x >= patrol.maxX) patrol.direction = -1;
             if (hazard.x <= patrol.minX) patrol.direction = 1;
             hazard.setVelocityX(patrol.speed * patrol.direction);
-            if (patrol.type === 'ball') hazard.rotation += patrol.direction * delta * 0.003;
+            if (patrol.bob) {
+                const wave = Math.sin(this.elapsed / 550);
+                const targetY = patrol.baseY + (patrol.grounded ? -Math.abs(wave) : wave) * patrol.bob;
+                hazard.setVelocityY((targetY - hazard.y) * 10);
+            }
+            const thread = hazard.getData('thread');
+            if (thread) thread.geom.y2 = hazard.y;
+            if (patrol.type === 'ball' || patrol.type === 'wheel') hazard.rotation += patrol.direction * delta * 0.003;
             else hazard.setFlipX(patrol.direction < 0);
         }
         // Bant oklarını sola kaydır. Soldan çıkan oku tekrar sağa taşı.
@@ -469,5 +538,31 @@ export class GameScene extends Phaser.Scene {
             this.updateHud();
         }
         this.progressFill.width = Phaser.Math.Clamp(this.player.x / this.level.exit.x, 0, 1) * HUD_PROGRESS_WIDTH;
+        this.checkPits();
+    }
+
+    checkPits() {
+        const gaps = this.level.gaps || [];
+        if (!this.falling && this.player.body.bottom > 534 && gaps.some(gap => this.player.x > gap.x && this.player.x < gap.x + gap.width)) {
+            this.falling = true;
+            showPlayerExpression(this.player, 'sad', this.elapsed, 5000);
+            this.player.setVelocityX(0);
+            this.touchControls.reset();
+        }
+        if (this.falling && this.player.y > 565) {
+            this.lost = true;
+            this.physics.pause();
+            this.gameState.hearts = 0;
+            this.sound.play('hurt', { volume: 0.23 });
+            document.getElementById('touch-controls').hidden = true;
+            document.getElementById('fall-result').hidden = false;
+            document.getElementById('retry-fall').focus({ preventScroll: true });
+            this.updateHud();
+        }
+    }
+
+    retryFall() {
+        if (!this.lost) return;
+        this.restart();
     }
 }

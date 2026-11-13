@@ -11,36 +11,92 @@
     <script type="module" src="src/game.js"></script>
 </head>
 <body>
-    <main>
-        <section class="game-shell" aria-label="Meyve Bahçesi oyunu">
-            <div class="game-toolbar"><span id="toolbar-status" class="sr-only">Karakterini seç</span><span class="build-version">Demo · yerel</span><button id="settings-button" type="button" aria-label="Oyun menüsünü aç" aria-expanded="false" aria-controls="settings-panel">☰</button><div id="settings-panel" class="settings-panel" hidden><button id="sound-button" type="button" aria-label="Sesi kapat" aria-pressed="false" disabled>♪</button><button id="menu-button" type="button" aria-label="Bölüm seçimine dön" hidden>Bölüm seç</button><button id="pause-button" type="button" aria-label="Devam et" disabled>Devam et</button><button id="restart-button" type="button" aria-label="Yeniden başla" disabled>Yeniden başla</button><button id="fullscreen-button" type="button" aria-label="Tam ekran">Tam ekran</button></div></div>
-            <div id="game-stage" class="game-stage choosing">
-                <div id="game" role="img" aria-label="Çocuk karakterle oynanan, klavyeyle kontrol edilen platform oyunu"></div>
-                <section id="character-select" class="character-select" aria-labelledby="character-title">
-                    <form id="character-form" class="character-form">
-                        <p class="eyebrow">MEYVE BAHÇESİ</p>
-                        <h2 id="character-title" tabindex="-1">Maceranı seç<span>.</span></h2>
-                        <p class="character-subtitle">Kiminle keşfe çıkmak istersin?</p>
-                        <div class="selection-layout"><fieldset class="character-options">
+<main>
+    <section class="game-shell" aria-label="Meyve Bahçesi oyunu">
+        <div class="game-toolbar"><span id="toolbar-status" class="sr-only">Karakterini seç</span><span
+            class="build-version">Demo · yerel</span>
+            <button id="settings-button" type="button" aria-label="Oyun menüsünü aç" aria-expanded="false"
+                    aria-controls="settings-panel">☰
+            </button>
+            <div id="settings-panel" class="settings-panel" hidden>
+                <button id="sound-button" type="button" aria-label="Sesi kapat" aria-pressed="false" disabled>♪</button>
+                <button id="menu-button" type="button" aria-label="Bölüm seçimine dön" hidden>Bölüm seç</button>
+                <button id="pause-button" type="button" aria-label="Devam et" disabled>Devam et</button>
+                <button id="restart-button" type="button" aria-label="Yeniden başla" disabled>Yeniden başla</button>
+                <button id="fullscreen-button" type="button" aria-label="Tam ekran">Tam ekran</button>
+            </div>
+        </div>
+        <div id="game-stage" class="game-stage choosing">
+            <div id="game" role="img"
+                 aria-label="Çocuk karakterle oynanan, klavyeyle kontrol edilen platform oyunu"></div>
+            <section id="character-select" class="character-select" aria-labelledby="character-title">
+                <form id="character-form" class="character-form">
+                    <p class="eyebrow">BİSMİLLÂHİRRAHMÂNİRRAHÎM</p>
+                    <h2 id="character-title" tabindex="-1">MEYVE BAHÇESİ<span></span></h2>
+                    <p class="character-subtitle">Meyve Bahçesinde yolculuk yapmak istermisin?</p>
+                    <div class="selection-layout">
+                        <fieldset class="character-options">
                             <legend class="sr-only">Oynayacağın karakter</legend>
-                            <label class="character-option"><input type="radio" name="character" value="boy" required><span class="character-card"><span class="character-portrait"><img src="assets/images/child-0.svg" alt="Sırt çantalı erkek çocuk" width="96" height="120"></span><strong>Erkek çocuk</strong><span class="character-check" aria-hidden="true">✓</span></span></label>
-                            <label class="character-option"><input type="radio" name="character" value="girl" required><span class="character-card"><span class="character-portrait"><img src="assets/images/girl-0.svg" alt="Başörtülü, sırt çantalı kız çocuk" width="96" height="120"></span><strong>Kız çocuk</strong><span class="character-check" aria-hidden="true">✓</span></span></label>
-                        </fieldset><fieldset class="level-options"><legend>Bölüm seç</legend><div id="level-grid" class="level-grid"></div></fieldset></div>
-                        <button id="start-button" type="submit" disabled>Maceraya başla →</button>
-                        <p class="character-note">Her bölümde 3 elmayı bul, anahtarı al ve camiye ulaş.</p>
-                    </form>
-                </section>
-                <section id="game-result" class="result" aria-labelledby="result-title" hidden>
-                    <div class="result-card"><p id="result-eyebrow" class="eyebrow">BÖLÜM TAMAMLANDI</p><h2 id="result-title">Tebrikler!</h2><p id="result-message"></p><p id="result-score" class="result-score"></p><button id="next-level" type="button">Sonraki bölüm →</button><button id="play-again" type="button" hidden>Yeniden oyna →</button></div>
-                </section>
+                            <label class="character-option"><input type="radio" name="character" value="boy"
+                                                                   required><span class="character-card"><span
+                                class="character-portrait"><img src="assets/images/child-0.svg"
+                                                                alt="Sırt çantalı erkek çocuk" width="96" height="120"></span><strong>Erkek çocuk</strong><span
+                                class="character-check" aria-hidden="true">✓</span></span></label>
+                            <label class="character-option"><input type="radio" name="character" value="girl"
+                                                                   required><span class="character-card"><span
+                                class="character-portrait"><img src="assets/images/girl-0.svg"
+                                                                alt="Başörtülü, sırt çantalı kız çocuk" width="96"
+                                                                height="120"></span><strong>Kız çocuk</strong><span
+                                class="character-check" aria-hidden="true">✓</span></span></label>
+                        </fieldset>
+                        <fieldset class="level-options">
+                            <legend>Bölüm seç</legend>
+                            <div id="level-grid" class="level-grid"></div>
+                            </fieldset>
+                    </div>
+                    <button id="start-button" type="submit" disabled>Maceraya başla →</button>
+                    <p class="character-note">talha savash 2026</p>
+                </form>
+            </section>
+            <section id="fall-result" class="result" aria-labelledby="fall-title" hidden>
+                <div class="result-card"><p class="eyebrow">YENİDEN DENE</p>
+                    <h2 id="fall-title">Çukura düştün!</h2>
+                    <p>Bu bölüme baştan başlayalım.</p>
+                    <button id="retry-fall" type="button">Yeniden dene →</button>
+                </div>
+            </section>
+            <section id="game-result" class="result" aria-labelledby="result-title" hidden>
+                <div class="result-card"><p id="result-eyebrow" class="eyebrow">BÖLÜM TAMAMLANDI</p>
+                    <h2 id="result-title">Tebrikler!</h2>
+                    <p id="result-message"></p>
+                    <blockquote id="result-verse" class="result-verse"></blockquote><p id="result-score" class="result-score"></p>
+                    <button id="next-level" type="button">Sonraki bölüm →</button>
+                    <button id="play-again" type="button" hidden>Yeniden oyna →</button>
+                </div>
+            </section>
+        </div>
+        <div id="touch-controls" class="touch-controls" aria-label="Hareket düğmeleri" hidden>
+            <div class="direction-buttons">
+                <button id="move-left" class="touch-button" type="button" aria-label="Sola yürü">
+                    <svg viewBox="0 0 100 100" aria-hidden="true">
+                        <path d="M85 8 Q92 4 92 14 V86 Q92 96 83 90 L9 55 Q0 50 9 45 Z"/>
+                    </svg>
+                </button>
+                <button id="move-right" class="touch-button" type="button" aria-label="Sağa yürü">
+                    <svg viewBox="0 0 100 100" aria-hidden="true">
+                        <path d="M15 8 Q8 4 8 14 V86 Q8 96 17 90 L91 55 Q100 50 91 45 Z"/>
+                    </svg>
+                </button>
             </div>
-            <div id="touch-controls" class="touch-controls" aria-label="Hareket düğmeleri" hidden>
-                <div class="direction-buttons"><button id="move-left" class="touch-button" type="button" aria-label="Sola yürü"><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M85 8 Q92 4 92 14 V86 Q92 96 83 90 L9 55 Q0 50 9 45 Z"/></svg></button><button id="move-right" class="touch-button" type="button" aria-label="Sağa yürü"><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M15 8 Q8 4 8 14 V86 Q8 96 17 90 L91 55 Q100 50 91 45 Z"/></svg></button></div>
-                <button id="jump" class="touch-button jump-button" type="button" aria-label="Zıpla"><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="44"/></svg></button>
-            </div>
-        </section>
+            <button id="jump" class="touch-button jump-button" type="button" aria-label="Zıpla">
+                <svg viewBox="0 0 100 100" aria-hidden="true">
+                    <circle cx="50" cy="50" r="44"/>
+                </svg>
+            </button>
+        </div>
+    </section>
 
-        <p id="game-status" class="sr-only" role="status" aria-live="polite"></p>
-    </main>
+    <p id="game-status" class="sr-only" role="status" aria-live="polite"></p>
+</main>
 </body>
 </html>

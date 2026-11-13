@@ -1,5 +1,9 @@
 const WARNING_MS = 1500;
 
+export function fireWait(rain, random = Math.random) {
+    return Math.max(8000, rain.period * (0.9 + random() * 0.5));
+}
+
 // Rastgele yer seçilirken başlangıç, cami ve dinlenme alanları korunur.
 export function chooseFireX(level, playerX, random = Math.random, occupied = []) {
     const left = Math.max(180, playerX - 180);
@@ -8,7 +12,8 @@ export function chooseFireX(level, playerX, random = Math.random, occupied = [])
     const safe = [level.spawn.x, level.checkpoint.x, level.exit.x, ...level.fountains.map(f => f.x)];
     for (let attempt = 0; attempt < 16; attempt++) {
         const x = left + random() * (right - left);
-        if (safe.every(point => Math.abs(x - point) > 110) && occupied.every(point => Math.abs(x - point) > 90)) return x;
+        const onGround = (level.gaps || []).every(gap => x < gap.x - 30 || x > gap.x + gap.width + 30);
+        if (onGround && safe.every(point => Math.abs(x - point) > 110) && occupied.every(point => Math.abs(x - point) > 90)) return x;
     }
     return null; // Uygun yer yoksa bu atışı beklet; güvenli alanı bozma.
 }
@@ -29,17 +34,16 @@ export function createFireRain(scene) {
         g.fillStyle(0xffdf88); g.fillCircle(16, 24, 6);
         g.generateTexture('fireball', 32, 40); g.destroy();
     }
-    scene.rainDrops = scene.level.fireRain.map(rain => {
+    // Aynı anda yalnızca bir ateş: yeni atış, önceki bittikten uzun süre sonra gelir.
+    scene.rainDrops = scene.level.fireRain.slice(0, 1).map(rain => {
         const sprite = scene.fireballs.create(0, 80, 'fireball').setDepth(14);
         sprite.body.setCircle(10, 6, 14);
         sprite.disableBody(true, true);
-        const warning = scene.add.container(0, 0).setDepth(15).setVisible(false);
+        const warning = scene.add.container(0, 0).setDepth(9).setVisible(false);
         warning.add([
-            scene.add.rectangle(0, 300, 16, 430, 0xff315a, 0.2),
-            scene.add.ellipse(0, 512, 78, 18, 0xef2550, 0.95).setStrokeStyle(3, 0xfff6bd),
-            scene.add.ellipse(0, 512, 40, 8, 0xffe76d),
-            scene.add.triangle(0, 475, 0, 34, 20, 0, 40, 34, 0xffe36a).setStrokeStyle(3, 0x99293b),
-            scene.add.text(0, 477, '!', { fontFamily: 'sans-serif', fontSize: '24px', fontStyle: 'bold', color: '#7d1833' }).setOrigin(0.5)
+            scene.add.ellipse(0, 514, 92, 20, 0xfff9dc, 0.2),
+            scene.add.ellipse(0, 513, 68, 12, 0xffffff, 0.8).setStrokeStyle(1, 0xb39f78),
+            scene.add.ellipse(0, 512, 40, 6, 0xffffff, 0.95)
         ]);
         return { rain, sprite, warning, plan: null, nextAt: 600 + rain.offset };
     });
@@ -61,7 +65,7 @@ export function updateFireRain(scene) {
         else if (drop.sprite.active) drop.sprite.disableBody(true, true);
         if (frame.done) {
             drop.plan = null;
-            drop.nextAt = scene.elapsed + drop.rain.period * (0.25 + Math.random() * 0.4);
+            drop.nextAt = scene.elapsed + fireWait(drop.rain);
         }
     }
 }

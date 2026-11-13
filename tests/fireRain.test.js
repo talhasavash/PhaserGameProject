@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { fireFrame, chooseFireX } from '../src/fireRain.js';
+import { fireFrame, chooseFireX, fireWait } from '../src/fireRain.js';
 import { levels } from '../src/level.js';
 
 test('A chosen target warns for 1.5 seconds, then falls and finishes without moving its target', () => {
@@ -32,9 +32,9 @@ test('Random fire targets vary, stay near the player and avoid safe spots and ot
     assert.equal(chooseFireX(levels[2], levels[2].exit.x, random), null);
     assert.equal(chooseFireX(levels[2], 100, () => 0), null, 'Do not fall back to an unsafe target');
 });
-test('Four chapters have unique themes and reachable apples before their key and mosque', () => {
-    assert.equal(levels.length, 4);
-    assert.equal(new Set(levels.map(level => level.theme)).size, 4);
+test('Eleven chapters have unique themes and reachable stars before their key and mosque', () => {
+    assert.equal(levels.length, 11);
+    assert.equal(new Set(levels.map(level => level.theme)).size, 11);
     const maxRise = 590 ** 2 / (2 * 1600);
     for (const level of levels) {
         const reached = [];
@@ -43,7 +43,7 @@ test('Four chapters have unique themes and reachable apples before their key and
                 step.y - p.y >= 0 && step.y - p.y < maxRise &&
                 p.x - (step.x + step.width) >= 0 && p.x - (step.x + step.width) < 100)) reached.push(p);
         }
-        const apples = level.fruits.filter(item => item.type === 'apple');
+        const apples = level.fruits.filter(item => item.type === 'star');
         assert.equal(apples.length, 3);
         assert.equal(new Set(level.fruits.map(item => item.id)).size, level.fruits.length);
         for (const apple of apples) {
@@ -51,5 +51,34 @@ test('Four chapters have unique themes and reachable apples before their key and
             assert.ok(apple.x < level.key.x);
         }
         assert.ok(level.key.x < level.exit.x && level.exit.x < level.width);
+    }
+});
+
+test('Fire is sparse: one reusable ball per level and at least eight seconds between drops', () => {
+    for (const level of levels) {
+        assert.ok((level.fireRain || []).length <= 1);
+        for (const rain of level.fireRain || []) {
+            assert.ok(rain.offset >= 4000);
+            for (const value of [0, 0.5, 1]) assert.ok(fireWait(rain, () => value) >= 8000);
+        }
+    }
+});
+
+test('Pits have safe respawn areas, clear approaches and widths within a running jump', () => {
+    const jumpRange = 265 * (2 * 590 / 1600);
+    for (const level of levels) {
+        let end = 0;
+        for (const gap of level.gaps || []) {
+            assert.ok(gap.width >= 80 && gap.width + 30 < jumpRange);
+            assert.ok(gap.x - end >= 150);
+            assert.ok(gap.x + gap.width < level.key.x);
+            for (const point of [level.spawn, level.checkpoint, ...level.fountains.map(f => ({ x: f.x }))]) {
+                assert.ok(point.x < gap.x - 10 || point.x > gap.x + gap.width + 10);
+            }
+            end = gap.x + gap.width;
+        }
+        for (const ice of level.ice || []) {
+            assert.ok((level.gaps || []).every(g => ice.x + ice.width <= g.x || ice.x >= g.x + g.width));
+        }
     }
 });

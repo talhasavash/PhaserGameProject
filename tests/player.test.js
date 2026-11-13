@@ -203,3 +203,21 @@ test('The girl keeps her own sad and happy appearances while moving', () => {
     movePlayer(player, 1300, 40, 0);
     assert.equal(animation, 'girl-walk-happy');
 });
+
+test('Ice takes longer to brake and reverse, while jump strength stays unchanged', () => {
+    const ground = playerForTest();
+    const ice = playerForTest();
+    ground.body.velocity.x = ice.body.velocity.x = 265;
+    for (let i = 0; i < 30; i++) {
+        movePlayer(ground, 1000 + i * 16, 16, 0);
+        movePlayer(ice, 1000 + i * 16, 16, 0, 0.14);
+    }
+    assert.equal(ground.body.velocity.x, 0);
+    assert.ok(ice.body.velocity.x > 200);
+    ice.cursors.left.isDown = true;
+    movePlayer(ice, 1500, 16, 0, 0.14);
+    assert.ok(ice.body.velocity.x > 0, 'A direction change cannot instantly cancel ice momentum');
+    ice.cursors.up.isDown = true;
+    movePlayer(ice, 1516, 16, 0, 0.14);
+    assert.equal(ice.body.velocity.y, -590);
+});

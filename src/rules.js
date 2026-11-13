@@ -3,6 +3,7 @@ export function createGameState(initialScore = 0) {
     return {
         collected: [],
         apples: 0,
+        stars: 0,
         score: initialScore,
         hearts: 3,
         hasKey: false,
@@ -13,7 +14,7 @@ export function createGameState(initialScore = 0) {
 }
 
 export function isKeyReady(state) {
-    return state.apples === 3;
+    return state.stars === 3;
 }
 
 export function recordFruit(state, id, type) {
@@ -21,7 +22,10 @@ export function recordFruit(state, id, type) {
     if (state.collected.includes(id)) return false;
     state.collected.push(id);
 
-    if (type === 'apple') {
+    if (type === 'star') {
+        state.stars += 1;
+        state.score += 40;
+    } else if (type === 'apple') {
         state.apples += 1;
         state.score += 30;
     } else if (['mat', 'lantern', 'crescent'].includes(type)) {

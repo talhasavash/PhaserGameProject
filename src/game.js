@@ -35,16 +35,15 @@ levels.forEach((level, index) => {
     card.className = 'level-card';
     const number = document.createElement('strong');
     number.textContent = index + 1;
-    const name = document.createElement('span');
-    name.textContent = level.name;
-    card.append(number, name); label.append(input, card); levelGrid.append(label);
+    if (level.boss) label.classList.add('boss-level');
+    card.append(number); label.append(input, card); levelGrid.append(label);
 });
 function refreshLevelLocks() {
     const unlocked = unlockedLevels(levels.length);
     for (const input of levelGrid.querySelectorAll('input')) {
         input.disabled = Number(input.value) >= unlocked;
         input.parentElement.classList.toggle('locked', input.disabled);
-        input.setAttribute('aria-label', `${Number(input.value) + 1} ${levels[Number(input.value)].name}${input.disabled ? ' · Kilitli' : ''}`);
+        input.setAttribute('aria-label', `${Number(input.value) + 1}. bölüm${levels[Number(input.value)].boss ? ' · Boss' : ''}${input.disabled ? ' · Kilitli' : ''}`);
     }
 }
 refreshLevelLocks();
@@ -133,6 +132,7 @@ function startGame(character, levelIndex) {
             document.body.classList.remove('playing');
             document.getElementById('touch-controls').hidden = true;
             document.getElementById('game-result').hidden = true;
+            document.getElementById('fall-result').hidden = true;
             document.getElementById('character-select').hidden = false;
             document.getElementById('game-stage').classList.add('choosing');
             for (const id of ['sound-button', 'pause-button', 'restart-button']) document.getElementById(id).disabled = true;

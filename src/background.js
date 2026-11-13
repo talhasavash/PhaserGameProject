@@ -1,8 +1,10 @@
+import { createChapterScenery } from './chapterScenery.js';
 // Bu dosya yalnızca görünümü çizer; oyun kurallarını değiştirmez.
 // Sabit bahçe çizimlerini bir kez dokuya çevirip tekrar kullanırız.
 export function createScenery(scene, width, theme = 'garden') {
     if (theme === 'courtyard') { createCourtyard(scene, width); return; }
     if (theme === 'desert' || theme === 'night') { createThemedScenery(scene, width, theme); return; }
+    if (createChapterScenery(scene, width, theme)) return;
     scene.cameras.main.setBackgroundColor('#c6edef');
     cacheTexture(scene, 'garden-cloud', 128, 64, g => {
         g.fillStyle(0xf5faf3);
@@ -138,7 +140,14 @@ export function createMosque(scene, x, theme = 'garden') {
         garden: { wall: 0xf0e6c5, roof: 0x4b897b, trim: 0xc5a86a, width: 168, top: 455, towers: [-106, 106], domes: [[0, 444, 144, 106]] },
         courtyard: { wall: 0xe5e8eb, roof: 0x427fa4, trim: 0x77bfc2, width: 218, top: 446, towers: [-132], domes: [[-72, 437, 70, 58], [72, 437, 70, 58], [0, 410, 116, 100]] },
         desert: { wall: 0xe8bc8c, roof: 0xcb8256, trim: 0xf5dd9c, width: 194, top: 428, towers: [126], domes: [[0, 410, 94, 70]] },
-        night: { wall: 0xe8dff0, roof: 0x7763a7, trim: 0xe8c77a, width: 230, top: 450, towers: [-140, -104, 104, 140], domes: [[-78, 435, 68, 68], [78, 435, 68, 68], [0, 399, 122, 116]] }
+        night: { wall: 0xe8dff0, roof: 0x7763a7, trim: 0xe8c77a, width: 230, top: 450, towers: [-140, -104, 104, 140], domes: [[-78, 435, 68, 68], [78, 435, 68, 68], [0, 399, 122, 116]] },
+        forest: { wall: 0xe3d9b2, roof: 0x53876a, trim: 0xa77d4f, width: 180, top: 450, towers: [112], domes: [[0, 421, 150, 90]] },
+        interior: { wall: 0xddceb1, roof: 0x728e91, trim: 0xbb9658, width: 220, top: 352, towers: [], domes: [] },
+        snow: { wall: 0xf5f0eb, roof: 0x80adca, trim: 0xc9dce2, width: 208, top: 448, towers: [-126, 126], domes: [[-65, 435, 75, 60], [65, 435, 75, 60], [0, 401, 108, 110]] },
+        river: { wall: 0xe1e7c8, roof: 0x3b8d9c, trim: 0xcbac65, width: 190, top: 440, towers: [-117], domes: [[0, 407, 155, 90]] },
+        canyon: { wall: 0xd8a591, roof: 0x88687e, trim: 0xf0d39b, width: 212, top: 427, towers: [-130, 130], domes: [[-65, 414, 78, 58], [65, 414, 78, 58], [0, 393, 100, 100]] },
+        festival: { wall: 0xf9e7c7, roof: 0x488f80, trim: 0xe2b951, width: 246, top: 441, towers: [-156, -116, 116, 156], domes: [[-85, 426, 72, 70], [85, 426, 72, 70], [0, 387, 125, 126]] },
+        boss: { wall: 0xeee5d6, roof: 0x665d94, trim: 0xe5c275, width: 250, top: 434, towers: [-154, -116, 116, 154], domes: [[-88, 421, 80, 76], [88, 421, 80, 76], [0, 380, 136, 138]] }
     };
     const design = designs[theme] || designs.garden;
     const add = scene.add;
@@ -153,6 +162,15 @@ export function createMosque(scene, x, theme = 'garden') {
         } else add.triangle(towerX, top - 15, 0, 30, 13, 0, 26, 30, design.roof).setDepth(5);
     }
     add.rectangle(x, (design.top + 520) / 2, design.width, 520 - design.top, design.wall).setDepth(5);
+    if (theme === 'interior') {
+        add.ellipse(x, 373, 170, 150, design.wall).setDepth(4);
+        add.ellipse(x, 389, 122, 114, design.roof).setDepth(6);
+        add.rectangle(x, 440, 122, 110, design.roof).setDepth(6);
+        for (const offset of [-95, 95]) {
+            add.rectangle(x + offset, 440, 14, 160, design.trim).setDepth(6);
+            add.rectangle(x + offset, 355, 26, 10, design.trim).setDepth(6);
+        }
+    }
     for (const [offset, y, width, height] of design.domes) {
         add.ellipse(x + offset, y, width, height, design.roof).setDepth(4);
         add.rectangle(x + offset, y + height / 3, width, 7, design.trim).setDepth(5);
@@ -178,10 +196,17 @@ export function createMosque(scene, x, theme = 'garden') {
     add.ellipse(x, 474, 58, 48, design.trim).setDepth(6);
     add.rectangle(x, 493, 58, 54, design.trim).setDepth(6);
     add.ellipse(x, 476, 44, 36, 0x344d56).setDepth(7);
-    const door = add.rectangle(x, 494, 44, 52, 0x344d56).setDepth(7);
-    add.line(x, 494, 0, -19, 0, 23, design.trim).setDepth(8);
-    add.circle(x + 12, 494, 3, 0xf0ce79).setDepth(8);
-    return door;
+    add.rectangle(x, 494, 44, 52, 0x273b43).setDepth(7);
+    const glow = add.ellipse(x, 492, 40, 54, 0xffe49d, 0.65).setDepth(8).setVisible(false);
+    const leftDoor = add.container(x - 11, 494).setDepth(9);
+    leftDoor.add([add.rectangle(0, 0, 21, 50, 0x8b6547).setStrokeStyle(1, design.trim), add.circle(6, 0, 2, 0xf0ce79)]);
+    const rightDoor = add.container(x + 11, 494).setDepth(9);
+    rightDoor.add([add.rectangle(0, 0, 21, 50, 0x8b6547).setStrokeStyle(1, design.trim), add.circle(-6, 0, 2, 0xf0ce79)]);
+    return { open() {
+        glow.setVisible(true);
+        scene.tweens.add({ targets: leftDoor, x: x - 24, scaleX: 0.2, duration: 500, ease: 'Sine.easeOut' });
+        scene.tweens.add({ targets: rightDoor, x: x + 24, scaleX: 0.2, duration: 500, ease: 'Sine.easeOut' });
+    } };
 }
 export function createFountain(scene, x) {
     const tiles = scene.add.graphics().setDepth(5);

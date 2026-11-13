@@ -146,7 +146,7 @@ export function readDirection(player) {
     return direction;
 }
 
-export function movePlayer(player, time, delta, conveyorSpeed) {
+export function movePlayer(player, time, delta, conveyorSpeed, grip = 1) {
     const movement = player.movement;
     const grounded = player.body.blocked.down || player.body.touching.down;
     if (grounded) {
@@ -181,6 +181,8 @@ export function movePlayer(player, time, delta, conveyorSpeed) {
     } else if (direction * player.body.velocity.x < 0) {
         acceleration = TURN_ACCELERATION;
     }
+    // Buz: yerdeki hız değişimi küçülür; zıplama ve havada kontrol aynı kalır.
+    if (grounded) acceleration *= grip;
 
     // delta: bir önceki kareden beri geçen süre. Farklı bilgisayarlarda hız aynı kalır.
     const seconds = Math.min(delta, 50) / 1000;

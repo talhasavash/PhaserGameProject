@@ -47,16 +47,16 @@ test('Touching the exit early leaves the game running and explains the mission',
     const scene = { gameState: createGameState(), elapsed: 5000, lastGateHint: 0, announce: message => { hint = message; } };
     GameScene.prototype.reachExit.call(scene);
     assert.equal(scene.gameState.complete, false);
-    assert.match(hint, /üç elma/);
+    assert.match(hint, /üç yıldız/);
 });
 
 test('Every mosque celebrates before showing a result; only Continue starts the next level', () => {
     for (let index = 0; index < levels.length; index++) {
-        const ids = ['result-score', 'game-result', 'play-again', 'next-level', 'result-eyebrow', 'result-title', 'result-message', 'touch-controls'];
-        const elements = new Map(ids.map(id => [id, { hidden: true, textContent: '', focus() { this.focused = true; } }]));
+        const ids = ['result-score', 'game-result', 'play-again', 'next-level', 'result-eyebrow', 'result-title', 'result-message', 'touch-controls', 'result-verse'];
+        const elements = new Map(ids.map(id => [id, { hidden: true, textContent: '', style: {}, focus() { this.focused = true; } }]));
         globalThis.document = { getElementById: id => elements.get(id) };
         const run = createGameState();
-        for (let i = 0; i < 3; i++) recordFruit(run, `apple-${i}`, 'apple');
+        for (let i = 0; i < 3; i++) recordFruit(run, `star-${i}`, 'star');
         takeKey(run);
         let pauseCount = 0;
         let delayed;
@@ -83,20 +83,21 @@ test('Every mosque celebrates before showing a result; only Continue starts the 
         GameScene.prototype.continueAfterResult.call(scene);
         assert.deepEqual(calls, [], 'No transition before result');
         delayed();
+        assert.ok(elements.get('result-verse').textContent.length > 10);
         assert.equal(elements.get('game-result').hidden, false);
-        assert.match(elements.get('result-score').textContent, /90 puan/);
+        assert.match(elements.get('result-score').textContent, /120 puan/);
         const final = index === levels.length - 1;
         assert.equal(elements.get('next-level').hidden, final);
         assert.equal(elements.get('play-again').hidden, !final);
         assert.equal(elements.get(final ? 'play-again' : 'next-level').focused, true);
         GameScene.prototype.continueAfterResult.call(scene);
         GameScene.prototype.continueAfterResult.call(scene);
-        assert.deepEqual(calls, final ? ['replay'] : [{ levelIndex: index + 1, score: 90 }]);
+        assert.deepEqual(calls, final ? ['replay'] : [{ levelIndex: index + 1, score: 120 }]);
     }
 });
 test('Respawn restores hearts at the flag and preserves collected fruit and key', () => {
     const run = createGameState();
-    for (let i = 0; i < 3; i++) recordFruit(run, `apple-${i}`, 'apple');
+    for (let i = 0; i < 3; i++) recordFruit(run, `star-${i}`, 'star');
     takeKey(run);
     run.checkpointActive = true;
     run.hearts = 0;
@@ -109,8 +110,8 @@ test('Respawn restores hearts at the flag and preserves collected fruit and key'
     GameScene.prototype.respawn.call(scene);
     assert.deepEqual(position, garden.checkpoint);
     assert.equal(run.hearts, 3);
-    assert.equal(run.apples, 3);
-    assert.equal(run.score, 90);
+    assert.equal(run.stars, 3);
+    assert.equal(run.score, 120);
     assert.equal(run.hasKey, true);
     assert.ok(scene.hurtUntil > scene.elapsed);
 });
@@ -139,4 +140,49 @@ test('Restart repeats the current level; play again begins from the garden', () 
     GameScene.prototype.restart.call(scene);
     GameScene.prototype.restart.call(scene, true);
     assert.deepEqual(calls, [{ levelIndex: 1, score: 130 }, { levelIndex: 0, score: 0 }]);
+});
+
+test('A pit ends the attempt even with full hearts, and retry restarts the current chapter', () => {
+    const elements = new Map(['fall-result', 'retry-fall', 'touch-controls'].map(id => [id, { hidden: true, focus() {} }]));
+    globalThis.document = { getElementById: id => elements.get(id) };
+    let paused = 0;
+    const restarts = [];
+    const run = createGameState(500);
+    recordFruit(run, 'star-1', 'star');
+    const scene = {
+        gameState: run, elapsed: 5000, levelIndex: 4, carriedScore: 500,
+        level: { groundY: 520, gaps: [{ x: 300, width: 100 }] },
+        player: { x: 350, y: 540, body: { bottom: 570, blocked: { down: false } }, anims: { stop() {} }, setTexture() {}, setVelocityX() {} },
+        physics: { pause() { paused++; }, resume() {} }, touchControls: { reset() {} }, sound: { play() {} }, updateHud() {},
+        time: {}, tweens: { resumeAll() {} }, scene: { restart(data) { restarts.push(data); } },
+        restart() { GameScene.prototype.restart.call(this); }
+    };
+    GameScene.prototype.checkPits.call(scene);
+    assert.equal(scene.falling, true);
+    assert.equal(scene.player.expression, 'sad');
+    assert.equal(paused, 0, 'The player must actually fall before the attempt ends');
+    scene.player.y = 570;
+    GameScene.prototype.checkPits.call(scene);
+    assert.equal(scene.lost, true);
+    assert.equal(run.hearts, 0);
+    assert.equal(paused, 1);
+    assert.equal(elements.get('fall-result').hidden, false);
+    GameScene.prototype.retryFall.call(scene);
+    assert.deepEqual(restarts, [{ levelIndex: 4, score: 500 }]);
+    const restarted = createGameState(restarts[0].score);
+    assert.equal(restarted.stars, 0);
+    assert.equal(restarted.hearts, 3);
+    assert.equal(restarted.score, 500, 'Only score carried from earlier chapters survives');
+});
+
+test('Taking the key opens the mosque once and does not finish the chapter remotely', () => {
+    const run = createGameState();
+    run.stars = 3;
+    let opened = 0;
+    const scene = { gameState: run, sound: { play() {} }, keySprite: { disableBody() {} }, door: { open() { opened++; } }, announce() {}, updateHud() {} };
+    GameScene.prototype.collectKey.call(scene);
+    GameScene.prototype.collectKey.call(scene);
+    assert.equal(opened, 1);
+    assert.equal(run.hasKey, true);
+    assert.equal(run.complete, false);
 });

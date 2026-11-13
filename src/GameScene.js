@@ -1,7 +1,7 @@
 import { garden } from './level.js';
 import { createGameState, isKeyReady, recordFruit, takeKey, finishLevel, healAtFountain } from './rules.js';
 import { createPlayer, movePlayer, resetPlayerMovement, showPlayerExpression, showRecovery, updatePlayerEffects } from './player.js';
-import { createScenery, makeSign, createMosque, createFountain } from './background.js';
+import { createScenery, createMosque, createFountain } from './background.js';
 import { bindTouchControls } from './controls.js';
 
 const textStyle = { fontFamily: 'Trebuchet MS, sans-serif', color: '#294e4c' };
@@ -101,7 +101,6 @@ export class GameScene extends Phaser.Scene {
         for (let i = 0; i < 10; i++) {
             this.beltMarks.push(this.add.text(belt.x + i * 22, 508, '‹', { ...textStyle, color: '#d2e7c8', fontSize: '23px' }).setDepth(8));
         }
-        makeSign(this, 1770, 'Bant seni sola taşır\nSağa yürüyerek ilerle');
     }
 
     // level.js içindeki meyve konumlarını kullan; anahtarı başlangıçta gizle.
@@ -128,8 +127,6 @@ export class GameScene extends Phaser.Scene {
             this.createHazard(enemy);
         }
         this.createHazard(garden.ball);
-        makeSign(this, 750, 'Hayvanlara dokunma\nÜzerlerinden zıpla');
-        makeSign(this, 3245, 'Dikkat: yuvarlanan taş', '#885f42');
     }
 
     createHazard(data) {
@@ -153,13 +150,6 @@ export class GameScene extends Phaser.Scene {
     }
 
     createLandmarks() {
-        const intro = this.add.container(48, 202).setDepth(10);
-        this.intro = intro;
-        intro.add([
-            this.add.text(0, 0, '01 / MEYVE BAHÇESİ', { ...textStyle, fontSize: '15px', fontStyle: 'bold', letterSpacing: 3 }),
-            this.add.text(0, 29, 'Küçük bir keşfe çık.', { ...textStyle, fontSize: '32px', fontStyle: 'bold' }),
-            this.add.text(0, 77, '3 elmayı bul, anahtarı al, camiye ulaş.\nOklarla yürü. Yukarı ok veya boşlukla zıpla.', { ...textStyle, fontSize: '16px', lineSpacing: 7 })
-        ]);
         const { x } = garden.checkpoint;
         this.add.rectangle(x, 476, 6, 88, 0x6b6e52).setDepth(6);
         this.checkpointFlag = this.add.triangle(x + 4, 433, 0, 0, 48, 12, 0, 27, 0xe3c37d).setOrigin(0, 0).setDepth(7);
@@ -207,26 +197,17 @@ export class GameScene extends Phaser.Scene {
         this.appleText = label(190, 17, '', 16);
         this.keyText = label(390, 17, '', 16);
         this.scoreText = label(590, 17, '', 16);
-        this.hintText = this.add.text(38, 67, '', { ...textStyle, fontSize: '14px' }).setScrollFactor(0).setVisible(false);
         this.progressTrack = this.add.rectangle(810, 28, 230, 4, 0xdce8d9).setScrollFactor(0).setDepth(101);
         this.progressFill = this.add.rectangle(695, 28, 1, 4, 0x649272).setOrigin(0, 0.5).setScrollFactor(0).setDepth(102);
-        this.hud.add([this.hintText, this.progressTrack, this.progressFill]);
-        this.toast = this.add.text(480, 135, '', {
-            ...textStyle, fontSize: '17px', fontStyle: 'bold', align: 'center',
-            backgroundColor: '#fff3d4', padding: { x: 12, y: 7 }
-        }).setOrigin(0.5, 0).setScrollFactor(0).setDepth(110).setVisible(false);
+        this.hud.add([this.progressTrack, this.progressFill]);
     }
 
     centerHud() {
         const hudScale = this.scale.width / 960;
         this.hud.setScale(hudScale);
-        this.toast.x = this.scale.width / 2;
-        this.toast.y = 58 * hudScale;
-        this.toast.setScale(hudScale);
         // Zemini aynı yerde tut: zıplarken ekran yukarı-aşağı sallanmasın.
         this.cameras.main.scrollY = Math.max(0, 600 - this.scale.height);
         this.cameras.main.setFollowOffset(-Math.min(190, this.scale.width * 0.2), 0);
-        this.intro.setVisible(this.scale.height >= 600);
     }
 
     bindPageControls() {
@@ -247,21 +228,11 @@ export class GameScene extends Phaser.Scene {
         this.appleText.setText(`ELMA  ${this.gameState.apples} / 3`);
         this.keyText.setText(this.gameState.hasKey ? 'ANAHTAR  ✓' : 'ANAHTAR  —');
         this.scoreText.setText(`${this.gameState.score} P`);
-        if (this.gameState.hasKey) {
-            this.hintText.setText('Anahtar sende! Cami girişine ulaş.');
-        } else if (isKeyReady(this.gameState)) {
-            this.hintText.setText('Üç elma tamam! İlerideki altın anahtarı al.');
-        } else {
-            this.hintText.setText('Görev: 3 elma bul. Meyve, tesbih ve seccadeler bonus puan.');
-        }
     }
 
     announce(message) {
+        // Ekranda kutu açma; ekran okuyucu için durum bilgisini koru.
         document.getElementById('game-status').textContent = message;
-        if (!this.toast) return;
-        this.toast.setText(message).setVisible(true);
-        if (this.toastTimer) this.toastTimer.remove();
-        this.toastTimer = this.time.delayedCall(3600, () => this.toast.setVisible(false));
     }
 
     // Phaser, karakter meyveye değdiğinde bu fonksiyonu çağırır.
@@ -347,10 +318,8 @@ export class GameScene extends Phaser.Scene {
         this.paused = !this.paused;
         if (this.paused) {
             this.physics.pause(); this.tweens.pauseAll(); this.time.paused = true;
-            this.toast.setText('Kısa bir mola. Devam etmek için Esc veya Devam et.').setVisible(true);
         } else {
             this.physics.resume(); this.tweens.resumeAll(); this.time.paused = false;
-            this.toast.setVisible(false);
         }
         document.getElementById('pause-button').textContent = this.paused ? 'Devam et' : 'Duraklat';
     }

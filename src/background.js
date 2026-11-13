@@ -31,14 +31,6 @@ export function createScenery(scene, width) {
     }
 }
 
-export function makeSign(scene, x, text, color = '#465b47') {
-    scene.add.rectangle(x, 499, 7, 42, 0x937854).setDepth(4);
-    return scene.add.text(x, 463, text, {
-        fontFamily: 'Trebuchet MS, sans-serif', fontSize: '14px', fontStyle: 'bold',
-        color, backgroundColor: '#fff1ce', padding: { x: 12, y: 8 }, align: 'center'
-    }).setOrigin(0.5).setDepth(5);
-}
-
 // Cami görünümünü çiz; giriş kapısını oyun akışının kullanması için geri döndür.
 export function createMosque(scene, x) {
     for (const side of [-1, 1]) {

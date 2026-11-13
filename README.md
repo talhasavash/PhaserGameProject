@@ -28,6 +28,8 @@ Yatay telefonda 600 yerine 360 dünya birimi yükseklik gösterilir: karakter ve
 yaklaşık %67 daha büyük görünür, ekran daha az uzak alan gösterir. Tablet görünümü 480 birimdir.
 Bu değerler `src/view.js` içindedir. Kamera zemine göre sabittir; zıplarken dikey kaymaz.
 Can/elma/anahtar/puan bilgileri ince bir üst satırdadır.
+Oyun sırasında açılan ipucu/uyarı kutuları ve uyarı tabelaları kapalıdır.
+Durum mesajları yalnızca ekran okuyucu için görünmeyen alanda tutulur.
 Tam ekranda destekleyen telefonlarda yatay yön istenir. Fiziksel cihaz kontrolü ayrıca yapılmalıdır.
 Dokunmatik zıplama tek dokunuşla tam yüksekliktedir; kısa dokunuşlar da saklanır.
 Klavye zıplamasında tuşu erken bırakınca kısa zıplama özelliği devam eder.

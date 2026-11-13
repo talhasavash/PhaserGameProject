@@ -3,14 +3,15 @@ import assert from 'node:assert/strict';
 import { gameView } from '../src/view.js';
 
 test('Landscape phone fills its game area with a closer, undistorted view', () => {
-    const view = gameView(873, 265, true);
+    const view = gameView(873, 393, true);
     const oldScale = 265 / 600;
-    const newScale = 265 / view.height;
-    assert.ok(newScale / oldScale > 1.6);
-    assert.ok(Math.abs(view.width / view.height - 873 / 265) < 0.002);
+    const newScale = 393 / view.height;
+    assert.ok(newScale / oldScale > 2.7);
+    assert.ok(Math.abs(view.width / view.height - 873 / 393) < 0.002);
     const top = 600 - view.height;
     assert.ok(top < 360, 'Jump apex must remain visible');
     assert.ok(520 > top && 520 < top + view.height, 'Ground must remain visible');
+    assert.ok((600 - 520) * newScale > 80, 'Controls need room below the ground');
 });
 
 test('Tablet gets a closer view, while desktop and portrait keep their full height', () => {

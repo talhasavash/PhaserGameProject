@@ -65,3 +65,12 @@ button:focus-visible { outline: 3px solid #e5bb6e; outline-offset: 2px; }
     .result h2 { font-size: 24px; }
     .result p { margin: 6px 0; }
 }
+
+/* Yatay mobilde ayrı şeritler yerine oyunun toprak kısmını kontrol alanı yap. */
+@media (orientation: landscape) and (any-pointer: coarse), (orientation: landscape) and (max-width: 1024px) {
+    body.playing .game-stage { inset: 0; }
+    body.playing .game-toolbar { inset: auto auto calc(18px + env(safe-area-inset-bottom)) 50%; transform: translateX(-50%); width: max-content; height: auto; padding: 0; }
+    body.playing .build-version { display: none; }
+    body.playing .toolbar-actions { gap: 4px; }
+    body.playing .game-toolbar button { font-size: 10px; padding: 6px 8px; }
+}

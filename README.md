@@ -22,17 +22,17 @@ Oyun sayfası ekranı kaplar; dışarıda başlık, açıklama veya site alt bil
 Destekleyen tarayıcılarda **Tam ekran** düğmesi tarayıcı çubuklarını da gizler.
 Telefon/tablette dokunmatik sol, sağ ve zıplama düğmeleri görünür. İki parmakla
 aynı anda yürüyüp zıplanabilir. Yatay kullanım daha büyük bir oyun görüntüsü sağlar;
-oyun oranı korunur, görüntü kırpılmaz. Yatay ekranda oyun alanı genişliği ekrana uyar;
-kontroller karakteri örtmesin diye ayrı alt alandadır. Dikey telefonda görüntü oranı korunur.
-Yatay telefonda 600 yerine 360 dünya birimi yükseklik gösterilir: karakter ve nesneler
-yaklaşık %67 daha büyük görünür, ekran daha az uzak alan gösterir. Tablet görünümü 480 birimdir.
+oyun oranı korunur, görüntü esnetilmez. Yatay mobilde oyun bütün ekranı kaplar;
+düğmeler karakterin altında kalan toprak alanındadır. Dikey telefonda görüntü oranı korunur.
+Yatay telefonda 600 yerine 320 dünya birimi yükseklik gösterilir; üst/alt şeritler de
+kaldırıldığı için karakter ve nesneler daha büyük görünür. Tablet görünümü 480 birimdir.
 Bu değerler `src/view.js` içindedir. Kamera zemine göre sabittir; zıplarken dikey kaymaz.
 Can/elma/anahtar/puan bilgileri ince bir üst satırdadır.
 Oyun sırasında açılan ipucu/uyarı kutuları ve uyarı tabelaları kapalıdır.
 Durum mesajları yalnızca ekran okuyucu için görünmeyen alanda tutulur.
 Tam ekranda destekleyen telefonlarda yatay yön istenir. Fiziksel cihaz kontrolü ayrıca yapılmalıdır.
-Dokunmatik zıplama tek dokunuşla tam yüksekliktedir; kısa dokunuşlar da saklanır.
-Klavye zıplamasında tuşu erken bırakınca kısa zıplama özelliği devam eder.
+Hem dokunmatik hem klavye zıplamasında erken bırakmak kısa, basılı tutmak yüksek zıplama yapar.
+Çok kısa dokunuşlar saklanır; mobilde ilk 70 ms yükseliş korunur, sonra bırakma algılanır.
 
 ## JavaScript mi, Phaser mı?
 

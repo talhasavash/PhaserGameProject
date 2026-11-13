@@ -60,7 +60,7 @@ test('Releasing movement coasts for a while and eventually stops', () => {
     assert.equal(player.body.velocity.x, 0);
 });
 
-test('A released mobile tap still launches a full jump while holding a direction', () => {
+test('A quick mobile tap launches reliably, then makes a short jump while walking', () => {
     const player = playerForTest();
     player.touchKeys = { left: key(), right: { isDown: true }, up: { isDown: false, justPressed: true } };
     movePlayer(player, 1000, 16, 0);
@@ -71,9 +71,11 @@ test('A released mobile tap still launches a full jump while holding a direction
     movePlayer(player, 1016, 16, 0);
     assert.equal(player.body.velocity.y, -590);
     assert.ok(player.body.velocity.x > 0);
+    movePlayer(player, 1080, 16, 0);
+    assert.equal(player.body.velocity.y, -240);
 });
 
-test('Releasing a held mobile jump does not shorten it; keyboard release still does', () => {
+test('Holding jump rises higher; release shortens touch and keyboard jumps', () => {
     for (const touch of [true, false]) {
         const player = playerForTest();
         player.touchKeys = { left: key(), right: key(), up: { isDown: touch, justPressed: touch } };
@@ -84,6 +86,8 @@ test('Releasing a held mobile jump does not shorten it; keyboard release still d
         player.cursors.up.isDown = false;
         movePlayer(player, 1016, 16, 0);
         assert.equal(player.body.velocity.y, touch ? -590 : -240);
+        movePlayer(player, 1080, 16, 0);
+        assert.equal(player.body.velocity.y, -240);
     }
 });
 

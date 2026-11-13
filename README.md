@@ -2,11 +2,34 @@
 
 8–10 yaş için **JavaScript + Phaser** ile geliştirilen bir platform oyunu.
 Amaç hem oyunu geliştirmek hem de kodunu adım adım anlayarak öğrenmek.
+Bu bir öğrenme ve deneme projesidir; senaryo zamanla değişebilir. Yeni özelliklerde
+çocukların kullanımı, okunabilir JavaScript ve bilgisayar/telefon/tablet desteği birlikte düşünülür.
+Mobil desteği korumak için klavye ve dokunmatik giriş aynı hareket koduna bağlanır.
+
+## İnternetten oyna
+
+Adres: https://talhasavash.github.io/PhaserGameProject/
+
+GitHub Pages, `main` dalının kök klasörünü ücretsiz yayımlar. `.nojekyll`, dosyaların
+doğrudan sunulmasını sağlar. Bu dala push yapıldığında yayın otomatik güncellenir;
+bilgisayarın veya yerel Node.js sunucusunun açık kalması gerekmez.
+
+Oyun sayfası ekranı kaplar; dışarıda başlık, açıklama veya site alt bilgisi yoktur.
+Destekleyen tarayıcılarda **Tam ekran** düğmesi tarayıcı çubuklarını da gizler.
+Telefon/tablette dokunmatik sol, sağ ve zıplama düğmeleri görünür. İki parmakla
+aynı anda yürüyüp zıplanabilir. Yatay kullanım daha büyük bir oyun görüntüsü sağlar;
+oyun oranı korunur, görüntü kırpılmaz. Fiziksel cihaz kontrolü ayrıca yapılmalıdır.
 
 ## JavaScript mi, Phaser mı?
 
 JavaScript programlama dilimizdir. Phaser, JavaScript ile kullandığımız oyun kütüphanesidir.
 İkisini birlikte kullanıyoruz.
+
+Kullanılan Phaser sürümü **3.90.0**. Kütüphane `lib/phaser.min.js` içinde yerel olarak tutulur;
+oyun açılırken CDN'den indirilmez. Dosya, [resmî sürüm sayfasında](https://phaser.io/download/release/v3.90.0)
+belirtilen [sabit sürümlü CDN adresinden](https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.min.js) alınmıştır.
+Bu dosyayı elle düzenlemiyoruz; kendi oyun kodumuz `src` klasöründedir.
+Phaser'ın MIT lisansı `lib/PHASER-LICENSE.md` dosyasındadır.
 
 | İş | Sorumlusu |
 | --- | --- |
@@ -30,6 +53,7 @@ PhaserGameProject/
 │   ├── game.js            Giriş noktası, ekran ve fizik ayarları
 │   ├── GameScene.js       Phaser ekranı; bölümün kurulması ve oyun akışı
 │   ├── player.js          Karakter oluşturma, yürüme ve zıplama
+│   ├── controls.js        Çoklu dokunma, bırakma ve odak kaybı yönetimi
 │   ├── level.js           Platform, meyve ve düşman konumları
 │   ├── rules.js           Puan, can, elma, anahtar ve bitiş kuralları
 │   └── background.js      Arka plan, ağaç, bulut ve tabela çizimleri
@@ -128,13 +152,13 @@ HTTP kullan; HTML dosyasını çift tıklayarak açma (oyun ES modülleri kullan
 - Dururken sallanma yoktur. Zıplama pozundaki kaldırılmış kol iki karakterde de başın yanında açıkça görünür.
 - Bant sola taşır; bu bir buz sürtünmesi değildir.
 
-Şimdilik tek bölüm var. Yeni bölümler, ses, kalıcı kayıt ve dokunmatik kontroller daha sonra eklenebilir.
+Şimdilik tek bölüm var. Yeni bölümler, ses ve kalıcı kayıt daha sonra eklenebilir.
 
 ## Kontroller ve Git
 
 ```sh
 node scripts/check.cjs
-node --test tests/rules.test.js tests/scene-flow.test.js tests/player.test.js
+node --test tests/*.test.js
 ```
 
 Npm varsa `npm run check` ve `npm test` eşdeğerdir.

@@ -115,8 +115,9 @@ export function resetPlayerMovement(player) {
 }
 
 export function readDirection(player) {
-    const leftHeld = player.cursors.left.isDown || player.keys.A.isDown;
-    const rightHeld = player.cursors.right.isDown || player.keys.D.isDown;
+    const touch = player.touchKeys;
+    const leftHeld = player.cursors.left.isDown || player.keys.A.isDown || touch?.left.isDown;
+    const rightHeld = player.cursors.right.isDown || player.keys.D.isDown || touch?.right.isDown;
     let direction = 0;
 
     if (leftHeld && rightHeld) {
@@ -128,6 +129,8 @@ export function readDirection(player) {
         if (player.keys.A.isDown) leftTime = Math.max(leftTime, player.keys.A.timeDown);
         if (player.cursors.right.isDown) rightTime = player.cursors.right.timeDown;
         if (player.keys.D.isDown) rightTime = Math.max(rightTime, player.keys.D.timeDown);
+        if (touch?.left.isDown) leftTime = Math.max(leftTime, touch.left.timeDown);
+        if (touch?.right.isDown) rightTime = Math.max(rightTime, touch.right.timeDown);
         direction = player.movement.lastDirection;
         if (rightTime > leftTime) direction = 1;
         if (leftTime > rightTime) direction = -1;
@@ -151,7 +154,7 @@ export function movePlayer(player, time, delta, conveyorSpeed) {
 
     // 1. Klavyeyi oku: -1 sol, 0 dur, 1 sağ.
     const direction = readDirection(player);
-    const jumpHeld = player.cursors.up.isDown || player.keys.W.isDown || player.keys.SPACE.isDown;
+    const jumpHeld = player.cursors.up.isDown || player.keys.W.isDown || player.keys.SPACE.isDown || player.touchKeys?.up.isDown;
     if (jumpHeld && !movement.wasJumpHeld) movement.jumpQueued = time;
 
     // 2. Hedef hızı hesapla. Bant etkisini yalnızca yerdeyken ekle.

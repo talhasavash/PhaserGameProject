@@ -2,6 +2,7 @@ import { garden } from './level.js';
 import { createGameState, isKeyReady, recordFruit, takeKey, finishLevel, healAtFountain } from './rules.js';
 import { createPlayer, movePlayer, resetPlayerMovement, showPlayerExpression, showRecovery, updatePlayerEffects } from './player.js';
 import { createScenery, makeSign, createMosque, createFountain } from './background.js';
+import { bindTouchControls } from './controls.js';
 
 const textStyle = { fontFamily: 'Trebuchet MS, sans-serif', color: '#294e4c' };
 const COLLECTIBLE_SCALE = 0.75;
@@ -52,6 +53,8 @@ export class GameScene extends Phaser.Scene {
         this.createLandmarks();
         this.createHealingSpots();
         this.player = createPlayer(this, garden.spawn.x, garden.spawn.y, this.character);
+        this.touchControls = bindTouchControls();
+        this.player.touchKeys = this.touchControls.keys;
         // collider: karakter platformun içinden geçmesin.
         // overlap: temas olunca belirtilen fonksiyonu çalıştır (örneğin meyve topla).
         this.physics.add.collider(this.player, this.solids);
@@ -66,6 +69,7 @@ export class GameScene extends Phaser.Scene {
         this.pauseKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
         this.bindPageControls();
         this.events.once('shutdown', () => {
+            this.touchControls.destroy();
             document.getElementById('pause-button').onclick = null;
             document.getElementById('restart-button').onclick = null;
             document.getElementById('play-again').onclick = null;
@@ -317,6 +321,7 @@ export class GameScene extends Phaser.Scene {
 
     togglePause() {
         if (this.gameState.complete) return;
+        this.touchControls.reset();
         this.paused = !this.paused;
         if (this.paused) {
             this.physics.pause(); this.tweens.pauseAll(); this.time.paused = true;

@@ -5,6 +5,19 @@ import { GameScene } from './GameScene.js';
 const characterForm = document.getElementById('character-form');
 const startButton = document.getElementById('start-button');
 let gameStarted = false;
+const fullscreenButton = document.getElementById('fullscreen-button');
+fullscreenButton.hidden = !document.documentElement.requestFullscreen;
+fullscreenButton.addEventListener('click', async () => {
+    try {
+        if (document.fullscreenElement) await document.exitFullscreen();
+        else await document.documentElement.requestFullscreen();
+    } catch {
+        document.getElementById('game-status').textContent = 'Bu tarayıcı tam ekrana geçişe izin vermedi.';
+    }
+});
+document.addEventListener('fullscreenchange', () => {
+    fullscreenButton.textContent = document.fullscreenElement ? 'Küçült' : 'Tam ekran';
+});
 
 characterForm.reset();
 characterForm.addEventListener('change', () => {
@@ -16,6 +29,8 @@ characterForm.addEventListener('submit', event => {
     const selected = characterForm.querySelector('input[name="character"]:checked');
     if (!selected || gameStarted) return;
     gameStarted = true;
+    document.body.classList.add('playing');
+    document.getElementById('touch-controls').hidden = false;
     startButton.disabled = true;
     document.getElementById('character-select').hidden = true;
     document.getElementById('game-stage').classList.remove('choosing');

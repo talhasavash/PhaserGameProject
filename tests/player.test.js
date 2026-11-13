@@ -40,6 +40,17 @@ test('A released A/D key cannot override a newer held arrow', () => {
     assert.equal(readDirection(player), 1);
 });
 
+test('Touch movement and jump use the same physics, and latest touch direction wins', () => {
+    const player = playerForTest();
+    player.touchKeys = { left: { isDown: true, timeDown: 100 }, right: { isDown: true, timeDown: 200 }, up: { isDown: true } };
+    assert.equal(readDirection(player), 1);
+    movePlayer(player, 1000, 16, 0);
+    assert.ok(player.body.velocity.x > 0);
+    assert.equal(player.body.velocity.y, -590);
+    player.touchKeys.right.isDown = false;
+    assert.equal(readDirection(player), -1);
+});
+
 test('Releasing movement coasts for a while and eventually stops', () => {
     const player = playerForTest();
     player.body.velocity.x = 265;

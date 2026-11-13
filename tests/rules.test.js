@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createGameState, isKeyReady, recordFruit, takeKey, finishLevel, healAtFountain } from '../src/rules.js';
+import { createGameState, isKeyReady, recordFruit, takeKey, finishLevel, healAtFountain, FRUIT_TYPES } from '../src/rules.js';
+import { levels } from '../src/level.js';
 
 test('Apples and bonuses score points, but only three distinct stars unlock the key', () => {
     const run = createGameState();
@@ -46,4 +47,16 @@ test('A fountain heals one missing heart once; full hearts preserve its use', ()
     assert.equal(healAtFountain(run, 'fountain-1'), false);
     assert.equal(healAtFountain(run, 'fountain-2'), true);
     assert.equal(run.hearts, 3);
+});
+
+test('Every chapter offers varied fruit; all six fruit types give points without unlocking a key', () => {
+    for (const level of levels) {
+        const fruit = level.fruits.filter(item => FRUIT_TYPES.includes(item.type));
+        assert.ok(new Set(fruit.map(item => item.type)).size >= 3);
+    }
+    const run = createGameState();
+    for (const type of FRUIT_TYPES) recordFruit(run, type, type);
+    assert.equal(run.score, FRUIT_TYPES.length * 30);
+    assert.equal(run.stars, 0);
+    assert.equal(takeKey(run), false);
 });

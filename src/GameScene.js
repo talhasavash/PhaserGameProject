@@ -1,5 +1,5 @@
 import { levels } from './level.js';
-import { createGameState, isKeyReady, recordFruit, takeKey, finishLevel, healAtFountain } from './rules.js';
+import { createGameState, isKeyReady, recordFruit, takeKey, finishLevel, healAtFountain, FRUIT_TYPES } from './rules.js';
 import { createPlayer, movePlayer, resetPlayerMovement, showPlayerExpression, showRecovery, updatePlayerEffects } from './player.js';
 import { createScenery, createMosque, createFountain } from './background.js';
 import { bindTouchControls } from './controls.js';
@@ -43,7 +43,9 @@ export class GameScene extends Phaser.Scene {
                 this.load.svg(`${prefix}${frame}`, `assets/images/${prefix}${frame}.svg`, { width: 64, height: 80 });
             }
         }
-        this.load.svg('apple', 'assets/images/apple.svg', { width: 40, height: 44 });
+        for (const fruit of FRUIT_TYPES) {
+            this.load.svg(fruit, `assets/images/${fruit}.svg`, { width: 40, height: 44 });
+        }
         this.load.svg('star', 'assets/images/star.svg', { width: 44, height: 44 });
         this.load.svg('berry', 'assets/images/berry.svg', { width: 32, height: 36 });
         this.load.svg('hedgehog', 'assets/images/hedgehog.svg', { width: 76, height: 52 });
@@ -279,9 +281,11 @@ export class GameScene extends Phaser.Scene {
             return text;
         };
         this.hud.add(bg);
-        this.heartsText = label(16, 5, '', 16);
-        this.hud.add(this.add.image(92, 14, 'star').setDisplaySize(15, 15).setScrollFactor(0).setDepth(101));
-        this.starText = label(108, 6, '', 14);
+        this.hud.add(this.add.circle(18, 14, 10, 0xedd59c).setScrollFactor(0).setDepth(101));
+        label(18, 6, String(this.levelIndex + 1), 14).setOrigin(0.5, 0).setColor('#684b23');
+        this.heartsText = label(42, 5, '', 16);
+        this.hud.add(this.add.image(118, 14, 'star').setDisplaySize(15, 15).setScrollFactor(0).setDepth(101));
+        this.starText = label(134, 6, '', 14);
         this.hud.add(this.add.image(230, 14, 'key').setDisplaySize(21, 13).setScrollFactor(0).setDepth(101));
         this.keyText = label(245, 6, '', 14);
         this.scoreText = label(390, 6, '', 14);

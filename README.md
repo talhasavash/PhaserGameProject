@@ -27,7 +27,7 @@ düğmeler karakterin altında kalan toprak alanındadır. Dikey telefonda gör�
 Yatay telefonda 600 yerine 320 dünya birimi yükseklik gösterilir; üst/alt şeritler de
 kaldırıldığı için karakter ve nesneler daha büyük görünür. Tablet görünümü 480 birimdir.
 Bu değerler `src/view.js` içindedir. Kamera zemine göre sabittir; zıplarken dikey kaymaz.
-Can/elma/anahtar/puan bilgileri ince bir üst satırdadır.
+Bölüm numarası/can/yıldız/anahtar/puan bilgileri ince bir üst satırdadır.
 Üst satır ekran genişliğinin yaklaşık %63'ünü kaplar. Küçük nota düğmesi sesleri açıp kapatır.
 Zıplama, toplama, çarpma, can yenileme ve anahtar alma kısa ses efektleri kullanır.
 `preload()` içindeki `load.audio` WAV dosyalarını yükler; `sound.play` olay gerçekleştiğinde çalar.
@@ -164,7 +164,7 @@ HTTP kullan; HTML dosyasını çift tıklayarak açma (oyun ES modülleri kullan
 - Oklar veya A/D: yürü. Yukarı ok, W veya Boşluk: zıpla.
 - Esc: mola/devam. R: bölümü baştan başlat.
 - Üç altın yıldızı tamamla, ileride çıkan anahtarı al ve açılan cami kapısına ulaş. Elmalar 30 puan verir; anahtarı açmaz.
-- Görev yıldızı 40; diğer meyveler ve tesbih taneleri 10, seccadeler 20 bonus puan verir. Kirpiye, salyangoza ve taşa dokunma.
+- Görev yıldızı 40; elma, armut, portakal, muz, üzüm ve çilek 30 puan verir. Yaban mersini ve tesbih taneleri 10, seccadeler 20 bonus puandır. Kirpiye, salyangoza ve taşa dokunma.
 - Bayrak kontrol noktasını etkinleştirir ve canları doldurur.
 - Can bitince geri dönülür; toplananlar korunur. R veya sayfa yenileme bütün bölümü sıfırlar.
 - İki yön tuşu birlikte basılıysa son basılan yön önceliklidir; havada da yön değiştirilebilir.

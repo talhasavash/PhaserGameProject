@@ -6,7 +6,7 @@ import { bindTouchControls } from './controls.js';
 import { createFireRain, updateFireRain } from './fireRain.js';
 import { unlockNext } from './progress.js';
 import { verses } from './verses.js';
-import { bossLift } from './boss.js';
+import { bossLift, bossMood } from './boss.js';
 
 const textStyle = { fontFamily: 'Trebuchet MS, sans-serif', color: '#294e4c' };
 const COLLECTIBLE_SCALE = 0.75;
@@ -51,6 +51,10 @@ export class GameScene extends Phaser.Scene {
         this.load.svg('ball', 'assets/images/ball.svg', { width: 52, height: 52 });
         this.load.svg('wheel', 'assets/images/wheel.svg', { width: 52, height: 52 });
         this.load.svg('ogre', 'assets/images/ogre.svg', { width: 96, height: 100 });
+        for (const variant of ['moss', 'stone', 'ember', 'ember-angry']) {
+            this.load.svg(`ogre-${variant}`, `assets/images/ogre-${variant}.svg`, { width: 96, height: 100 });
+        }
+        this.load.svg('allah-plaque', 'assets/images/allah-plaque.svg', { width: 96, height: 76 });
         for (const animal of ['bee', 'fox', 'penguin', 'frog', 'turtle', 'bat', 'bird', 'spider']) {
             this.load.svg(animal, `assets/images/${animal}.svg`, { width: 76, height: 52 });
         }
@@ -199,7 +203,7 @@ export class GameScene extends Phaser.Scene {
         if (data.type === 'ball' || data.type === 'wheel') y = this.level.groundY - 22 * ENEMY_SCALE;
         if (data.y !== undefined) y = data.y;
         if (data.type === 'ogre') y = this.level.groundY - 44 * data.scale;
-        const sprite = this.hazards.create(data.x, y, data.type).setDepth(12);
+        const sprite = this.hazards.create(data.x, y, data.texture || data.type).setDepth(12);
         sprite.setScale(data.scale || ENEMY_SCALE);
         sprite.setData('patrol', {
             minX: data.minX,
@@ -210,6 +214,9 @@ export class GameScene extends Phaser.Scene {
             bob: data.bob || 0,
             grounded: data.y === undefined,
             jump: data.jump,
+            jumpClock: 0,
+            rage: data.rage || false,
+            engagedAt: null,
             direction: 1
         });
         if (data.type === 'spider') {
@@ -504,8 +511,18 @@ export class GameScene extends Phaser.Scene {
         for (const hazard of this.hazards.getChildren()) {
             const patrol = hazard.getData('patrol');
             if (patrol.jump) {
+                let jumpSpeed = 1;
+                if (patrol.rage) {
+                    if (patrol.engagedAt === null && Math.abs(this.player.x - hazard.x) < 450) patrol.engagedAt = this.elapsed;
+                    const mood = bossMood(this.elapsed, patrol.engagedAt);
+                    jumpSpeed = mood.speed;
+                    hazard.setTint(mood.tint);
+                    hazard.setTexture(mood.angry ? 'ogre-ember-angry' : 'ogre-ember');
+                }
+                // Saati biriktirmek, hız değişirken zıplamanın ortasında sıçramayı önler.
+                patrol.jumpClock += delta * jumpSpeed;
                 // Gövde ve görsel birlikte taşınır; hava boşluğunda görünmez çarpışma kalmaz.
-                hazard.body.reset(hazard.x, patrol.baseY - bossLift(this.elapsed, patrol.jump));
+                hazard.body.reset(hazard.x, patrol.baseY - bossLift(patrol.jumpClock, patrol.jump));
                 hazard.getData('shadow').setPosition(hazard.x, 517);
             }
             if (hazard.x >= patrol.maxX) patrol.direction = -1;

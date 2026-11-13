@@ -50,12 +50,7 @@ export function createChapterScenery(scene, width, theme) {
     texture(scene, `${theme}-near`, 512, 512, g => {
         if (theme === 'interior') {
             g.fillStyle(0xc7af88); g.fillRect(18, 120, 24, 392); g.fillRect(8, 115, 44, 15); g.fillRect(8, 495, 44, 17);
-            // Çerçevede lale; yıldız ve üçgen motif kullanılmaz.
-            g.fillStyle(0xad8755); g.fillRoundedRect(184, 292, 84, 62, 5);
-            g.fillStyle(0x637f7b); g.fillRect(190, 298, 72, 50);
-            g.lineStyle(3, 0xb9c895); g.lineBetween(226, 338, 226, 318);
-            g.fillStyle(0xdab18f); g.fillEllipse(226, 315, 20, 17);
-            g.fillStyle(0xb9c895); g.fillEllipse(218, 331, 16, 7); g.fillEllipse(234, 328, 16, 7);
+            // Lafzatullah tabloları aşağıda aynı SVG dokusundan eklenir.
             g.fillStyle(0xbaa06e); g.fillRect(375, 140, 3, 110); g.fillEllipse(377, 258, 62, 12);
             g.fillStyle(0xffdd85); g.fillCircle(355, 259, 6); g.fillCircle(377, 259, 6); g.fillCircle(399, 259, 6);
         } else if (theme === 'boss') {
@@ -82,6 +77,11 @@ export function createChapterScenery(scene, width, theme) {
         }
     });
     scene.add.tileSprite(0, 0, width + 512, 512, `${theme}-near`).setOrigin(0).setScrollFactor(0.82).setDepth(-20);
+    if (theme === 'interior') {
+        for (let x = 226; x < width + 512; x += 512) {
+            scene.add.image(x, 323, 'allah-plaque').setScrollFactor(0.82).setDepth(-19);
+        }
+    }
     scene.add.rectangle(width / 2, 560, width, 80, p.earth).setDepth(-5);
     scene.add.rectangle(width / 2, 524, width, 12, p.edge).setDepth(-4);
     if (theme === 'interior') {

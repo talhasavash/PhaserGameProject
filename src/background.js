@@ -179,10 +179,21 @@ export function createMosque(scene, x, theme = 'garden') {
     add.rectangle(x, design.top, design.width + 10, 9, design.trim).setDepth(6);
     // Renkli pencere kemerleri ve basamaklar.
     for (const offset of [-66, 66]) {
-        add.ellipse(x + offset, 477, 23, 32, design.roof).setDepth(6);
-        add.rectangle(x + offset, 489, 23, 25, design.roof).setDepth(6);
-        add.rectangle(x + offset, 483, 3, 35, design.trim).setDepth(7);
-        add.rectangle(x + offset, 485, 23, 3, design.trim).setDepth(7);
+        if (theme === 'interior') {
+            // Ahşap çaprazlar yerine açık renk taş kemer ve desenli vitray.
+            add.ellipse(x + offset, 466, 30, 40, 0xf5ecd5).setDepth(7);
+            add.rectangle(x + offset, 482, 30, 34, 0xf5ecd5).setDepth(7);
+            add.ellipse(x + offset, 468, 22, 32, 0x9bd3d7).setDepth(8);
+            add.rectangle(x + offset, 482, 22, 26, 0x9bd3d7).setDepth(8);
+            for (const y of [465, 478, 490]) {
+                add.circle(x + offset, y, 4, y === 478 ? 0xf2d69b : 0xe0f2e7).setDepth(9);
+            }
+        } else {
+            add.ellipse(x + offset, 477, 23, 32, design.roof).setDepth(6);
+            add.rectangle(x + offset, 489, 23, 25, design.roof).setDepth(6);
+            add.rectangle(x + offset, 483, 3, 35, design.trim).setDepth(7);
+            add.rectangle(x + offset, 485, 23, 3, design.trim).setDepth(7);
+        }
     }
     if (theme === 'courtyard') {
         const tiles = add.graphics().setDepth(6);

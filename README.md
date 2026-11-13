@@ -191,7 +191,7 @@ Tarayıcı verileri silinirse ilerleme sıfırlanır; farklı cihazlara eşitlen
 | 3 | Çöl; palmiye siluetleri ve seyrek rastgele ateş |
 | 4 | Gece bahçesi; daha dar basamaklar, hareketli engeller |
 | 5 | Orman; arılar, tilkiler ve ilk gerçek çukurlar |
-| 6 | Cami içi; halılar, kolonlar, çiçek tabloları, örümcekler ve tekerlekler |
+| 6 | Cami içi; halılar, kolonlar, lafzatullah tabloları, örümcekler ve tekerlekler |
 | 7 | Karlı dağ; penguenler, kuşlar, buz ve yarıklar |
 | 8 | Dere geçitleri; kurbağalar, kaplumbağalar ve su boşlukları |
 | 9 | Kaya vadisi; yarasalar, alçak geçitler, buz ve seyrek ateş |
@@ -223,6 +223,17 @@ parametresi buzda 0.14 olur: fren ve yön değiştirme yavaşlar; zıplama kuvve
 kalır. `bossLift` muhafızın yüksekliğini zamanla hesaplar. Görsel ve fizik gövdesi
 birlikte taşınır; havalanınca altından geçmek mümkündür. Muhafızlara saldırmak
 veya onları yenmek gerekmez; zamanlamayla geçmek yeterlidir.
+
+Muhafızların dördü farklı SVG görünümü kullanır. Son turuncu muhafız, oyuncu
+450 dünya birimi yakınına geldiğinde öfkelenmeye başlar. 18 saniyede yüzü değişir,
+rengi kızarır ve zıplama saati en çok 1.6 kat hızlanır. Saat kareler boyunca
+biriktirilir; hız değişirken zıplamanın ortasında konum atlaması olmaz. Öfke ve
+zıplama duraklatmada ilerlemez; bölüm yeniden başlayınca sıfırlanır.
+Tam öfkede bile muhafızın altından geçiş süresi test edilir.
+
+6. bölümün son yapısında ahşap pencere bölmeleri yerine taş kemerli açık renkli
+vitraylar vardır. Lafzatullah görseli `allah-plaque.svg` içinde standart Arapça
+Allah ligatürüyle (U+FDF2) oluşturulur ve arka planda aynı doku tekrar kullanılır.
 
 Ateş olan bölümlerde aynı anda en çok bir top bulunur. Her top bittikten sonra
 en az 8 saniye beklenir; konum, hız ve süre değişir. Önceden yalnızca parlak,

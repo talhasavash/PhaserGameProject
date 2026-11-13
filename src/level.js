@@ -381,9 +381,9 @@ export const bossGate = trail({
     ],
     enemies: [
         { type: 'ogre', x: 1050, minX: 1010, maxX: 1090, speed: 28, scale: 1.5, jump: { height: 180, duration: 1700, period: 3300, offset: 0 } },
-        { type: 'ogre', x: 2350, minX: 2310, maxX: 2390, speed: 30, scale: 1.65, jump: { height: 200, duration: 1800, period: 3400, offset: 900 } },
-        { type: 'ogre', x: 3690, minX: 3650, maxX: 3730, speed: 32, scale: 1.7, jump: { height: 210, duration: 1800, period: 3300, offset: 1400 } },
-        { type: 'ogre', x: 4630, minX: 4590, maxX: 4670, speed: 32, scale: 1.8, jump: { height: 220, duration: 1800, period: 3200, offset: 500 } }
+        { type: 'ogre', texture: 'ogre-moss', x: 2350, minX: 2310, maxX: 2390, speed: 30, scale: 1.65, jump: { height: 200, duration: 1800, period: 3400, offset: 900 } },
+        { type: 'ogre', texture: 'ogre-stone', x: 3690, minX: 3650, maxX: 3730, speed: 32, scale: 1.7, jump: { height: 210, duration: 1800, period: 3300, offset: 1400 } },
+        { type: 'ogre', texture: 'ogre-ember', rage: true, x: 4630, minX: 4590, maxX: 4670, speed: 32, scale: 1.8, jump: { height: 220, duration: 1800, period: 3200, offset: 500 } }
     ],
     gaps: [{ x: 1320, width: 130 }, { x: 2730, width: 135 }, { x: 4100, width: 140 }],
     ice: [{ x: 4380, width: 380 }]

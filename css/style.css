@@ -10,18 +10,28 @@ button { font: inherit; cursor: pointer; border: 1px solid #789082; border-radiu
 button:hover { background: #e8eddf; }
 button:disabled { opacity: .45; cursor: default; }
 button:focus-visible { outline: 3px solid #e5bb6e; outline-offset: 2px; }
-.game-toolbar button { font-size: 12px; min-height: 34px; }
+.game-toolbar button { font-size: 20px; min-width: 36px; min-height: 36px; padding: 4px 8px; }
 .game-stage { position: absolute; inset: calc(44px + env(safe-area-inset-top)) 0 env(safe-area-inset-bottom); }
 #game { width: 100%; height: 100%; overflow: hidden; }
 #game canvas { display: block; touch-action: none; }
 .character-select { position: absolute; inset: 0; overflow: auto; display: grid; place-items: center; background: radial-gradient(ellipse at 15% 95%, #b8d6bb 0%, transparent 50%), #eff3e7; padding: 16px; }
-.character-form { text-align: center; width: min(100%, 460px); }
+.character-form { text-align: center; width: min(100%, 780px); }
+.selection-layout { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 24px; margin: 18px 0; }
+.level-options { border: 0; margin: 0; padding: 0; }
+.level-options legend { width: 100%; margin-bottom: 12px; font-size: 14px; font-weight: bold; }
+.level-grid { display: flex; justify-content: center; gap: 16px; }
+.level-option { position: relative; cursor: pointer; width: 112px; }
+.level-option input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.level-card { display: flex; flex-direction: column; align-items: center; gap: 10px; font-size: 12px; }
+.level-card strong { display: grid; place-items: center; width: 74px; height: 74px; border-radius: 50%; background: #d3dfce; border: 3px solid #fffdf3; color: #416a54; font-size: 32px; box-shadow: 0 3px 0 #a8bca2; }
+.level-option input:checked + .level-card strong { background: #416a54; color: #fff9e8; box-shadow: 0 3px 0 #244d39, 0 0 0 3px #c49c59; }
+.level-option input:focus-visible + .level-card strong { outline: 3px solid #b47e47; outline-offset: 4px; }
 .eyebrow { font-size: 10px; letter-spacing: 2.5px; font-weight: bold; margin: 0 0 12px; }
 .character-form h2 { font: 36px/1.1 Georgia, serif; margin: 0 0 9px; }
 .character-form h2 span { color: #b27a4c; }
 .character-subtitle { margin: 0 0 20px; font-size: 14px; color: #6d806b; }
-.character-options { display: flex; justify-content: center; gap: 18px; padding: 0; border: 0; margin: 0 0 22px; }
-.character-option { position: relative; width: 160px; cursor: pointer; }
+.character-options { display: flex; justify-content: center; gap: 14px; padding: 0; border: 0; margin: 0; }
+.character-option { position: relative; width: clamp(112px, 18vw, 160px); cursor: pointer; }
 .character-option input { position: absolute; opacity: 0; width: 1px; height: 1px; }
 .character-card { position: relative; display: flex; flex-direction: column; align-items: center; padding: 14px 12px 16px; border-radius: 16px; border: 2px solid #d3ddca; background: #fffdf3; }
 .character-card strong { font-size: 14px; margin-top: 8px; }
@@ -33,11 +43,11 @@ button:focus-visible { outline: 3px solid #e5bb6e; outline-offset: 2px; }
 .character-option input:focus-visible + .character-card { outline: 3px solid #b47e47; outline-offset: 3px; }
 #start-button { background: #416a54; color: #fff9e8; padding: 12px 28px; font-size: 14px; }
 .character-note { font-size: 12px; color: #63785f; margin: 13px 0 0; }
-.touch-controls { display: none; position: absolute; inset: auto 0 0; padding: 8px max(18px, env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left)); justify-content: space-between; z-index: 2; touch-action: none; user-select: none; -webkit-user-select: none; }
+.touch-controls { display: none; position: absolute; inset: auto 0 0; padding: 8px max(18px, env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left)); justify-content: space-between; z-index: 2; touch-action: none; user-select: none; -webkit-user-select: none; pointer-events: none; }
 .direction-buttons { display: flex; gap: 16px; }
-.touch-button { width: 76px; height: 64px; font-size: 25px; border-radius: 20px; border: 2px solid #99b49b; background: #eaf0ddeb; touch-action: none; -webkit-touch-callout: none; }
+.touch-button { width: clamp(88px, 12vw, 116px); height: clamp(80px, 22dvh, 108px); font-size: 34px; border-radius: 28px; border: 2px solid #fff9e8b0; background: #eaf0ddb8; touch-action: none; -webkit-touch-callout: none; pointer-events: auto; }
 .touch-button.pressed { background: #e3bd6c; transform: translateY(2px); }
-.jump-button { width: 112px; }
+.jump-button { width: clamp(112px, 16vw, 152px); }
 .jump-button span { font-size: 14px; }
 .result { position: absolute; inset: 0; z-index: 4; background: #213f3dcc; display: grid; place-items: center; overflow: auto; padding: 16px; }
 .result-card { border-radius: 24px; background: #fff9e8; padding: 28px; text-align: center; max-width: 480px; }
@@ -49,7 +59,7 @@ button:focus-visible { outline: 3px solid #e5bb6e; outline-offset: 2px; }
 [hidden] { display: none !important; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 @media (any-pointer: coarse), (max-width: 1024px) {
-    body.playing .game-stage { bottom: calc(84px + env(safe-area-inset-bottom)); }
+    body.playing .game-stage { bottom: calc(128px + env(safe-area-inset-bottom)); }
     .touch-controls { display: flex; }
 }
 @media (max-height: 500px) {
@@ -72,5 +82,15 @@ button:focus-visible { outline: 3px solid #e5bb6e; outline-offset: 2px; }
     body.playing .game-toolbar { inset: auto auto calc(18px + env(safe-area-inset-bottom)) 50%; transform: translateX(-50%); width: max-content; height: auto; padding: 0; }
     body.playing .build-version { display: none; }
     body.playing .toolbar-actions { gap: 4px; }
-    body.playing .game-toolbar button { font-size: 10px; padding: 6px 8px; }
+    body.playing .game-toolbar button { font-size: 20px; padding: 4px 8px; }
+}
+
+@media (orientation: portrait) {
+    .selection-layout { grid-template-columns: 1fr; }
+}
+@media (orientation: landscape) and (max-height: 340px) {
+    .touch-controls { padding-bottom: calc(4px + env(safe-area-inset-bottom)); }
+    .touch-button { height: 76px; }
+    .selection-layout { margin: 8px 0; gap: 12px; }
+    .character-note { display: none; }
 }

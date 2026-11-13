@@ -1,36 +1,59 @@
 // Bu dosya yalnızca görünümü çizer; oyun kurallarını değiştirmez.
-// Phaser'ın add.rectangle, add.circle, add.ellipse gibi çizim araçlarını kullanırız.
-// setScrollFactor: 0 sabit, 1 dünya ile aynı hız. Ara değerler derinlik hissi verir.
+// Sabit bahçe çizimlerini bir kez dokuya çevirip tekrar kullanırız.
 export function createScenery(scene, width, theme = 'garden') {
     if (theme === 'courtyard') { createCourtyard(scene, width); return; }
     scene.cameras.main.setBackgroundColor('#c6edef');
-    scene.add.rectangle(480, 300, 960, 600, 0xc6edef).setScrollFactor(0).setDepth(-100);
+    cacheTexture(scene, 'garden-cloud', 128, 64, g => {
+        g.fillStyle(0xf5faf3);
+        g.fillEllipse(64, 44, 116, 28); g.fillEllipse(43, 30, 50, 42); g.fillEllipse(84, 24, 58, 48);
+    });
+    cacheTexture(scene, 'garden-hills-far', 1024, 512, g => {
+        g.fillStyle(0x9bced0);
+        for (let x = 0; x <= 1024; x += 512) g.fillEllipse(x, 419, 800, 430);
+    });
+    cacheTexture(scene, 'garden-hills-near', 1024, 512, g => {
+        g.fillStyle(0x73b5a5);
+        for (let x = -256; x <= 1280; x += 512) g.fillEllipse(x, 457, 680, 300);
+    });
+    cacheTexture(scene, 'garden-trees', 512, 256, g => {
+        g.fillStyle(0x7c9573, 0.8); g.fillRect(122, 126, 13, 130);
+        g.fillStyle(0x5fa38b, 0.8);
+        g.fillEllipse(128, 111, 125, 135); g.fillEllipse(93, 145, 92, 94); g.fillEllipse(162, 144, 92, 94);
+    });
+    cacheTexture(scene, 'garden-earth', 256, 128, g => {
+        for (let x = 0; x < 256; x += 28) {
+            g.fillStyle(x % 3 ? 0x956c4a : 0xc78b5c, 0.65);
+            g.fillRoundedRect(x, 30 + (x % 4) * 8, 9, 5, 2);
+        }
+    });
+    cacheTexture(scene, 'garden-flowers', 256, 32, g => {
+        g.fillStyle(0x528b56); g.fillEllipse(55, 24, 54, 18);
+        g.fillStyle(0xffd779); g.fillCircle(67, 16, 4);
+        g.fillStyle(0xf1bf9a); g.fillCircle(45, 21, 3);
+    });
     scene.add.circle(775, 152, 47, 0xffe6a0).setScrollFactor(0.08).setDepth(-90);
     for (let i = 0; i < 9; i++) {
-        const cloud = scene.add.container(i * 260 + 120, 155 + (i % 3) * 32).setScrollFactor(0.18).setDepth(-80);
-        cloud.add([scene.add.ellipse(0, 0, 116, 30, 0xf5faf3), scene.add.ellipse(-21, -13, 50, 42, 0xf5faf3), scene.add.ellipse(20, -18, 58, 50, 0xf5faf3)]);
+        scene.add.image(i * 260 + 120, 155 + (i % 3) * 32, 'garden-cloud').setScrollFactor(0.18).setDepth(-80);
     }
-    for (let i = 0; i < 15; i++) {
-        scene.add.ellipse(i * 300, 507, 650, 355 + (i % 3) * 70, 0x9bced0).setScrollFactor(0.3).setDepth(-70);
-        scene.add.ellipse(i * 260 + 130, 545, 460, 260, 0x73b5a5).setScrollFactor(0.5).setDepth(-60);
-    }
-    for (let x = 100; x < width + 900; x += 310) {
-        const tree = scene.add.container(x, 510).setScrollFactor(0.75).setDepth(-40).setAlpha(0.8);
-        tree.add([scene.add.rectangle(0, -65, 13, 130, 0x7c9573), scene.add.ellipse(0, -145, 125, 135, 0x5fa38b), scene.add.ellipse(-35, -111, 92, 94, 0x5fa38b), scene.add.ellipse(34, -112, 92, 94, 0x5fa38b)]);
-    }
+    // Her katman tek TileSprite: kamera kayar, pahalı şekiller yeniden çizilmez.
+    const tile = (key, y, height, scroll, depth) => scene.add.tileSprite(0, y, width + 1024, height, key)
+        .setOrigin(0).setScrollFactor(scroll).setDepth(depth);
+    tile('garden-hills-far', 88, 512, 0.3, -70);
+    tile('garden-hills-near', 88, 512, 0.5, -60);
+    tile('garden-trees', 254, 256, 0.75, -40);
     scene.add.rectangle(width / 2, 560, width, 80, 0xaf7851).setDepth(-5);
     scene.add.rectangle(width / 2, 530, width, 20, 0x7dba64).setDepth(-4);
     scene.add.rectangle(width / 2, 520, width, 7, 0x417d54).setDepth(-3);
-    const earth = scene.add.graphics().setDepth(-2);
-    for (let x = 0; x < width; x += 28) {
-        earth.fillStyle(x % 3 ? 0x956c4a : 0xc78b5c, 0.65);
-        earth.fillRoundedRect(x, 550 + (x % 4) * 8, 9, 5, 2);
-    }
-    for (let x = 55; x < width; x += 175) {
-        scene.add.ellipse(x, 512, 54, 18, 0x528b56).setDepth(1);
-        scene.add.circle(x + 12, 504, 4, 0xffd779).setDepth(2);
-        scene.add.circle(x - 10, 509, 3, 0xf1bf9a).setDepth(2);
-    }
+    tile('garden-earth', 520, 80, 1, -2);
+    tile('garden-flowers', 488, 32, 1, 1);
+}
+
+function cacheTexture(scene, key, width, height, draw) {
+    if (scene.textures.exists(key)) return;
+    const graphics = scene.make.graphics({ x: 0, y: 0, add: false });
+    draw(graphics);
+    graphics.generateTexture(key, width, height);
+    graphics.destroy();
 }
 
 function createCourtyard(scene, width) {
@@ -89,7 +112,6 @@ export function createMosque(scene, x) {
     scene.add.ellipse(x, 477, 42, 36, 0x486b62).setDepth(7);
     const door = scene.add.rectangle(x, 494, 42, 52, 0x486b62).setDepth(7);
     scene.add.circle(x + 12, 494, 3, 0xf0ce79).setDepth(8);
-    scene.add.text(x, 331, 'CAMİ GİRİŞİ', { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '16px', fontStyle: 'bold', color: '#294e4c' }).setOrigin(0.5).setDepth(7);
     return door;
 }
 
@@ -101,12 +123,12 @@ export function createFountain(scene, x) {
     tiles.fillRoundedRect(x - 25, 467, 50, 44, 4);
     scene.add.rectangle(x, 469, 56, 4, 0xc8af78).setDepth(6);
     scene.add.ellipse(x, 514, 84, 15, 0xd1c7a3).setDepth(6);
-    scene.add.ellipse(x, 512, 66, 8, 0x96cdd0).setDepth(7);
+    const water = scene.add.ellipse(x, 512, 66, 8, 0x96cdd0).setDepth(7);
     for (const offset of [-14, 14]) {
         scene.add.rectangle(x + offset, 487, 12, 4, 0xdabb79).setDepth(7);
         scene.add.rectangle(x + offset + 5, 491, 4, 8, 0xdabb79).setDepth(7);
         const drop = scene.add.ellipse(x + offset + 5, 500, 3, 6, 0xaee6e6).setDepth(7);
         scene.tweens.add({ targets: drop, y: 509, alpha: 0.3, duration: 650, repeat: -1 });
     }
-    return scene.add.text(x, 435, 'ABDEST ALANI · +1 CAN', { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '13px', fontStyle: 'bold', color: '#375e58' }).setOrigin(0.5).setDepth(7);
+    return water;
 }

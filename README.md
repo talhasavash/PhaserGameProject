@@ -173,6 +173,18 @@ HTTP kullan; HTML dosyasını çift tıklayarak açma (oyun ES modülleri kullan
 
 ## İki bölümlü akış
 
+Ana ekranda karakterini ve numaralı bölümünü seçebilirsin. Şimdilik 1 ve 2 açıktır;
+menü `levels` dizisinden üretilir. Oyundaki ☰ düğmesi bölüm seçimine döndürür.
+Menüye dönerken eski Phaser oyunu ve ekran boyutu izleyicisi temizlenir.
+
+İlk bölümün sabit arka planı `cacheTexture` ile bir kez hazırlanır. Tekrarlanan
+katmanlar `TileSprite` ile çizilir; arka plan nesne sayısı 213'ten 18'e indirilmiştir.
+Bu sayı bir FPS ölçümü değildir; gerçek telefon performansı ayrıca kontrol edilmelidir.
+Önbellekteki görseller bölüm yeniden başlatıldığında tekrar üretilmez.
+
+Dokunma düğmeleri ekran boyutuna göre büyür. Oyun alanında açıklama, yer adı veya
+uyarı yazısı yoktur; can, elma, anahtar ve puan simgeler/sayılarla gösterilir.
+
 `src/level.js`, `garden` (Meyve Bahçesi) ve `courtyard` (Kandilli Cami Avlusu)
 verilerini, ayrıca bunları sıraya koyan `levels` dizisini içerir. İki bölüm aynı `GameScene`
 koduyla çalışır; yeni bölüm eklemek için sahne kodunu kopyalamak gerekmez.

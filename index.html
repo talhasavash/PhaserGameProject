@@ -13,19 +13,19 @@
 <body>
     <main>
         <section class="game-shell" aria-label="Meyve Bahçesi oyunu">
-            <div class="game-toolbar"><span id="toolbar-status" class="sr-only">Karakterini seç</span><div class="toolbar-actions"><span class="build-version">Demo · yerel</span><button id="sound-button" type="button" aria-label="Sesi kapat" aria-pressed="false" disabled>♪</button><button id="pause-button" type="button" disabled>Duraklat</button><button id="restart-button" type="button" disabled>Yeniden başla</button><button id="fullscreen-button" type="button">Tam ekran</button></div></div>
+            <div class="game-toolbar"><span id="toolbar-status" class="sr-only">Karakterini seç</span><div class="toolbar-actions"><span class="build-version">Demo · yerel</span><button id="sound-button" type="button" aria-label="Sesi kapat" aria-pressed="false" disabled>♪</button><button id="menu-button" type="button" aria-label="Bölüm seçimine dön" hidden>☰</button><button id="pause-button" type="button" aria-label="Duraklat" disabled>Ⅱ</button><button id="restart-button" type="button" aria-label="Yeniden başla" disabled>↺</button><button id="fullscreen-button" type="button" aria-label="Tam ekran">⛶</button></div></div>
             <div id="game-stage" class="game-stage choosing">
                 <div id="game" role="img" aria-label="Çocuk karakterle oynanan, klavyeyle kontrol edilen platform oyunu"></div>
                 <section id="character-select" class="character-select" aria-labelledby="character-title">
                     <form id="character-form" class="character-form">
                         <p class="eyebrow">MEYVE BAHÇESİ</p>
-                        <h2 id="character-title">Karakterini seç<span>.</span></h2>
+                        <h2 id="character-title" tabindex="-1">Maceranı seç<span>.</span></h2>
                         <p class="character-subtitle">Kiminle keşfe çıkmak istersin?</p>
-                        <fieldset class="character-options">
+                        <div class="selection-layout"><fieldset class="character-options">
                             <legend class="sr-only">Oynayacağın karakter</legend>
                             <label class="character-option"><input type="radio" name="character" value="boy" required><span class="character-card"><span class="character-portrait"><img src="assets/images/child-0.svg" alt="Sırt çantalı erkek çocuk" width="96" height="120"></span><strong>Erkek çocuk</strong><span class="character-check" aria-hidden="true">✓</span></span></label>
                             <label class="character-option"><input type="radio" name="character" value="girl" required><span class="character-card"><span class="character-portrait"><img src="assets/images/girl-0.svg" alt="Başörtülü, sırt çantalı kız çocuk" width="96" height="120"></span><strong>Kız çocuk</strong><span class="character-check" aria-hidden="true">✓</span></span></label>
-                        </fieldset>
+                        </fieldset><fieldset class="level-options"><legend>Bölüm seç</legend><div id="level-grid" class="level-grid"></div></fieldset></div>
                         <button id="start-button" type="submit" disabled>Maceraya başla →</button>
                         <p class="character-note">Her bölümde 3 elmayı bul, anahtarı al ve camiye ulaş.</p>
                     </form>
@@ -36,7 +36,7 @@
             </div>
             <div id="touch-controls" class="touch-controls" aria-label="Hareket düğmeleri" hidden>
                 <div class="direction-buttons"><button id="move-left" class="touch-button" type="button" aria-label="Sola yürü">◀</button><button id="move-right" class="touch-button" type="button" aria-label="Sağa yürü">▶</button></div>
-                <button id="jump" class="touch-button jump-button" type="button" aria-label="Zıpla">↑ <span>Zıpla</span></button>
+                <button id="jump" class="touch-button jump-button" type="button" aria-label="Zıpla">↑</button>
             </div>
         </section>
 

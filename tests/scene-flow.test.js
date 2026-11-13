@@ -7,6 +7,14 @@ import { garden, courtyard } from '../src/level.js';
 globalThis.Phaser = { Scene: class {} };
 const { GameScene } = await import('../src/GameScene.js');
 
+test('Selecting a numbered level starts that scene directly', () => {
+    const scene = new GameScene('boy', 1);
+    GameScene.prototype.init.call(scene);
+    assert.equal(scene.levelIndex, 1);
+    assert.equal(scene.level, courtyard);
+    assert.equal(scene.carriedScore, 0);
+});
+
 test('A collectible plays one quiet effect, even with repeated overlaps', () => {
     const played = [];
     const scene = {

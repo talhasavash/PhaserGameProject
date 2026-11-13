@@ -12,13 +12,13 @@ const HUD_PROGRESS_WIDTH = 96;
 export class GameScene extends Phaser.Scene {
     // Tek sınıfımız bu: Phaser bir oyun ekranını "Scene" olarak yönetir.
     // "this", bu oyun ekranını temsil eder. Fizik ve kamera ona aittir.
-    constructor(character = 'boy') {
+    constructor(character = 'boy', levelIndex = 0) {
         super('Garden');
         this.character = character;
         this.soundMuted = false;
-        this.levelIndex = 0;
+        this.levelIndex = levelIndex;
         this.carriedScore = 0;
-        this.level = levels[0];
+        this.level = levels[levelIndex];
     }
 
     // Phaser, restart ile gönderilen bölüm bilgisini önce init'e verir.
@@ -137,7 +137,6 @@ export class GameScene extends Phaser.Scene {
         this.keySprite.disableBody(true, true);
         this.add.ellipse(this.level.key.x, 514, 100, 12, 0x528b56).setDepth(2);
         this.add.rectangle(this.level.key.x, 506, 64, 18, 0xc8b78c).setDepth(3);
-        this.keyCaption = this.add.text(this.level.key.x, 431, '3 elma → anahtar', { ...textStyle, fontSize: '15px', fontStyle: 'bold' }).setOrigin(0.5).setDepth(8);
     }
 
     createHazards() {
@@ -173,7 +172,6 @@ export class GameScene extends Phaser.Scene {
         const { x } = this.level.checkpoint;
         this.add.rectangle(x, 476, 6, 88, 0x6b6e52).setDepth(6);
         this.checkpointFlag = this.add.triangle(x + 4, 433, 0, 0, 48, 12, 0, 27, 0xe3c37d).setOrigin(0, 0).setDepth(7);
-        this.checkpointLabel = this.add.text(x, 407, 'KONTROL NOKTASI', { ...textStyle, fontSize: '13px', fontStyle: 'bold' }).setOrigin(0.5).setDepth(6);
         const exit = this.level.exit;
         this.door = createMosque(this, exit.x);
         this.exitZone = this.add.zone(exit.x, 480, 68, 80);
@@ -183,10 +181,10 @@ export class GameScene extends Phaser.Scene {
     createHealingSpots() {
         this.fountains = this.physics.add.staticGroup();
         for (const fountain of this.level.fountains) {
-            const label = createFountain(this, fountain.x);
+            const water = createFountain(this, fountain.x);
             const zone = this.add.zone(fountain.x, 480, 85, 80);
             zone.setData('id', fountain.id);
-            zone.setData('label', label);
+            zone.setData('water', water);
             this.fountains.add(zone);
         }
     }
@@ -195,7 +193,7 @@ export class GameScene extends Phaser.Scene {
         if (!healAtFountain(this.gameState, zone.getData('id'))) return;
         this.sound.play('heal', { volume: 0.20 });
         showRecovery(player, this.elapsed);
-        zone.getData('label').setText('DİNLENDİN · +1 CAN ✓');
+        zone.getData('water').setFillStyle(0xd9efda);
         this.announce('Abdest alanında dinlendin. Bir canın yenilendi!');
         this.updateHud();
     }
@@ -215,7 +213,9 @@ export class GameScene extends Phaser.Scene {
         };
         this.hud.add(bg);
         this.heartsText = label(16, 5, '', 16);
+        this.hud.add(this.add.image(92, 14, 'apple').setDisplaySize(13, 15).setScrollFactor(0).setDepth(101));
         this.appleText = label(108, 6, '', 14);
+        this.hud.add(this.add.image(230, 14, 'key').setDisplaySize(21, 13).setScrollFactor(0).setDepth(101));
         this.keyText = label(245, 6, '', 14);
         this.scoreText = label(390, 6, '', 14);
         this.progressTrack = this.add.rectangle(528, 14, HUD_PROGRESS_WIDTH, 3, 0xdce8d9).setScrollFactor(0).setDepth(101);
@@ -235,7 +235,8 @@ export class GameScene extends Phaser.Scene {
     bindPageControls() {
         const result = document.getElementById('game-result');
         result.hidden = true;
-        document.getElementById('pause-button').textContent = 'Duraklat';
+        document.getElementById('pause-button').textContent = 'Ⅱ';
+        document.getElementById('pause-button').setAttribute('aria-label', 'Duraklat');
         document.getElementById('pause-button').disabled = false;
         document.getElementById('restart-button').disabled = false;
         document.getElementById('toolbar-status').textContent = `${this.level.name} seni bekliyor`;
@@ -261,9 +262,9 @@ export class GameScene extends Phaser.Scene {
     updateHud() {
         this.heartsText.setText('♥'.repeat(this.gameState.hearts) + '♡'.repeat(3 - this.gameState.hearts));
         this.heartsText.setColor('#bd6959');
-        this.appleText.setText(`${this.levelIndex + 1}. BÖLÜM · ${this.gameState.apples}/3`);
-        this.keyText.setText(this.gameState.hasKey ? 'ANAHTAR  ✓' : 'ANAHTAR  —');
-        this.scoreText.setText(`${this.gameState.score} P`);
+        this.appleText.setText(`${this.gameState.apples}/3`);
+        this.keyText.setText(this.gameState.hasKey ? '✓' : '—');
+        this.scoreText.setText(`☆ ${this.gameState.score}`);
     }
 
     announce(message) {
@@ -287,7 +288,6 @@ export class GameScene extends Phaser.Scene {
         if (item.type === 'crescent') this.announce('Hilal ve yıldız buldun! +20 puan.');
         if (isKeyReady(this.gameState) && !this.gameState.hasKey && !this.keySprite.active) {
             this.keySprite.enableBody(false, this.level.key.x, this.level.key.y, true, true);
-            this.keyCaption.setText('Anahtarını al!');
         }
         this.updateHud();
     }
@@ -296,7 +296,6 @@ export class GameScene extends Phaser.Scene {
         if (!takeKey(this.gameState)) return;
         this.sound.play('key', { volume: 0.20 });
         this.keySprite.disableBody(true, true);
-        this.keyCaption.setText('Kapıya doğru →');
         this.door.setFillStyle(0x394e49);
         this.announce('Anahtar sende! Şimdi cami girişine ulaş.');
         this.updateHud();
@@ -367,7 +366,8 @@ export class GameScene extends Phaser.Scene {
         } else {
             this.physics.resume(); this.tweens.resumeAll(); this.time.paused = false;
         }
-        document.getElementById('pause-button').textContent = this.paused ? 'Devam et' : 'Duraklat';
+        document.getElementById('pause-button').textContent = this.paused ? '▶' : 'Ⅱ';
+        document.getElementById('pause-button').setAttribute('aria-label', this.paused ? 'Devam et' : 'Duraklat');
     }
 
     restart(fromBeginning = false) {
@@ -427,7 +427,6 @@ export class GameScene extends Phaser.Scene {
         if (!this.gameState.checkpointActive && this.player.x > this.level.checkpoint.x - 18) {
             this.gameState.checkpointActive = true;
             this.checkpointFlag.setFillStyle(0x55977b);
-            this.checkpointLabel.setText('BURADAN DEVAM EDEBİLİRSİN');
             if (this.gameState.hearts < 3) {
                 showRecovery(this.player, this.elapsed);
                 this.sound.play('heal', { volume: 0.20 });

@@ -11,7 +11,8 @@ const contentTypes = {
     '.js': 'text/javascript; charset=utf-8',
     '.png': 'image/png',
     '.svg': 'image/svg+xml',
-    '.mp3': 'audio/mpeg'
+    '.mp3': 'audio/mpeg',
+    '.wav': 'audio/wav'
 };
 
 const server = http.createServer(async (request, response) => {

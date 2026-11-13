@@ -202,6 +202,7 @@ export function movePlayer(player, time, delta, conveyorSpeed) {
         movement.lastGrounded = -Infinity;
         movement.jumpConsumed = true;
         movement.jumpStarted = time;
+        player.onJump?.(); // Ses yalnızca gerçekten zıplandığında çalsın.
     }
     const releasedKeyboardJump = !movement.touchJump && movement.wasJumpHeld;
     const releasedTouchJump = movement.touchJump && time - movement.jumpStarted >= MIN_TOUCH_JUMP_TIME;

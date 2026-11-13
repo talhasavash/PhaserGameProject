@@ -6,7 +6,7 @@ const output = path.join(root, 'dist');
 const version = (process.env.GITHUB_SHA || 'local').slice(0, 7);
 const suffix = `?v=${version}`;
 
-for (const directory of ['css', 'src', 'lib', 'assets/images']) {
+for (const directory of ['css', 'src', 'lib', 'assets/images', 'assets/audio']) {
     fs.cpSync(path.join(root, directory), path.join(output, directory), { recursive: true });
 }
 
@@ -22,7 +22,7 @@ for (const file of fs.readdirSync(path.join(output, 'src'))) {
     let code = fs.readFileSync(target, 'utf8');
     // Modüller ve SVG'ler de aynı sürümden gelsin; eski önbellekle karışmasın.
     code = code.replace(/(from ['"]\.\/[^'"?]+)(['"])/g, `$1${suffix}$2`);
-    code = code.replace(/(assets\/images\/[^'"`]+\.svg)(['"`])/g, `$1${suffix}$2`);
+    code = code.replace(/(assets\/(?:images|audio)\/[^'"`]+\.(?:svg|wav))(['"`])/g, `$1${suffix}$2`);
     fs.writeFileSync(target, code);
 }
 console.log(`Yayın hazır: dist / ${version}`);

@@ -28,6 +28,11 @@ Yatay telefonda 600 yerine 320 dünya birimi yükseklik gösterilir; üst/alt ş
 kaldırıldığı için karakter ve nesneler daha büyük görünür. Tablet görünümü 480 birimdir.
 Bu değerler `src/view.js` içindedir. Kamera zemine göre sabittir; zıplarken dikey kaymaz.
 Can/elma/anahtar/puan bilgileri ince bir üst satırdadır.
+Üst satır ekran genişliğinin yaklaşık %63'ünü kaplar. Küçük nota düğmesi sesleri açıp kapatır.
+Zıplama, toplama, çarpma, can yenileme ve anahtar alma kısa ses efektleri kullanır.
+`preload()` içindeki `load.audio` WAV dosyalarını yükler; `sound.play` olay gerçekleştiğinde çalar.
+Ses dosyaları `assets/audio` içindedir; özgün tonları `node scripts/build-sounds.cjs` yeniden üretir.
+Tarayıcıların ses kuralı nedeniyle ilk tıklama/dokunmadan sonra ses açılır; Phaser bunu yönetir.
 Oyun sırasında açılan ipucu/uyarı kutuları ve uyarı tabelaları kapalıdır.
 Durum mesajları yalnızca ekran okuyucu için görünmeyen alanda tutulur.
 Tam ekranda destekleyen telefonlarda yatay yön istenir. Fiziksel cihaz kontrolü ayrıca yapılmalıdır.
@@ -166,7 +171,7 @@ HTTP kullan; HTML dosyasını çift tıklayarak açma (oyun ES modülleri kullan
 - Dururken sallanma yoktur. Zıplama pozundaki kaldırılmış kol iki karakterde de başın yanında açıkça görünür.
 - Bant sola taşır; bu bir buz sürtünmesi değildir.
 
-Şimdilik tek bölüm var. Yeni bölümler, ses ve kalıcı kayıt daha sonra eklenebilir.
+Şimdilik tek bölüm var. Yeni bölümler ve kalıcı kayıt daha sonra eklenebilir.
 
 ## Kontroller ve Git
 

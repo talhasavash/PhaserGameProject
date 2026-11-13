@@ -60,6 +60,15 @@ test('Releasing movement coasts for a while and eventually stops', () => {
     assert.equal(player.body.velocity.x, 0);
 });
 
+test('Jump feedback fires only on a real takeoff, not on every held frame', () => {
+    const player = playerForTest();
+    let sounds = 0;
+    player.onJump = () => { sounds += 1; };
+    player.cursors.up.isDown = true;
+    for (let frame = 0; frame < 10; frame++) movePlayer(player, 1000 + frame * 16, 16, 0);
+    assert.equal(sounds, 1);
+});
+
 test('A quick mobile tap launches reliably, then makes a short jump while walking', () => {
     const player = playerForTest();
     player.touchKeys = { left: key(), right: { isDown: true }, up: { isDown: false, justPressed: true } };

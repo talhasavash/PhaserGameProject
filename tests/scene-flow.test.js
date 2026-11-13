@@ -7,6 +7,33 @@ import { garden } from '../src/level.js';
 globalThis.Phaser = { Scene: class {} };
 const { GameScene } = await import('../src/GameScene.js');
 
+test('A collectible plays one quiet effect, even with repeated overlaps', () => {
+    const played = [];
+    const scene = {
+        gameState: createGameState(),
+        sound: { play(key, options) { played.push({ key, volume: options.volume }); } },
+        tweens: { killTweensOf() {} }, updateHud() {}, announce() {}
+    };
+    const fruit = { getData: () => ({ id: 'berry-1', type: 'berry' }), disableBody() {} };
+    GameScene.prototype.collectFruit.call(scene, {}, fruit);
+    GameScene.prototype.collectFruit.call(scene, {}, fruit);
+    assert.deepEqual(played, [{ key: 'collect', volume: 0.18 }]);
+});
+
+test('Invulnerability suppresses repeated impact sounds as well as repeated damage', () => {
+    let sounds = 0;
+    const player = { x: 100, anims: { stop() {} }, setTexture() {}, setVelocity() {} };
+    const scene = {
+        gameState: createGameState(), elapsed: 1000, hurtUntil: 0,
+        sound: { play(key) { assert.equal(key, 'hurt'); sounds += 1; } },
+        cameras: { main: { shake() {} } }, updateHud() {}, announce() {}
+    };
+    GameScene.prototype.hitHazard.call(scene, player, { x: 200 });
+    GameScene.prototype.hitHazard.call(scene, player, { x: 200 });
+    assert.equal(sounds, 1);
+    assert.equal(scene.gameState.hearts, 2);
+});
+
 test('Touching the exit early leaves the game running and explains the mission', () => {
     let hint = '';
     const scene = { gameState: createGameState(), elapsed: 5000, lastGateHint: 0, announce: message => { hint = message; } };

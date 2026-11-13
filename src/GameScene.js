@@ -7,6 +7,7 @@ import { bindTouchControls } from './controls.js';
 const textStyle = { fontFamily: 'Trebuchet MS, sans-serif', color: '#294e4c' };
 const COLLECTIBLE_SCALE = 0.75;
 const ENEMY_SCALE = 0.8;
+const HUD_PROGRESS_WIDTH = 96;
 
 export class GameScene extends Phaser.Scene {
     // Tek sınıfımız bu: Phaser bir oyun ekranını "Scene" olarak yönetir.
@@ -14,6 +15,7 @@ export class GameScene extends Phaser.Scene {
     constructor(character = 'boy') {
         super('Garden');
         this.character = character;
+        this.soundMuted = false;
     }
 
     // Phaser önce preload'u çağırır: görselleri hazırla.
@@ -35,6 +37,9 @@ export class GameScene extends Phaser.Scene {
         this.load.svg('key', 'assets/images/key.svg', { width: 64, height: 40 });
         this.load.svg('bead', 'assets/images/bead.svg', { width: 40, height: 44 });
         this.load.svg('mat', 'assets/images/mat.svg', { width: 36, height: 52 });
+        for (const effect of ['jump', 'collect', 'hurt', 'heal', 'key']) {
+            this.load.audio(effect, `assets/audio/${effect}.wav`);
+        }
     }
 
     // Görseller yüklenince Phaser create'i bir kez çağırır: bölümü kur.
@@ -53,6 +58,7 @@ export class GameScene extends Phaser.Scene {
         this.createLandmarks();
         this.createHealingSpots();
         this.player = createPlayer(this, garden.spawn.x, garden.spawn.y, this.character);
+        this.player.onJump = () => this.sound.play('jump', { volume: 0.20 });
         this.touchControls = bindTouchControls();
         this.player.touchKeys = this.touchControls.keys;
         // collider: karakter platformun içinden geçmesin.
@@ -76,6 +82,7 @@ export class GameScene extends Phaser.Scene {
             document.getElementById('pause-button').onclick = null;
             document.getElementById('restart-button').onclick = null;
             document.getElementById('play-again').onclick = null;
+            document.getElementById('sound-button').onclick = null;
         });
         this.announce('Üç elmayı bul. Meyve, tesbih ve seccadeler bonus puan!');
         this.updateHud();
@@ -173,6 +180,7 @@ export class GameScene extends Phaser.Scene {
 
     useFountain(player, zone) {
         if (!healAtFountain(this.gameState, zone.getData('id'))) return;
+        this.sound.play('heal', { volume: 0.20 });
         showRecovery(player, this.elapsed);
         zone.getData('label').setText('DİNLENDİN · +1 CAN ✓');
         this.announce('Abdest alanında dinlendin. Bir canın yenilendi!');
@@ -183,28 +191,29 @@ export class GameScene extends Phaser.Scene {
         this.hud = this.add.container(0, 0).setScrollFactor(0).setDepth(100);
         // HUD: can ve puan gibi ekran bilgileri. ScrollFactor(0) ile kameradan bağımsız kalır.
         const bg = this.add.graphics().setScrollFactor(0).setDepth(100);
-        bg.fillStyle(0xfffcf0, 0.96);
-        bg.fillRoundedRect(18, 8, 924, 40, 12);
+        bg.fillStyle(0xfffcf0, 0.83);
+        bg.fillRoundedRect(0, 0, 600, 28, 8);
         bg.lineStyle(1, 0x94b7a0, 0.4);
-        bg.strokeRoundedRect(18, 8, 924, 40, 12);
+        bg.strokeRoundedRect(0, 0, 600, 28, 8);
         const label = (x, y, content, size = 16) => {
             const text = this.add.text(x, y, content, { ...textStyle, fontSize: `${size}px`, fontStyle: 'bold' }).setScrollFactor(0).setDepth(101);
             this.hud.add(text);
             return text;
         };
         this.hud.add(bg);
-        this.heartsText = label(34, 16, '', 19);
-        this.appleText = label(190, 17, '', 16);
-        this.keyText = label(390, 17, '', 16);
-        this.scoreText = label(590, 17, '', 16);
-        this.progressTrack = this.add.rectangle(810, 28, 230, 4, 0xdce8d9).setScrollFactor(0).setDepth(101);
-        this.progressFill = this.add.rectangle(695, 28, 1, 4, 0x649272).setOrigin(0, 0.5).setScrollFactor(0).setDepth(102);
+        this.heartsText = label(16, 5, '', 16);
+        this.appleText = label(108, 6, '', 14);
+        this.keyText = label(245, 6, '', 14);
+        this.scoreText = label(390, 6, '', 14);
+        this.progressTrack = this.add.rectangle(528, 14, HUD_PROGRESS_WIDTH, 3, 0xdce8d9).setScrollFactor(0).setDepth(101);
+        this.progressFill = this.add.rectangle(480, 14, 1, 3, 0x649272).setOrigin(0, 0.5).setScrollFactor(0).setDepth(102);
         this.hud.add([this.progressTrack, this.progressFill]);
     }
 
     centerHud() {
         const hudScale = this.scale.width / 960;
         this.hud.setScale(hudScale);
+        this.hud.setPosition((this.scale.width - 600 * hudScale) / 2, 6 * hudScale);
         // Zemini aynı yerde tut: zıplarken ekran yukarı-aşağı sallanmasın.
         this.cameras.main.scrollY = Math.max(0, 600 - this.scale.height);
         this.cameras.main.setFollowOffset(-Math.min(190, this.scale.width * 0.2), 0);
@@ -220,6 +229,20 @@ export class GameScene extends Phaser.Scene {
         document.getElementById('pause-button').onclick = () => this.togglePause();
         document.getElementById('restart-button').onclick = () => this.restart();
         document.getElementById('play-again').onclick = () => this.restart();
+        const soundButton = document.getElementById('sound-button');
+        soundButton.disabled = false;
+        this.sound.setMute(this.soundMuted);
+        const updateSoundButton = () => {
+            soundButton.textContent = this.soundMuted ? '♪×' : '♪';
+            soundButton.setAttribute('aria-label', this.soundMuted ? 'Sesi aç' : 'Sesi kapat');
+            soundButton.setAttribute('aria-pressed', String(this.soundMuted));
+        };
+        updateSoundButton();
+        soundButton.onclick = () => {
+            this.soundMuted = !this.soundMuted;
+            this.sound.setMute(this.soundMuted);
+            updateSoundButton();
+        };
     }
 
     updateHud() {
@@ -239,6 +262,7 @@ export class GameScene extends Phaser.Scene {
     collectFruit(player, fruit) {
         const item = fruit.getData('item');
         if (!recordFruit(this.gameState, item.id, item.type)) return;
+        this.sound.play('collect', { volume: 0.18 });
         fruit.disableBody(true, true);
         this.tweens.killTweensOf(fruit);
         if (item.type === 'apple') {
@@ -255,6 +279,7 @@ export class GameScene extends Phaser.Scene {
 
     collectKey() {
         if (!takeKey(this.gameState)) return;
+        this.sound.play('key', { volume: 0.20 });
         this.keySprite.disableBody(true, true);
         this.keyCaption.setText('Kapıya doğru →');
         this.door.setFillStyle(0x394e49);
@@ -266,6 +291,7 @@ export class GameScene extends Phaser.Scene {
     hitHazard(player, hazard) {
         if (this.paused || this.gameState.complete || this.elapsed < this.hurtUntil) return;
         this.gameState.hearts -= 1;
+        this.sound.play('hurt', { volume: 0.23 });
         this.cameras.main.shake(110, 0.002);
         if (this.gameState.hearts === 0) {
             this.respawn();
@@ -374,11 +400,14 @@ export class GameScene extends Phaser.Scene {
             this.gameState.checkpointActive = true;
             this.checkpointFlag.setFillStyle(0x55977b);
             this.checkpointLabel.setText('BURADAN DEVAM EDEBİLİRSİN');
-            if (this.gameState.hearts < 3) showRecovery(this.player, this.elapsed);
+            if (this.gameState.hearts < 3) {
+                showRecovery(this.player, this.elapsed);
+                this.sound.play('heal', { volume: 0.20 });
+            }
             this.gameState.hearts = 3;
             this.announce('Kontrol noktası! Canların doldu. Buradan devam edebilirsin.');
             this.updateHud();
         }
-        this.progressFill.width = Phaser.Math.Clamp(this.player.x / garden.exit.x, 0, 1) * 230;
+        this.progressFill.width = Phaser.Math.Clamp(this.player.x / garden.exit.x, 0, 1) * HUD_PROGRESS_WIDTH;
     }
 }

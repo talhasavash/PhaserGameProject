@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createGameState, recordFruit, takeKey } from '../src/rules.js';
-import { garden } from '../src/level.js';
+import { garden, courtyard } from '../src/level.js';
 
 // Exercise scene transitions without requiring WebGL in Node.
 globalThis.Phaser = { Scene: class {} };
@@ -50,7 +50,7 @@ test('The key and exit open the result screen exactly once', () => {
     takeKey(run);
     let pauseCount = 0;
     const scene = {
-        gameState: run, elapsed: 10000,
+        gameState: run, elapsed: 10000, levelIndex: 1,
         physics: { pause() { pauseCount += 1; } },
         player: { anims: { stop() {} }, setTexture() {} },
         tweens: { pauseAll() {} }, announce() {}, updateHud() {}
@@ -72,7 +72,7 @@ test('Respawn restores hearts at the flag and preserves collected fruit and key'
     run.hearts = 0;
     let position;
     const scene = {
-        gameState: run, elapsed: 9000,
+        gameState: run, elapsed: 9000, level: garden,
         player: { movement: {}, anims: { stop() {} }, setTexture() {}, setVelocity() {}, setRotation() {}, setPosition() {}, body: { reset(x, y) { position = { x, y }; } } },
         cameras: { main: { flash() {} } }, announce() {}, updateHud() {}
     };
@@ -83,4 +83,44 @@ test('Respawn restores hearts at the flag and preserves collected fruit and key'
     assert.equal(run.score, 90);
     assert.equal(run.hasKey, true);
     assert.ok(scene.hurtUntil > scene.elapsed);
+});
+
+test('First mosque automatically starts the second level exactly once with score preserved', () => {
+    const run = createGameState();
+    for (let i = 0; i < 3; i++) recordFruit(run, `apple-${i}`, 'apple');
+    takeKey(run);
+    const calls = [];
+    const scene = {
+        gameState: run, levelIndex: 0, elapsed: 9000,
+        touchControls: { reset() {} }, scene: { restart(data) { calls.push(data); } }
+    };
+    GameScene.prototype.reachExit.call(scene);
+    GameScene.prototype.reachExit.call(scene);
+    assert.deepEqual(calls, [{ levelIndex: 1, score: 90 }]);
+});
+
+test('Second level resets its mission and hearts, preserves character, sound setting and total score', () => {
+    const scene = new GameScene('girl');
+    scene.soundMuted = true;
+    GameScene.prototype.init.call(scene, { levelIndex: 1, score: 150 });
+    assert.equal(scene.level, courtyard);
+    const state = createGameState(scene.carriedScore);
+    assert.equal(state.score, 150);
+    assert.equal(state.apples, 0);
+    assert.equal(state.hasKey, false);
+    assert.equal(state.hearts, 3);
+    assert.equal(scene.character, 'girl');
+    assert.equal(scene.soundMuted, true);
+});
+
+test('Restart repeats the current level; play again begins from the garden', () => {
+    const calls = [];
+    const scene = {
+        levelIndex: 1, carriedScore: 130,
+        time: {}, tweens: { resumeAll() {} }, physics: { resume() {} },
+        scene: { restart(data) { calls.push(data); } }
+    };
+    GameScene.prototype.restart.call(scene);
+    GameScene.prototype.restart.call(scene, true);
+    assert.deepEqual(calls, [{ levelIndex: 1, score: 130 }, { levelIndex: 0, score: 0 }]);
 });

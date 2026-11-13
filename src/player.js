@@ -6,8 +6,8 @@ const AIR_ACCELERATION = 1350;
 const GROUND_BRAKING = 700; // Tuş bırakıldığında hemen durmak yerine yavaşla.
 const AIR_BRAKING = 220; // Havada hareketin ivmesini daha uzun koru.
 const TURN_ACCELERATION = 2200; // Ters yöne basınca daha hızlı tepki ver.
-const EDGE_JUMP_TIME = 110; // Kenardan ayrıldıktan sonra kısa bir zıplama toleransı.
-const EARLY_JUMP_TIME = 140; // Yere inmeden hemen önce basılan zıplamayı hatırla.
+const EDGE_JUMP_TIME = 140; // Kenardan ayrıldıktan sonra kısa bir zıplama toleransı.
+const EARLY_JUMP_TIME = 240; // Yere inmeden hemen önce basılan zıplamayı hatırla.
 const PLAYER_SCALE = 0.8; // Karakter önceki boyutundan %20 küçük.
 const MIN_TOUCH_JUMP_TIME = 70; // Çok kısa dokunuş da algılansın; sonrası basma süresine bağlı.
 

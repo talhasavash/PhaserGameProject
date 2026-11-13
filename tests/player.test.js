@@ -111,6 +111,19 @@ test('Up and left can remain held while a new right press reverses airborne move
     assert.ok(player.body.velocity.x > 0);
 });
 
+test('A jump tapped 200 ms before landing is remembered while running', () => {
+    const player = playerForTest();
+    player.body.blocked.down = false;
+    player.body.velocity.y = 100;
+    player.touchKeys = { left: key(), right: { isDown: true }, up: { isDown: false, justPressed: true } };
+    movePlayer(player, 1000, 16, 0);
+    assert.equal(player.body.velocity.y, 100);
+    player.body.blocked.down = true;
+    movePlayer(player, 1200, 16, 0);
+    assert.equal(player.body.velocity.y, -590);
+    assert.ok(player.body.velocity.x > 0);
+});
+
 test('Coasting deceleration is consistent at 30, 60, and 120 FPS', () => {
     for (const fps of [30, 60, 120]) {
         const player = playerForTest();

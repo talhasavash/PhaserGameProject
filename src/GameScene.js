@@ -1,4 +1,4 @@
-import { garden } from './level.js';
+import { levels } from './level.js';
 import { createGameState, isKeyReady, recordFruit, takeKey, finishLevel, healAtFountain } from './rules.js';
 import { createPlayer, movePlayer, resetPlayerMovement, showPlayerExpression, showRecovery, updatePlayerEffects } from './player.js';
 import { createScenery, createMosque, createFountain } from './background.js';
@@ -16,6 +16,16 @@ export class GameScene extends Phaser.Scene {
         super('Garden');
         this.character = character;
         this.soundMuted = false;
+        this.levelIndex = 0;
+        this.carriedScore = 0;
+        this.level = levels[0];
+    }
+
+    // Phaser, restart ile gönderilen bölüm bilgisini önce init'e verir.
+    init(data = {}) {
+        if (data.levelIndex !== undefined) this.levelIndex = data.levelIndex;
+        if (data.score !== undefined) this.carriedScore = data.score;
+        this.level = levels[this.levelIndex];
     }
 
     // Phaser önce preload'u çağırır: görselleri hazırla.
@@ -37,6 +47,8 @@ export class GameScene extends Phaser.Scene {
         this.load.svg('key', 'assets/images/key.svg', { width: 64, height: 40 });
         this.load.svg('bead', 'assets/images/bead.svg', { width: 40, height: 44 });
         this.load.svg('mat', 'assets/images/mat.svg', { width: 36, height: 52 });
+        this.load.svg('lantern', 'assets/images/lantern.svg', { width: 40, height: 52 });
+        this.load.svg('crescent', 'assets/images/crescent.svg', { width: 44, height: 46 });
         for (const effect of ['jump', 'collect', 'hurt', 'heal', 'key']) {
             this.load.audio(effect, `assets/audio/${effect}.wav`);
         }
@@ -44,20 +56,20 @@ export class GameScene extends Phaser.Scene {
 
     // Görseller yüklenince Phaser create'i bir kez çağırır: bölümü kur.
     create() {
-        this.gameState = createGameState();
+        this.gameState = createGameState(this.carriedScore);
         this.elapsed = 0;
         this.hurtUntil = 0;
         this.knockbackUntil = 0;
         this.paused = false;
         this.lastGateHint = -Infinity;
-        this.physics.world.setBounds(0, 0, garden.width, 600);
-        createScenery(this, garden.width);
+        this.physics.world.setBounds(0, 0, this.level.width, 600);
+        createScenery(this, this.level.width, this.level.theme);
         this.createTerrain();
         this.createCollectibles();
         this.createHazards();
         this.createLandmarks();
         this.createHealingSpots();
-        this.player = createPlayer(this, garden.spawn.x, garden.spawn.y, this.character);
+        this.player = createPlayer(this, this.level.spawn.x, this.level.spawn.y, this.character);
         this.player.onJump = () => this.sound.play('jump', { volume: 0.20 });
         this.touchControls = bindTouchControls();
         this.player.touchKeys = this.touchControls.keys;
@@ -69,7 +81,7 @@ export class GameScene extends Phaser.Scene {
         this.physics.add.overlap(this.player, this.keySprite, this.collectKey, null, this);
         this.physics.add.overlap(this.player, this.exitZone, this.reachExit, null, this);
         this.physics.add.overlap(this.player, this.fountains, this.useFountain, null, this);
-        this.cameras.main.setBounds(0, 0, garden.width, 600);
+        this.cameras.main.setBounds(0, 0, this.level.width, 600);
         this.cameras.main.startFollow(this.player, true, 0.09, 0, -190, 0);
         this.createHud();
         this.centerHud();
@@ -84,15 +96,15 @@ export class GameScene extends Phaser.Scene {
             document.getElementById('play-again').onclick = null;
             document.getElementById('sound-button').onclick = null;
         });
-        this.announce('Üç elmayı bul. Meyve, tesbih ve seccadeler bonus puan!');
+        this.announce(`${this.levelIndex + 1}. bölüm: ${this.level.name}. Üç elmayı bul, anahtarı al ve camiye ulaş.`);
         this.updateHud();
     }
 
     // Zemini ve platformları sabit fizik gövdeleriyle oluştur.
     createTerrain() {
         this.solids = this.physics.add.staticGroup();
-        this.solids.add(this.add.rectangle(garden.width / 2, 570, garden.width, 100).setVisible(false));
-        for (const platform of garden.platforms) {
+        this.solids.add(this.add.rectangle(this.level.width / 2, 570, this.level.width, 100).setVisible(false));
+        for (const platform of this.level.platforms) {
             const { x, y, width } = platform;
             const ground = this.add.rectangle(x + width / 2, y + 14, width, 28, 0x9c7653).setDepth(5);
             this.solids.add(ground);
@@ -102,7 +114,7 @@ export class GameScene extends Phaser.Scene {
                 this.add.rectangle(xx, y + 17, 12, 4, 0xb9956a).setDepth(6);
             }
         }
-        const belt = garden.belt;
+        const belt = this.level.belt;
         this.add.rectangle(belt.x + belt.width / 2, 524, belt.width, 17, 0x466b72).setDepth(7);
         this.beltMarks = [];
         for (let i = 0; i < 10; i++) {
@@ -113,33 +125,34 @@ export class GameScene extends Phaser.Scene {
     // level.js içindeki meyve konumlarını kullan; anahtarı başlangıçta gizle.
     createCollectibles() {
         this.fruits = this.physics.add.staticGroup();
-        for (const fruit of garden.fruits) {
+        for (const fruit of this.level.fruits) {
             const sprite = this.fruits.create(fruit.x, fruit.y, fruit.type).setDepth(10);
             sprite.setScale(COLLECTIBLE_SCALE).refreshBody();
             sprite.setData('item', fruit);
             // Görsel hafifçe süzülür; toplama kutusu yerinde kalır.
             this.tweens.add({ targets: sprite, y: fruit.y - 5, duration: 950, yoyo: true, repeat: -1, delay: fruit.x % 400, ease: 'Sine.easeInOut' });
         }
-        this.keySprite = this.physics.add.staticImage(garden.key.x, garden.key.y, 'key').setDepth(10);
+        this.keySprite = this.physics.add.staticImage(this.level.key.x, this.level.key.y, 'key').setDepth(10);
         this.keySprite.setScale(COLLECTIBLE_SCALE).refreshBody();
         this.keySprite.disableBody(true, true);
-        this.add.ellipse(garden.key.x, 514, 100, 12, 0x528b56).setDepth(2);
-        this.add.rectangle(garden.key.x, 506, 64, 18, 0xc8b78c).setDepth(3);
-        this.keyCaption = this.add.text(garden.key.x, 431, '3 elma → anahtar', { ...textStyle, fontSize: '15px', fontStyle: 'bold' }).setOrigin(0.5).setDepth(8);
+        this.add.ellipse(this.level.key.x, 514, 100, 12, 0x528b56).setDepth(2);
+        this.add.rectangle(this.level.key.x, 506, 64, 18, 0xc8b78c).setDepth(3);
+        this.keyCaption = this.add.text(this.level.key.x, 431, '3 elma → anahtar', { ...textStyle, fontSize: '15px', fontStyle: 'bold' }).setOrigin(0.5).setDepth(8);
     }
 
     createHazards() {
         this.hazards = this.physics.add.group({ allowGravity: false, immovable: true });
-        for (const enemy of garden.enemies) {
+        for (const enemy of this.level.enemies) {
             this.createHazard(enemy);
         }
-        this.createHazard(garden.ball);
+        this.createHazard(this.level.ball);
+        for (const hazard of this.level.extraHazards || []) this.createHazard(hazard);
     }
 
     createHazard(data) {
         // Küçülünce de ayaklar yerde kalsın. Kutuların alt kenarı zeminle aynı hizada.
-        let y = garden.groundY - 24 * ENEMY_SCALE;
-        if (data.type === 'ball') y = garden.groundY - 22 * ENEMY_SCALE;
+        let y = this.level.groundY - 24 * ENEMY_SCALE;
+        if (data.type === 'ball') y = this.level.groundY - 22 * ENEMY_SCALE;
         const sprite = this.hazards.create(data.x, y, data.type).setDepth(12);
         sprite.setScale(ENEMY_SCALE);
         sprite.setData('patrol', {
@@ -157,11 +170,11 @@ export class GameScene extends Phaser.Scene {
     }
 
     createLandmarks() {
-        const { x } = garden.checkpoint;
+        const { x } = this.level.checkpoint;
         this.add.rectangle(x, 476, 6, 88, 0x6b6e52).setDepth(6);
         this.checkpointFlag = this.add.triangle(x + 4, 433, 0, 0, 48, 12, 0, 27, 0xe3c37d).setOrigin(0, 0).setDepth(7);
         this.checkpointLabel = this.add.text(x, 407, 'KONTROL NOKTASI', { ...textStyle, fontSize: '13px', fontStyle: 'bold' }).setOrigin(0.5).setDepth(6);
-        const exit = garden.exit;
+        const exit = this.level.exit;
         this.door = createMosque(this, exit.x);
         this.exitZone = this.add.zone(exit.x, 480, 68, 80);
         this.physics.add.existing(this.exitZone, true);
@@ -169,7 +182,7 @@ export class GameScene extends Phaser.Scene {
 
     createHealingSpots() {
         this.fountains = this.physics.add.staticGroup();
-        for (const fountain of garden.fountains) {
+        for (const fountain of this.level.fountains) {
             const label = createFountain(this, fountain.x);
             const zone = this.add.zone(fountain.x, 480, 85, 80);
             zone.setData('id', fountain.id);
@@ -225,10 +238,10 @@ export class GameScene extends Phaser.Scene {
         document.getElementById('pause-button').textContent = 'Duraklat';
         document.getElementById('pause-button').disabled = false;
         document.getElementById('restart-button').disabled = false;
-        document.getElementById('toolbar-status').textContent = 'Bahçe seni bekliyor';
+        document.getElementById('toolbar-status').textContent = `${this.level.name} seni bekliyor`;
         document.getElementById('pause-button').onclick = () => this.togglePause();
         document.getElementById('restart-button').onclick = () => this.restart();
-        document.getElementById('play-again').onclick = () => this.restart();
+        document.getElementById('play-again').onclick = () => this.restart(true);
         const soundButton = document.getElementById('sound-button');
         soundButton.disabled = false;
         this.sound.setMute(this.soundMuted);
@@ -248,7 +261,7 @@ export class GameScene extends Phaser.Scene {
     updateHud() {
         this.heartsText.setText('♥'.repeat(this.gameState.hearts) + '♡'.repeat(3 - this.gameState.hearts));
         this.heartsText.setColor('#bd6959');
-        this.appleText.setText(`ELMA  ${this.gameState.apples} / 3`);
+        this.appleText.setText(`${this.levelIndex + 1}. BÖLÜM · ${this.gameState.apples}/3`);
         this.keyText.setText(this.gameState.hasKey ? 'ANAHTAR  ✓' : 'ANAHTAR  —');
         this.scoreText.setText(`${this.gameState.score} P`);
     }
@@ -270,8 +283,10 @@ export class GameScene extends Phaser.Scene {
         }
         if (item.type === 'bead') this.announce('Tesbih taneleri buldun! +10 puan.');
         if (item.type === 'mat') this.announce('Bir seccade buldun! +20 puan.');
+        if (item.type === 'lantern') this.announce('Bir kandil buldun! +20 puan.');
+        if (item.type === 'crescent') this.announce('Hilal ve yıldız buldun! +20 puan.');
         if (isKeyReady(this.gameState) && !this.gameState.hasKey && !this.keySprite.active) {
-            this.keySprite.enableBody(false, garden.key.x, garden.key.y, true, true);
+            this.keySprite.enableBody(false, this.level.key.x, this.level.key.y, true, true);
             this.keyCaption.setText('Anahtarını al!');
         }
         this.updateHud();
@@ -307,8 +322,8 @@ export class GameScene extends Phaser.Scene {
     }
 
     respawn() {
-        let point = garden.spawn;
-        if (this.gameState.checkpointActive) point = garden.checkpoint;
+        let point = this.level.spawn;
+        if (this.gameState.checkpointActive) point = this.level.checkpoint;
         this.gameState.hearts = 3;
         this.player.setPosition(point.x, point.y);
         this.player.body.reset(point.x, point.y);
@@ -323,14 +338,19 @@ export class GameScene extends Phaser.Scene {
 
     reachExit() {
         if (finishLevel(this.gameState)) {
+            if (this.levelIndex + 1 < levels.length) {
+                this.touchControls.reset();
+                this.scene.restart({ levelIndex: this.levelIndex + 1, score: this.gameState.score });
+                return;
+            }
             this.physics.pause();
             this.player.anims.stop();
             showPlayerExpression(this.player, 'happy', this.elapsed, 2200);
             this.tweens.pauseAll();
-            document.getElementById('result-score').textContent = `${this.gameState.score} puan · 3 elma · 1 anahtar`;
+            document.getElementById('result-score').textContent = `${this.gameState.score} puan · 2 bölüm tamamlandı`;
             document.getElementById('game-result').hidden = false;
             document.getElementById('play-again').focus({ preventScroll: true });
-            this.announce('Keşif tamamlandı! Üç elmayı topladın ve camiye ulaştın.');
+            this.announce('Keşif tamamlandı! İki bölümün anahtarlarını alıp camiye ulaştın.');
             this.updateHud();
         } else if (!this.gameState.complete && this.elapsed - this.lastGateHint > 4000) {
             this.lastGateHint = this.elapsed;
@@ -350,11 +370,14 @@ export class GameScene extends Phaser.Scene {
         document.getElementById('pause-button').textContent = this.paused ? 'Devam et' : 'Duraklat';
     }
 
-    restart() {
+    restart(fromBeginning = false) {
         this.time.paused = false;
         this.tweens.resumeAll();
         this.physics.resume();
-        this.scene.restart();
+        this.scene.restart({
+            levelIndex: fromBeginning ? 0 : this.levelIndex,
+            score: fromBeginning ? 0 : this.carriedScore
+        });
     }
 
     // Phaser update'i her karede çağırır: girişleri ve hareketleri güncelle.
@@ -364,14 +387,14 @@ export class GameScene extends Phaser.Scene {
         if (Phaser.Input.Keyboard.JustDown(this.player.keys.R)) { this.restart(); return; }
         if (Phaser.Input.Keyboard.JustDown(this.pauseKey)) this.togglePause();
         if (this.gameState.complete) {
-            if (Phaser.Input.Keyboard.JustDown(this.player.keys.ENTER)) this.restart();
+            if (Phaser.Input.Keyboard.JustDown(this.player.keys.ENTER)) this.restart(true);
             return;
         }
         if (this.paused) return;
         this.elapsed += delta;
-        const onBelt = this.player.x >= garden.belt.x && this.player.x <= garden.belt.x + garden.belt.width && this.player.body.bottom >= garden.groundY - 3;
+        const onBelt = this.player.x >= this.level.belt.x && this.player.x <= this.level.belt.x + this.level.belt.width && this.player.body.bottom >= this.level.groundY - 3;
         let conveyorSpeed = 0;
-        if (onBelt) conveyorSpeed = garden.belt.speed;
+        if (onBelt) conveyorSpeed = this.level.belt.speed;
         if (this.elapsed > this.knockbackUntil) {
             movePlayer(this.player, this.elapsed, delta, conveyorSpeed);
         }
@@ -383,6 +406,11 @@ export class GameScene extends Phaser.Scene {
             this.player.setAlpha(1);
         }
         updatePlayerEffects(this.player, this.elapsed);
+        // Yüksek basamaklarda karakteri görünürde tut; yerdeyken kamera sabit kalsın.
+        const camera = this.cameras.main;
+        let top = Phaser.Math.Clamp(camera.scrollY, this.player.y - this.scale.height + 80, this.player.y - 80);
+        top = Phaser.Math.Clamp(top, 0, Math.max(0, 600 - this.scale.height));
+        camera.scrollY += (top - camera.scrollY) * Math.min(delta / 100, 1);
         for (const hazard of this.hazards.getChildren()) {
             const patrol = hazard.getData('patrol');
             if (hazard.x >= patrol.maxX) patrol.direction = -1;
@@ -394,9 +422,9 @@ export class GameScene extends Phaser.Scene {
         // Bant oklarını sola kaydır. Soldan çıkan oku tekrar sağa taşı.
         for (const mark of this.beltMarks) {
             mark.x -= 35 * delta / 1000;
-            if (mark.x < garden.belt.x) mark.x += garden.belt.width;
+            if (mark.x < this.level.belt.x) mark.x += this.level.belt.width;
         }
-        if (!this.gameState.checkpointActive && this.player.x > garden.checkpoint.x - 18) {
+        if (!this.gameState.checkpointActive && this.player.x > this.level.checkpoint.x - 18) {
             this.gameState.checkpointActive = true;
             this.checkpointFlag.setFillStyle(0x55977b);
             this.checkpointLabel.setText('BURADAN DEVAM EDEBİLİRSİN');
@@ -408,6 +436,6 @@ export class GameScene extends Phaser.Scene {
             this.announce('Kontrol noktası! Canların doldu. Buradan devam edebilirsin.');
             this.updateHud();
         }
-        this.progressFill.width = Phaser.Math.Clamp(this.player.x / garden.exit.x, 0, 1) * HUD_PROGRESS_WIDTH;
+        this.progressFill.width = Phaser.Math.Clamp(this.player.x / this.level.exit.x, 0, 1) * HUD_PROGRESS_WIDTH;
     }
 }

@@ -3,6 +3,7 @@ const path = require('node:path');
 const target = path.resolve(__dirname, '../assets/images');
 fs.mkdirSync(target, { recursive: true });
 const save = (name, width, height, body) => {
+    if (process.argv.includes('--extras-only') && !['lantern', 'crescent'].includes(name)) return;
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">${body}</svg>\n`;
     fs.writeFileSync(path.join(target, name + '.svg'), svg.replace(/[ \t]+$/gm, ''));
 };
@@ -91,4 +92,6 @@ save('key', 64, 40, `<circle cx="18" cy="19" r="13" fill="#f6cf65" stroke="#a47a
 // Tesbih taneleri: ip üzerindeki küçük turkuaz boncuklar.
 save('bead', 40, 44, `<path d="M8 10Q1 25 20 29Q36 32 32 8M20 29v10" fill="none" stroke="#ad955e" stroke-width="2"/><g fill="#3c9995" stroke="#286867" stroke-width="1.5"><circle cx="8" cy="13" r="5"/><circle cx="8" cy="24" r="5"/><circle cx="18" cy="29" r="5"/><circle cx="29" cy="25" r="5"/><circle cx="32" cy="14" r="5"/></g><path d="M16 41l4-8 4 8" fill="#d4b261"/><g fill="#c1e7d4"><circle cx="7" cy="11" r="1.5"/><circle cx="17" cy="27" r="1.5"/><circle cx="31" cy="12" r="1.5"/></g>`);
 save('mat', 36, 52, `<rect x="4" y="5" width="28" height="42" rx="2" fill="#3e8378" stroke="#285e59" stroke-width="2"/><path d="M8 10h20v32H8Z" fill="none" stroke="#e6c57e" stroke-width="1.5"/><path d="M12 35V24q0-7 6-10 6 3 6 10v11Z" fill="none" stroke="#e6c57e" stroke-width="1.5"/><path d="M8 3V0m5 3V0m5 3V0m5 3V0m5 3V0M8 49v3m5-3v3m5-3v3m5-3v3m5-3v3" stroke="#d5b77e" stroke-width="2"/>`);
+save('lantern', 40, 52, `<path d="M16 8V5a4 4 0 0 1 8 0v3" fill="none" stroke="#876139" stroke-width="2"/><path d="M12 10h16l5 9-4 23H11L7 19Z" fill="#dcac52" stroke="#876139" stroke-width="2"/><path d="M15 20h10l-2 17h-6Z" fill="#fff1a5"/><path d="M7 19h26M11 42h18M14 47h12" stroke="#876139" stroke-width="3"/><circle cx="20" cy="28" r="3" fill="#fffbe4"/>`);
+save('crescent', 44, 46, `<path d="M30 4C5 0 0 29 19 39c9 5 18 0 22-6C18 39 11 14 30 4Z" fill="#f2cb67" stroke="#aa803a" stroke-width="2"/><path d="m33 8 2 5 6 1-4 4 1 6-5-3-5 3 1-6-4-4 6-1Z" fill="#ffe6a0" stroke="#aa803a" stroke-width="1.5"/>`);
 console.log('Vector game assets created in assets/images.');

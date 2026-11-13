@@ -171,7 +171,30 @@ HTTP kullan; HTML dosyasını çift tıklayarak açma (oyun ES modülleri kullan
 - Dururken sallanma yoktur. Zıplama pozundaki kaldırılmış kol iki karakterde de başın yanında açıkça görünür.
 - Bant sola taşır; bu bir buz sürtünmesi değildir.
 
-Şimdilik tek bölüm var. Yeni bölümler ve kalıcı kayıt daha sonra eklenebilir.
+## İki bölümlü akış
+
+`src/level.js`, `garden` (Meyve Bahçesi) ve `courtyard` (Kandilli Cami Avlusu)
+verilerini, ayrıca bunları sıraya koyan `levels` dizisini içerir. İki bölüm aynı `GameScene`
+koduyla çalışır; yeni bölüm eklemek için sahne kodunu kopyalamak gerekmez.
+
+Her bölümde üç elma anahtarı açar. Anahtarla ilk cami girişine gelince ikinci bölüm
+otomatik başlar. Karakter, ses tercihi ve toplam puan korunur; elmalar, anahtar,
+kontrol noktası ve canlar yeni bölüm için sıfırlanır. İkinci cami girişinde final ekranı açılır.
+R/Yeniden başla mevcut bölümü, finalde Bir kez daha keşfet ise bütün oyunu baştan başlatır.
+
+İkinci bölümde kemerli bir avlu, kandiller, basamaklı yüksek platformlar, daha hızlı
+hayvanlar, iki hareketli taş ve daha güçlü bir bant vardır. Yüksek yerlere çıkınca kamera
+karakteri görünürde tutar. Kandil ve hilal-yıldız bonusları 20 puandır; elma görevine sayılmaz.
+
+Phaser `init(data)` ile bölüm numarası ve taşınan puanı alır, sonra `preload/create/update`
+akışına devam eder. Geçiş `scene.restart({ levelIndex, score })` ile aynı sahneyi yeniden kurar.
+
+Telefonlarda `controls.js`, gerçek dokunma olaylarında her parmağı kimliğiyle izler ve
+yalnızca `changedTouches` listesindeki parmakları günceller. Farede Pointer Events kullanılır.
+Yere inmeden 240 ms önce basılan zıplama hatırlanır; kenardan ayrıldıktan sonra 140 ms tolerans vardır.
+Zıplama yüksekliği basış süresine bağlıdır. Fiziksel telefonla tekrar kontrol edilmelidir.
+
+Kalıcı kayıt ve yeni senaryolar daha sonra eklenebilir.
 
 ## Kontroller ve Git
 

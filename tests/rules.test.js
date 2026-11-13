@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createGameState, isKeyReady, recordFruit, takeKey, finishLevel, healAtFountain } from '../src/rules.js';
-import { garden } from '../src/level.js';
+import { garden, courtyard } from '../src/level.js';
 
 test('Bonus fruit cannot unlock the key; three distinct apples can', () => {
     const run = createGameState();
@@ -11,6 +11,35 @@ test('Bonus fruit cannot unlock the key; three distinct apples can', () => {
     for (let i = 0; i < 3; i++) recordFruit(run, `apple-${i}`, 'apple');
     assert.equal(isKeyReady(run), true);
     assert.equal(run.score, 210);
+});
+
+test('Lanterns and crescent stars give bonus points without unlocking the mission key', () => {
+    const state = createGameState(100);
+    recordFruit(state, 'lantern-1', 'lantern');
+    recordFruit(state, 'crescent-1', 'crescent');
+    assert.equal(state.score, 140);
+    assert.equal(state.apples, 0);
+    assert.equal(isKeyReady(state), false);
+});
+
+test('Courtyard apples are reachable using its steps and hazards are harder than the garden', () => {
+    const maxRise = 590 ** 2 / (2 * 1600);
+    const reached = [];
+    for (const platform of courtyard.platforms) {
+        if (courtyard.groundY - platform.y < maxRise || reached.some(step =>
+            step.y - platform.y >= 0 && step.y - platform.y < maxRise &&
+            platform.x - (step.x + step.width) < 100)) reached.push(platform);
+    }
+    const apples = courtyard.fruits.filter(item => item.type === 'apple');
+    assert.equal(apples.length, 3);
+    for (const apple of apples) {
+        assert.ok(reached.some(p => apple.x > p.x && apple.x < p.x + p.width && p.y - apple.y < 60));
+    }
+    assert.equal(new Set(courtyard.fruits.map(item => item.id)).size, courtyard.fruits.length);
+    assert.ok(courtyard.ball.speed > garden.ball.speed);
+    assert.ok(courtyard.extraHazards.length > 0);
+    assert.ok(courtyard.key.x > Math.max(...apples.map(item => item.x)));
+    assert.ok(courtyard.key.x < courtyard.exit.x && courtyard.exit.x < courtyard.width);
 });
 
 test('Overlap events cannot award the same fruit or key twice', () => {

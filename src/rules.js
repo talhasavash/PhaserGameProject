@@ -1,9 +1,9 @@
 // Burada Phaser yok. Sadece puan, elma, anahtar ve can bilgisi var.
-export function createGameState() {
+export function createGameState(initialScore = 0) {
     return {
         collected: [],
         apples: 0,
-        score: 0,
+        score: initialScore,
         hearts: 3,
         hasKey: false,
         checkpointActive: false,
@@ -24,7 +24,7 @@ export function recordFruit(state, id, type) {
     if (type === 'apple') {
         state.apples += 1;
         state.score += 30;
-    } else if (type === 'mat') {
+    } else if (['mat', 'lantern', 'crescent'].includes(type)) {
         state.score += 20;
     } else {
         state.score += 10;

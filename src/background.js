@@ -1,7 +1,9 @@
 // Bu dosya yalnızca görünümü çizer; oyun kurallarını değiştirmez.
 // Phaser'ın add.rectangle, add.circle, add.ellipse gibi çizim araçlarını kullanırız.
 // setScrollFactor: 0 sabit, 1 dünya ile aynı hız. Ara değerler derinlik hissi verir.
-export function createScenery(scene, width) {
+export function createScenery(scene, width, theme = 'garden') {
+    if (theme === 'courtyard') { createCourtyard(scene, width); return; }
+    scene.cameras.main.setBackgroundColor('#c6edef');
     scene.add.rectangle(480, 300, 960, 600, 0xc6edef).setScrollFactor(0).setDepth(-100);
     scene.add.circle(775, 152, 47, 0xffe6a0).setScrollFactor(0.08).setDepth(-90);
     for (let i = 0; i < 9; i++) {
@@ -28,6 +30,40 @@ export function createScenery(scene, width) {
         scene.add.ellipse(x, 512, 54, 18, 0x528b56).setDepth(1);
         scene.add.circle(x + 12, 504, 4, 0xffd779).setDepth(2);
         scene.add.circle(x - 10, 509, 3, 0xf1bf9a).setDepth(2);
+    }
+}
+
+function createCourtyard(scene, width) {
+    scene.cameras.main.setBackgroundColor('#ded3ea');
+    scene.add.circle(620, 145, 43, 0xffe7a3).setScrollFactor(0.08).setDepth(-90);
+    scene.add.circle(636, 132, 38, 0xded3ea).setScrollFactor(0.08).setDepth(-89);
+    // Kemerli avlu duvarı, kandiller ve servi ağaçları.
+    for (let x = 0; x < width + 900; x += 260) {
+        const wall = scene.add.container(x, 520).setScrollFactor(0.7).setDepth(-40);
+        wall.add([
+            scene.add.rectangle(110, -70, 250, 140, 0xc4aabf),
+            scene.add.ellipse(110, -136, 82, 110, 0xb49bb6),
+            scene.add.rectangle(110, -74, 82, 130, 0xb49bb6),
+            scene.add.rectangle(0, -100, 16, 200, 0xe5cfbe),
+            scene.add.rectangle(0, -200, 28, 10, 0xb294a9)
+        ]);
+        scene.add.line(x + 18, 326, 0, -28, 0, 12, 0x80677d).setDepth(-30);
+        scene.add.ellipse(x + 18, 354, 20, 28, 0xffd47b).setDepth(-29);
+        scene.add.rectangle(x + 18, 354, 7, 18, 0xfff2bc).setDepth(-28);
+        const tree = scene.add.container(x + 206, 520).setScrollFactor(0.9).setDepth(-20);
+        tree.add([
+            scene.add.rectangle(0, -55, 9, 110, 0x876d70),
+            scene.add.ellipse(0, -132, 42, 166, 0x6d8c82)
+        ]);
+    }
+    scene.add.rectangle(width / 2, 560, width, 80, 0xb99b91).setDepth(-5);
+    scene.add.rectangle(width / 2, 526, width, 14, 0xe4ccb0).setDepth(-4);
+    scene.add.rectangle(width / 2, 520, width, 5, 0x8b7681).setDepth(-3);
+    const tiles = scene.add.graphics().setDepth(-2);
+    tiles.lineStyle(1, 0x977e80, 0.6);
+    for (let x = 0; x < width; x += 64) {
+        tiles.strokeRect(x, 535, 64, 28);
+        tiles.strokeRect(x + 32, 563, 64, 28);
     }
 }
 

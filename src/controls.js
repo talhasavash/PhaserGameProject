@@ -1,68 +1,101 @@
-// Ekran düğmeleri klavye gibi isDown ve timeDown değerleri taşır.
-// Her parmağın pointerId'si ayrıdır: yürürken başka parmakla zıplanabilir.
+// Her parmağın kimliği ayrı tutulur. İkinci parmak yön tuşunu bırakmış sayılmaz.
 export function bindTouchControls(root = document, page = window) {
     const keys = {};
-    const presses = {};
+    const buttons = {};
+    const fingers = {};
+    const owners = new Map();
     const cleanup = [];
-    const releases = [];
-    for (const [name, id] of [['left', 'move-left'], ['right', 'move-right'], ['up', 'jump']]) {
-        const button = root.getElementById(id);
-        const key = { isDown: false, timeDown: 0, justPressed: false };
-        keys[name] = key;
-        const fingers = new Set();
-        function release(event) {
-            if (event) fingers.delete(event.pointerId);
-            else { fingers.clear(); key.justPressed = false; }
-            if (event?.type === 'pointercancel') key.justPressed = false;
-            key.isDown = fingers.size > 0;
-            button.classList.toggle('pressed', key.isDown);
-        }
-        function press(event) {
-            if (event.type === 'pointerdown' && event.button !== 0) return;
-            event.preventDefault();
-            fingers.add(event.pointerId);
-            key.isDown = true;
-            key.timeDown = performance.now();
-            key.justPressed = true; // Çok kısa dokunuşu sonraki oyun karesine kadar sakla.
-            button.classList.add('pressed');
-            // Parmak dışarı kaysa da bırakma olayını al.
-            button.setPointerCapture(event.pointerId);
-        }
-        presses[name] = press;
-        function move(event) {
-            if (name === 'up' || !fingers.has(event.pointerId)) return;
-            // Basılı parmağı diğer yön düğmesine kaydırınca yönü değiştir.
-            const otherName = name === 'left' ? 'right' : 'left';
-            const otherId = name === 'left' ? 'move-right' : 'move-left';
-            const otherButton = root.getElementById(otherId);
-            const bounds = otherButton.getBoundingClientRect();
-            if (event.clientX < bounds.left || event.clientX > bounds.right ||
-                event.clientY < bounds.top || event.clientY > bounds.bottom) return;
-            // Yeni düğme bu pointer'ı devralsın; başka parmaklar etkilenmesin.
-            release(event);
-            presses[otherName](event);
-        }
-        button.addEventListener('pointerdown', press);
-        button.addEventListener('pointermove', move);
-        for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) button.addEventListener(type, release);
-        releases.push(() => release());
-        cleanup.push(() => {
-            button.removeEventListener('pointerdown', press);
-            button.removeEventListener('pointermove', move);
-            for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) button.removeEventListener(type, release);
-        });
+    const nativeTouch = (page.navigator?.maxTouchPoints || 0) > 0 && 'ontouchstart' in page;
+    for (const [action, id] of [['left', 'move-left'], ['right', 'move-right'], ['up', 'jump']]) {
+        keys[action] = { isDown: false, timeDown: 0, justPressed: false };
+        buttons[action] = root.getElementById(id);
+        fingers[action] = new Set();
     }
-    function reset() { for (const release of releases) release(); }
-    function visibilityChanged() { if (root.hidden) reset(); }
-    page.addEventListener('blur', reset);
-    root.addEventListener('visibilitychange', visibilityChanged);
-    return {
-        keys, reset,
-        destroy() {
-            reset();
-            for (const remove of cleanup) remove();
-            page.removeEventListener('blur', reset);
-            root.removeEventListener('visibilitychange', visibilityChanged);
+    function show(action) {
+        keys[action].isDown = fingers[action].size > 0;
+        buttons[action].classList.toggle('pressed', keys[action].isDown);
+    }
+    function release(id, cancelled = false) {
+        const action = owners.get(id);
+        if (!action) return;
+        fingers[action].delete(id);
+        owners.delete(id);
+        if (cancelled && fingers[action].size === 0) keys[action].justPressed = false;
+        show(action);
+    }
+    function press(id, action) {
+        if (owners.get(id) === action) return;
+        release(id);
+        owners.set(id, action);
+        fingers[action].add(id);
+        keys[action].timeDown = performance.now();
+        keys[action].justPressed = true;
+        show(action);
+    }
+    function slide(id, x, y) {
+        const action = owners.get(id);
+        if (!action || action === 'up') return;
+        const other = action === 'left' ? 'right' : 'left';
+        const box = buttons[other].getBoundingClientRect();
+        if (x >= box.left && x <= box.right && y >= box.top && y <= box.bottom) {
+            press(id, other);
+            if (!nativeTouch) buttons[other].setPointerCapture(id);
         }
-    };
+    }
+    function listen(target, type, handler, options) {
+        target.addEventListener(type, handler, options);
+        cleanup.push(() => target.removeEventListener(type, handler, options));
+    }
+    for (const action of ['left', 'right', 'up']) {
+        const button = buttons[action];
+        if (nativeTouch) {
+            // Dokunmatik ekranı olan bir bilgisayarda fare de kullanılabilir.
+            listen(button, 'mousedown', event => {
+                if (event.button !== 0) return;
+                event.preventDefault();
+                press('mouse', action);
+            });
+            // Android/iOS: yalnızca bu olayda değişen parmakları işle.
+            listen(button, 'touchstart', event => {
+                event.preventDefault();
+                for (const touch of event.changedTouches) press(touch.identifier, action);
+            }, { passive: false });
+            listen(button, 'touchmove', event => {
+                event.preventDefault();
+                for (const touch of event.changedTouches) slide(touch.identifier, touch.clientX, touch.clientY);
+            }, { passive: false });
+            for (const type of ['touchend', 'touchcancel']) {
+                listen(button, type, event => {
+                    event.preventDefault();
+                    for (const touch of event.changedTouches) release(touch.identifier, type === 'touchcancel');
+                }, { passive: false });
+            }
+        } else {
+            listen(button, 'pointerdown', event => {
+                // Dokunmada ikinci parmağı mouse düğmesi filtresiyle eleme.
+                if (event.pointerType !== 'touch' && event.button !== 0) return;
+                event.preventDefault();
+                press(event.pointerId, action);
+                button.setPointerCapture(event.pointerId);
+            });
+            listen(button, 'pointermove', event => slide(event.pointerId, event.clientX, event.clientY));
+            for (const type of ['pointerup', 'pointercancel']) {
+                listen(button, type, event => release(event.pointerId, type === 'pointercancel'));
+            }
+            listen(button, 'lostpointercapture', event => {
+                if (owners.get(event.pointerId) === action) release(event.pointerId);
+            });
+        }
+    }
+    if (nativeTouch) {
+        listen(page, 'mousemove', event => slide('mouse', event.clientX, event.clientY));
+        listen(page, 'mouseup', () => release('mouse'));
+    }
+    function reset() {
+        for (const id of owners.keys()) release(id);
+        for (const key of Object.values(keys)) key.justPressed = false;
+    }
+    listen(page, 'blur', reset);
+    listen(root, 'visibilitychange', () => { if (root.hidden) reset(); });
+    return { keys, reset, destroy() { reset(); for (const remove of cleanup) remove(); } };
 }

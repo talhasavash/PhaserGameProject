@@ -17,10 +17,11 @@ export function bossStep(before, after, jump) {
     return { lift, sound };
 }
 
-// Son muhafız, oyuncu yaklaştıktan sonra 18 saniyede giderek öfkelenir.
+// Yakınlık ve bekleme öfkeyi artırır; uzaklaşmak her zaman sakinleştirir.
 export function bossMood(elapsed, engagedAt, distance = 450) {
     const proximity = Math.max(0, Math.min(1, 1 - distance / 450));
-    const anger = engagedAt === null ? 0 : Math.max(0, Math.min(1, (elapsed - engagedAt) / 18000 + proximity * 0.75));
+    const waiting = engagedAt === null ? 0 : Math.max(0, Math.min(1, (elapsed - engagedAt) / 18000));
+    const anger = engagedAt === null ? 0 : Math.min(1, proximity * (0.8 + waiting * 0.8));
     const green = Math.round(255 - anger * 138);
     const blue = Math.round(255 - anger * 147);
     return { anger, speed: 1 + anger * 0.6, tint: (255 << 16) | (green << 8) | blue, angry: anger >= 0.5 };

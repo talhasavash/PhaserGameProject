@@ -48,14 +48,14 @@ button:focus-visible { outline: 3px solid #e5bb6e; outline-offset: 2px; }
 .character-option input:focus-visible + .character-card { outline: 3px solid #b47e47; outline-offset: 3px; }
 #start-button { background: #416a54; color: #fff9e8; padding: 12px 28px; font-size: 14px; }
 .character-note { font-size: 12px; color: #63785f; margin: 13px 0 0; }
-.touch-controls { display: none; position: absolute; inset: auto 0 0; padding: 8px max(18px, env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left)); justify-content: space-between; z-index: 2; touch-action: none; user-select: none; -webkit-user-select: none; pointer-events: none; }
-.direction-buttons { display: flex; gap: 4px; }
+.touch-controls { --control-bottom: calc(8px + env(safe-area-inset-bottom)); display: none; position: absolute; inset: auto 0 0; height: 160px; padding: 0; z-index: 2; touch-action: none; user-select: none; -webkit-user-select: none; pointer-events: none; }
+.direction-buttons { position: absolute; left: max(0px, env(safe-area-inset-left)); bottom: var(--control-bottom); display: flex; gap: 0; }
 .touch-button { position: relative; display: grid; place-items: center; width: clamp(114px, 16vw, 156px); height: clamp(106px, 30dvh, 140px); padding: 4px; border: 0; border-radius: 0; background: transparent; touch-action: none; -webkit-touch-callout: none; pointer-events: auto; }
 .touch-button:hover, .touch-button.pressed { background: transparent; }
 .touch-button svg { position: absolute; inset: 4px; width: calc(100% - 8px); height: calc(100% - 8px); display: block; overflow: visible; pointer-events: none; }
 .touch-button path, .touch-button circle { fill: #fff9e80d; stroke: #fff9e880; stroke-width: 3; stroke-linejoin: round; }
 .touch-button.pressed path, .touch-button.pressed circle { fill: #fff9e82b; stroke: #fff9e8d9; }
-.jump-button { width: clamp(124px, 17vw, 164px); }
+.jump-button { position: absolute; right: max(0px, env(safe-area-inset-right)); bottom: var(--control-bottom); width: clamp(124px, 17vw, 164px); }
 .result { position: absolute; inset: 0; z-index: 4; background: #213f3dcc; display: grid; place-items: center; overflow: auto; padding: 16px; }
 .result-card { border-radius: 24px; background: #fff9e8; padding: 28px; text-align: center; max-width: 480px; }
 .result h2 { font: 32px Georgia, serif; margin: 12px 0; }
@@ -98,7 +98,7 @@ button:focus-visible { outline: 3px solid #e5bb6e; outline-offset: 2px; }
     .selection-layout { grid-template-columns: 1fr; }
 }
 @media (orientation: landscape) and (max-height: 340px) {
-    .touch-controls { padding-bottom: calc(4px + env(safe-area-inset-bottom)); }
+    .touch-controls { --control-bottom: calc(4px + env(safe-area-inset-bottom)); }
     .touch-button { width: 114px; height: 100px; }
     .jump-button { width: 124px; }
     .selection-layout { margin: 8px 0; gap: 12px; }

@@ -62,6 +62,7 @@ test('Every mosque celebrates before showing a result; only Continue starts the 
         let delayed;
         let scheduled = 0;
         const calls = [];
+        elements.set('menu-button', { click() { calls.push('menu'); } });
         const scene = {
             gameState: run, elapsed: 10000, levelIndex: index,
             physics: { pause() { pauseCount++; }, resume() {} },
@@ -92,7 +93,7 @@ test('Every mosque celebrates before showing a result; only Continue starts the 
         assert.equal(elements.get(final ? 'play-again' : 'next-level').focused, true);
         GameScene.prototype.continueAfterResult.call(scene);
         GameScene.prototype.continueAfterResult.call(scene);
-        assert.deepEqual(calls, final ? ['replay'] : [{ levelIndex: index + 1, score: 120 }]);
+        assert.deepEqual(calls, final ? ['menu'] : [{ levelIndex: index + 1, score: 120 }]);
     }
 });
 test('Respawn restores hearts at the flag and preserves collected fruit and key', () => {

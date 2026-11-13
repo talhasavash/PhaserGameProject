@@ -57,7 +57,8 @@ export const courtyard = {
         { x: 390, y: 430, width: 200 },
         { x: 1260, y: 430, width: 170 }, { x: 1450, y: 350, width: 180 },
         { x: 2450, y: 430, width: 160 }, { x: 2630, y: 350, width: 170 },
-        { x: 3250, y: 430, width: 140 }, { x: 3430, y: 430, width: 120 }
+        { x: 3250, y: 430, width: 90, single: true }, { x: 3380, y: 400, width: 64, single: true },
+        { x: 3430, y: 430, width: 120 }
     ],
     fruits: [
         { id: 'star-1', type: 'star', x: 480, y: 394 },
@@ -180,7 +181,8 @@ function trail(data) {
 export const forest = trail({
     name: 'Arıların Orman Yolu', theme: 'forest', width: 4800,
     platforms: [
-        { x: 420, y: 430, width: 170 }, { x: 610, y: 350, width: 160 },
+        { x: 420, y: 430, width: 80, single: true }, { x: 520, y: 390, width: 70, single: true },
+        { x: 610, y: 350, width: 160 },
         { x: 1510, y: 430, width: 150 }, { x: 1690, y: 350, width: 150 },
         { x: 2880, y: 430, width: 140 }, { x: 3050, y: 350, width: 150 }
     ],
@@ -238,7 +240,8 @@ export const snowPass = trail({
     name: 'Karlı Dağ Geçidi', theme: 'snow', width: 5160,
     platforms: [
         { x: 420, y: 430, width: 150 }, { x: 600, y: 350, width: 140 },
-        { x: 1630, y: 430, width: 140 }, { x: 1800, y: 350, width: 140 },
+        { x: 1630, y: 430, width: 70, single: true }, { x: 1720, y: 390, width: 60, single: true },
+        { x: 1800, y: 350, width: 140 },
         { x: 3020, y: 430, width: 130 }, { x: 3180, y: 350, width: 140 }
     ],
     fruits: [
@@ -246,7 +249,7 @@ export const snowPass = trail({
         { id: 'star-2', type: 'star', x: 1870, y: 314 },
         { id: 'star-3', type: 'star', x: 3250, y: 314 },
         { id: 'fruit-1', type: 'apple', x: 490, y: 394 },
-        { id: 'fruit-2', type: 'orange', x: 1700, y: 394 },
+        { id: 'fruit-2', type: 'orange', x: 1665, y: 394 },
         { id: 'fruit-3', type: 'banana', x: 3080, y: 394 },
         { id: 'lantern-1', type: 'lantern', x: 280, y: 480 },
         { id: 'mat-1', type: 'mat', x: 2350, y: 480 },
@@ -266,7 +269,8 @@ export const river = trail({
     name: 'Köprüler ve Nilüferler', theme: 'river', width: 5400,
     fountains: [{ id: 'fountain-1', x: 1340 }, { id: 'fountain-2', x: 4450 }],
     platforms: [
-        { x: 400, y: 430, width: 140 }, { x: 570, y: 350, width: 140 },
+        { x: 400, y: 430, width: 80, single: true }, { x: 500, y: 390, width: 60, single: true },
+        { x: 570, y: 350, width: 140 },
         { x: 1730, y: 430, width: 130 }, { x: 1890, y: 350, width: 140 },
         { x: 3180, y: 430, width: 130 }, { x: 3340, y: 350, width: 130 },
         { x: 4050, y: 430, width: 120 }
@@ -298,7 +302,8 @@ export const canyon = trail({
     platforms: [
         { x: 410, y: 430, width: 130 }, { x: 570, y: 350, width: 130 },
         { x: 1720, y: 430, width: 120 }, { x: 1870, y: 350, width: 130 },
-        { x: 3220, y: 430, width: 120 }, { x: 3370, y: 350, width: 130 },
+        { x: 3220, y: 430, width: 70, single: true }, { x: 3310, y: 390, width: 50, single: true },
+        { x: 3370, y: 350, width: 130 },
         { x: 4130, y: 430, width: 120 }
     ],
     fruits: [
@@ -329,7 +334,8 @@ export const festival = trail({
     name: 'Bayramın Işıklı Bahçesi', theme: 'festival', width: 5880,
     fountains: [{ id: 'fountain-1', x: 1370 }, { id: 'fountain-2', x: 4930 }],
     platforms: [
-        { x: 430, y: 430, width: 120 }, { x: 580, y: 350, width: 130 },
+        { x: 430, y: 430, width: 80, single: true }, { x: 520, y: 390, width: 50, single: true },
+        { x: 580, y: 350, width: 130 },
         { x: 1750, y: 430, width: 120 }, { x: 1900, y: 350, width: 130 },
         { x: 3290, y: 430, width: 120 }, { x: 3440, y: 350, width: 120 },
         { x: 4300, y: 430, width: 120 }
@@ -366,7 +372,8 @@ export const bossGate = trail({
     fountains: [{ id: 'fountain-1', x: 1500 }, { id: 'fountain-2', x: 4900 }],
     platforms: [
         { x: 410, y: 430, width: 140 }, { x: 580, y: 350, width: 140 },
-        { x: 1690, y: 430, width: 140 }, { x: 1860, y: 350, width: 140 },
+        { x: 1690, y: 430, width: 80, single: true }, { x: 1790, y: 390, width: 60, single: true },
+        { x: 1860, y: 350, width: 140 },
         { x: 3040, y: 430, width: 140 }, { x: 3210, y: 350, width: 140 }
     ],
     fruits: [

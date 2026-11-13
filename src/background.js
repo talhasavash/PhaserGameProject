@@ -179,12 +179,13 @@ export function createMosque(scene, x, theme = 'garden') {
     add.rectangle(x, design.top, design.width + 10, 9, design.trim).setDepth(6);
     // Renkli pencere kemerleri ve basamaklar.
     for (const offset of [-66, 66]) {
-        if (theme === 'interior') {
+        if (theme === 'interior' || theme === 'boss') {
             // Ahşap çaprazlar yerine açık renk taş kemer ve desenli vitray.
             add.ellipse(x + offset, 466, 30, 40, 0xf5ecd5).setDepth(7);
             add.rectangle(x + offset, 482, 30, 34, 0xf5ecd5).setDepth(7);
-            add.ellipse(x + offset, 468, 22, 32, 0x9bd3d7).setDepth(8);
-            add.rectangle(x + offset, 482, 22, 26, 0x9bd3d7).setDepth(8);
+            const glass = theme === 'boss' ? 0xb3cee5 : 0x9bd3d7;
+            add.ellipse(x + offset, 468, 22, 32, glass).setDepth(8);
+            add.rectangle(x + offset, 482, 22, 26, glass).setDepth(8);
             for (const y of [465, 478, 490]) {
                 add.circle(x + offset, y, 4, y === 478 ? 0xf2d69b : 0xe0f2e7).setDepth(9);
             }
@@ -209,10 +210,11 @@ export function createMosque(scene, x, theme = 'garden') {
     add.ellipse(x, 476, 44, 36, 0x344d56).setDepth(7);
     add.rectangle(x, 494, 44, 52, 0x273b43).setDepth(7);
     const glow = add.ellipse(x, 492, 40, 54, 0xffe49d, 0.65).setDepth(8).setVisible(false);
+    const doorColor = theme === 'boss' ? 0x8495ac : 0x8b6547;
     const leftDoor = add.container(x - 11, 494).setDepth(9);
-    leftDoor.add([add.rectangle(0, 0, 21, 50, 0x8b6547).setStrokeStyle(1, design.trim), add.circle(6, 0, 2, 0xf0ce79)]);
+    leftDoor.add([add.rectangle(0, 0, 21, 50, doorColor).setStrokeStyle(1, design.trim), add.circle(6, 0, 2, 0xf0ce79)]);
     const rightDoor = add.container(x + 11, 494).setDepth(9);
-    rightDoor.add([add.rectangle(0, 0, 21, 50, 0x8b6547).setStrokeStyle(1, design.trim), add.circle(-6, 0, 2, 0xf0ce79)]);
+    rightDoor.add([add.rectangle(0, 0, 21, 50, doorColor).setStrokeStyle(1, design.trim), add.circle(-6, 0, 2, 0xf0ce79)]);
     return { open() {
         glow.setVisible(true);
         scene.tweens.add({ targets: leftDoor, x: x - 24, scaleX: 0.2, duration: 500, ease: 'Sine.easeOut' });

@@ -74,6 +74,7 @@ PhaserGameProject/
 │   ├── player.js          Karakter oluşturma, yürüme ve zıplama
 │   ├── controls.js        Çoklu dokunma, bırakma ve odak kaybı yönetimi
 │   ├── level.js           Platform, meyve ve düşman konumları
+│   ├── platforms.js       Bölüme özel basamak çizimleri ve doku önbelleği
 │   ├── rules.js           Puan, can, elma, anahtar ve bitiş kuralları
 │   ├── progress.js        Tarayıcıda açılan bölümleri saklama
 │   ├── fireRain.js        Seyrek düşen ateş topları ve beyaz gölge uyarısı
@@ -203,7 +204,8 @@ alınınca caminin iki kapı kanadı yana açılır ve giriş aydınlanır. Cami
 önce 1,2 saniye yıldızlarla parlar, sonra tamamlanma mesajı ve kısa ayet aynı sonuç
 kartında görünür. Ayrı bir okuma ekranı veya görünür kaynak bağlantısı yoktur.
 Kart kendiliğinden kapanmaz; Sonraki bölüm veya Enter ile ilerlenir. 11'in sonunda
-Yeniden oyna görünür. Kaynak ve sure/ayet numaraları denetlenebilmesi için
+Ana ekrana dön görünür; düğme veya Enter bölüm seçimine döndürür, 1. bölümü
+kendiliğinden başlatmaz. Açılan bölümler korunur. Kaynak ve sure/ayet numaraları denetlenebilmesi için
 `src/verses.js` içinde saklanır; Diyanet meallerinden kısa alıntılar kullanılır.
 Üç nokta ayetin yalnızca bir kısmının alındığını gösterir.
 
@@ -211,6 +213,13 @@ Yeniden oyna görünür. Kaynak ve sure/ayet numaraları denetlenebilmesi için
 önceki bölümlerden taşınan puanı alır; `scene.restart({ levelIndex, score })` yeni
 bölümü kurar. Karakter ve ses tercihi korunur. Yeni bölümde yıldızlar, anahtar ve
 canlar sıfırlanır. R/Yeniden başla mevcut bölümü tekrar başlatır.
+
+Basamaklar her bölümde farklı malzeme ve biçimde çizilir: çimen, taş, kumtaşı,
+bulut, kütük, halı, buz, köprü, kaya, bayram süsü ve metal. Bazı ileri bölümlerde
+50–90 birim genişlikte tek basamak zincirleri vardır. `platforms.js` çizimleri
+boyut ve temaya göre bir kez dokuya çevirip önbelleğe alır. Fizik yüzeyleri düz
+kalır; süsler çarpışma davranışını değiştirmez. Son bölümün camisinde de taş
+kemerli cam pencereler ve mavi gri metal kapılar kullanılır.
 
 Çukurlar sadece bir renk değişikliği değildir: o aralıklarda fizik zemini kurulmaz.
 Karakter gerçekten aşağı düşer; düşerken üzülür ve deneme biter. Yeniden dene,
@@ -227,7 +236,8 @@ veya onları yenmek gerekmez; zamanlamayla geçmek yeterlidir.
 Muhafızların dördü farklı SVG görünümü kullanır. Son turuncu muhafız, oyuncu
 450 dünya birimi yakınına geldiğinde öfkelenmeye başlar. Mesafe azaldıkça öfke
 artar; temas veya çarpma gerekmez. Yakınında beklemek de öfkeyi artırır; en geç
-18 saniyede yüzü değişir, rengi kızarır ve zıplama saati en çok 1.6 kat hızlanır. Saat kareler boyunca
+18 saniyede yüzü değişir, rengi kızarır ve zıplama saati en çok 1.6 kat hızlanır.
+Uzaklaştıkça sakinleşir; 450 birimde normal rengine ve hızına döner, bekleme süresi sıfırlanır. Saat kareler boyunca
 biriktirilir; hız değişirken zıplamanın ortasında konum atlaması olmaz. Öfke ve
 zıplama duraklatmada ilerlemez; bölüm yeniden başlayınca sıfırlanır.
 Tam öfkede bile muhafızın altından geçiş süresi test edilir. Can bitip kontrol
@@ -247,7 +257,9 @@ başladıktan sonra yer değiştirmez. Başlangıç, abdest alanları, kontrol n
 
 Sağ üstteki ☰ ayar panelini açınca oyun duraklar. Ses, tam ekran, yeniden başlatma
 ve bölüm seçimi buradadır. Devam et ile oyun sürer. Yönler saydam üçgen,
-zıplama saydam dairedir. İki parmakla yön ve zıplama bağımsız kullanılabilir.
+zıplama saydam dairedir. Yönler sol alt kenara bitişik ve aralıksız, zıplama sağ
+alt kenara sabittir; telefonun güvenli ekran boşlukları korunur. İki parmakla yön
+ve zıplama bağımsız kullanılabilir.
 Zıplama basış süresine bağlıdır; erken bırakma kısa, basılı tutma yüksek zıplamadır.
 
 Arka planlar küçük dokulara bir kez çizilir ve `TileSprite` ile tekrarlanır. İlk

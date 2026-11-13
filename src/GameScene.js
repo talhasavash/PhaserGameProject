@@ -7,6 +7,7 @@ import { createFireRain, updateFireRain } from './fireRain.js';
 import { unlockNext } from './progress.js';
 import { verses } from './verses.js';
 import { bossStep, bossMood, resetBossRage } from './boss.js';
+import { createPlatformArt } from './platforms.js';
 
 const textStyle = { fontFamily: 'Trebuchet MS, sans-serif', color: '#294e4c' };
 const COLLECTIBLE_SCALE = 0.75;
@@ -157,13 +158,9 @@ export class GameScene extends Phaser.Scene {
         }
         for (const platform of this.level.platforms) {
             const { x, y, width } = platform;
-            const ground = this.add.rectangle(x + width / 2, y + 14, width, 28, 0x9c7653).setDepth(5);
+            const ground = this.add.rectangle(x + width / 2, y + 14, width, 28).setVisible(false);
             this.solids.add(ground);
-            this.add.rectangle(x + width / 2, y + 2, width + 4, 8, 0x5d9d5e).setDepth(6);
-            this.add.rectangle(x + width / 2, y + 29, width - 12, 5, 0x765a46, 0.35).setDepth(4);
-            for (let xx = x + 16; xx < x + width; xx += 34) {
-                this.add.rectangle(xx, y + 17, 12, 4, 0xb9956a).setDepth(6);
-            }
+            createPlatformArt(this, platform, this.level.theme);
         }
         const belt = this.level.belt;
         this.add.rectangle(belt.x + belt.width / 2, 524, belt.width, 17, 0x466b72).setDepth(7);
@@ -316,7 +313,7 @@ export class GameScene extends Phaser.Scene {
             document.getElementById('settings-button').click();
             this.restart();
         };
-        document.getElementById('play-again').onclick = () => this.restart(true);
+        document.getElementById('play-again').onclick = () => this.continueAfterResult();
         document.getElementById('next-level').onclick = () => this.continueAfterResult();
         document.getElementById('retry-fall').onclick = () => this.retryFall();
         const soundButton = document.getElementById('sound-button');
@@ -449,7 +446,7 @@ export class GameScene extends Phaser.Scene {
     continueAfterResult() {
         if (!this.gameState.complete || !this.resultShown) return;
         this.resultShown = false;
-        if (this.levelIndex === levels.length - 1) { this.restart(true); return; }
+        if (this.levelIndex === levels.length - 1) { document.getElementById('menu-button').click(); return; }
         this.tweens.resumeAll();
         this.physics.resume();
         this.scene.restart({ levelIndex: this.levelIndex + 1, score: this.gameState.score });
@@ -518,8 +515,10 @@ export class GameScene extends Phaser.Scene {
             if (patrol.jump) {
                 let jumpSpeed = 1;
                 if (patrol.rage) {
-                    if (patrol.engagedAt === null && Math.abs(this.player.x - hazard.x) < 450) patrol.engagedAt = this.elapsed;
-                    const mood = bossMood(this.elapsed, patrol.engagedAt, Math.abs(this.player.x - hazard.x));
+                    const distance = Math.abs(this.player.x - hazard.x);
+                    if (distance >= 450) patrol.engagedAt = null;
+                    else if (patrol.engagedAt === null) patrol.engagedAt = this.elapsed;
+                    const mood = bossMood(this.elapsed, patrol.engagedAt, distance);
                     jumpSpeed = mood.speed;
                     hazard.setTint(mood.tint);
                     hazard.setTexture(mood.angry ? 'ogre-ember-angry' : 'ogre-ember');

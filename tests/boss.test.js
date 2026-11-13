@@ -20,7 +20,7 @@ test('The eleventh chapter has giant jumping guards with enough time to run unde
         let clearanceMs = 0;
         for (let age = 0; age < guard.jump.duration; age += 10) if (bossLift(start + age, guard.jump) > 85) clearanceMs += 10;
         const runUnderMs = (58 * guard.scale + 24) / (265 - guard.speed) * 1000;
-        const speed = guard.rage ? bossMood(18000, 0).speed : 1;
+        const speed = guard.rage ? bossMood(18000, 0, 0).speed : 1;
         assert.ok(clearanceMs / speed > runUnderMs + 150, 'Even the angry guardian leaves a fair passage window');
     }
 });
@@ -31,20 +31,27 @@ test('The final guard only grows angry after engagement and its speed and red ti
     assert.ok(levels[10].enemies.slice(0, -1).every(guard => !guard.rage));
     assert.equal(bossMood(999999, null).speed, 1);
     const calm = bossMood(1000, 1000);
-    const warming = bossMood(5500, 1000);
-    const angry = bossMood(19000, 1000);
+    const warming = bossMood(5500, 1000, 300);
+    const angry = bossMood(19000, 1000, 0);
     assert.equal(calm.tint, 0xffffff);
     assert.ok(calm.speed < warming.speed && warming.speed < angry.speed);
     assert.ok(calm.tint > warming.tint && warming.tint > angry.tint);
     assert.equal(warming.angry, false);
     assert.equal(angry.angry, true);
-    assert.deepEqual(bossMood(999999, 1000), angry, 'Difficulty has a fixed upper limit');
+    assert.deepEqual(bossMood(999999, 1000, 0), angry, 'Difficulty has a fixed upper limit');
     const distant = bossMood(1000, 1000, 440);
     const approaching = bossMood(1000, 1000, 300);
     const nearby = bossMood(1000, 1000, 140);
     assert.ok(distant.anger < approaching.anger && approaching.anger < nearby.anger);
     assert.ok(distant.speed < approaching.speed && approaching.speed < nearby.speed);
     assert.equal(nearby.angry, true, 'The face changes before contact, without taking damage');
+    const retreating = bossMood(25000, 1000, 400);
+    const farAway = bossMood(26000, 1000, 500);
+    assert.ok(retreating.anger < angry.anger);
+    assert.equal(retreating.angry, false);
+    assert.equal(farAway.anger, 0, 'Waiting cannot keep a distant guardian angry');
+    assert.equal(farAway.tint, 0xffffff);
+    assert.equal(farAway.speed, 1);
 });
 
 test('Every chapter has a sourced verse; citations remain in data rather than on the result card', () => {

@@ -50,28 +50,50 @@ test('Touching the exit early leaves the game running and explains the mission',
     assert.match(hint, /üç elma/);
 });
 
-test('The key and exit open the result screen exactly once', () => {
-    const elements = new Map(['result-score', 'game-result', 'play-again'].map(id => [id, { hidden: true, textContent: '', focus() { this.focused = true; } }]));
-    globalThis.document = { getElementById: id => elements.get(id) };
-    const run = createGameState();
-    for (let i = 0; i < 3; i++) recordFruit(run, `apple-${i}`, 'apple');
-    takeKey(run);
-    let pauseCount = 0;
-    const scene = {
-        gameState: run, elapsed: 10000, levelIndex: levels.length - 1,
-        physics: { pause() { pauseCount += 1; } },
-        player: { anims: { stop() {} }, setTexture() {} },
-        tweens: { pauseAll() {} }, announce() {}, updateHud() {}
-    };
-    GameScene.prototype.reachExit.call(scene);
-    GameScene.prototype.reachExit.call(scene);
-    assert.equal(run.complete, true);
-    assert.equal(pauseCount, 1);
-    assert.equal(elements.get('game-result').hidden, false);
-    assert.match(elements.get('result-score').textContent, /90 puan/);
-    assert.equal(elements.get('play-again').focused, true);
+test('Every mosque celebrates before showing a result; only Continue starts the next level', () => {
+    for (let index = 0; index < levels.length; index++) {
+        const ids = ['result-score', 'game-result', 'play-again', 'next-level', 'result-eyebrow', 'result-title', 'result-message', 'touch-controls'];
+        const elements = new Map(ids.map(id => [id, { hidden: true, textContent: '', focus() { this.focused = true; } }]));
+        globalThis.document = { getElementById: id => elements.get(id) };
+        const run = createGameState();
+        for (let i = 0; i < 3; i++) recordFruit(run, `apple-${i}`, 'apple');
+        takeKey(run);
+        let pauseCount = 0;
+        let delayed;
+        let scheduled = 0;
+        const calls = [];
+        const scene = {
+            gameState: run, elapsed: 10000, levelIndex: index,
+            physics: { pause() { pauseCount++; }, resume() {} },
+            player: { anims: { stop() {} }, setTexture() {}, setVelocity() {}, setAlpha() {} },
+            touchControls: { reset() {} }, sound: { play() {} },
+            time: { delayedCall(ms, callback) { assert.equal(ms, 1200); scheduled++; delayed = callback; } },
+            tweens: { pauseAll() {}, resumeAll() {} }, announce() {}, updateHud() {},
+            showLevelResult() { GameScene.prototype.showLevelResult.call(this); },
+            scene: { restart(data) { calls.push(data); } }, restart() { calls.push('replay'); }
+        };
+        GameScene.prototype.reachExit.call(scene);
+        GameScene.prototype.reachExit.call(scene);
+        assert.equal(run.complete, true);
+        assert.equal(pauseCount, 1);
+        assert.equal(scheduled, 1);
+        assert.equal(elements.get('game-result').hidden, true, 'Let the player see the sparkle first');
+        assert.equal(scene.player.expression, 'happy');
+        assert.ok(scene.player.recoveryUntil > scene.elapsed);
+        GameScene.prototype.continueAfterResult.call(scene);
+        assert.deepEqual(calls, [], 'No transition before result');
+        delayed();
+        assert.equal(elements.get('game-result').hidden, false);
+        assert.match(elements.get('result-score').textContent, /90 puan/);
+        const final = index === levels.length - 1;
+        assert.equal(elements.get('next-level').hidden, final);
+        assert.equal(elements.get('play-again').hidden, !final);
+        assert.equal(elements.get(final ? 'play-again' : 'next-level').focused, true);
+        GameScene.prototype.continueAfterResult.call(scene);
+        GameScene.prototype.continueAfterResult.call(scene);
+        assert.deepEqual(calls, final ? ['replay'] : [{ levelIndex: index + 1, score: 90 }]);
+    }
 });
-
 test('Respawn restores hearts at the flag and preserves collected fruit and key', () => {
     const run = createGameState();
     for (let i = 0; i < 3; i++) recordFruit(run, `apple-${i}`, 'apple');
@@ -91,32 +113,6 @@ test('Respawn restores hearts at the flag and preserves collected fruit and key'
     assert.equal(run.score, 90);
     assert.equal(run.hasKey, true);
     assert.ok(scene.hurtUntil > scene.elapsed);
-});
-
-test('First mosque automatically starts the second level exactly once with score preserved', () => {
-    const run = createGameState();
-    for (let i = 0; i < 3; i++) recordFruit(run, `apple-${i}`, 'apple');
-    takeKey(run);
-    const calls = [];
-    const scene = {
-        gameState: run, levelIndex: 0, elapsed: 9000,
-        touchControls: { reset() {} }, scene: { restart(data) { calls.push(data); } }
-    };
-    GameScene.prototype.reachExit.call(scene);
-    GameScene.prototype.reachExit.call(scene);
-    assert.deepEqual(calls, [{ levelIndex: 1, score: 90, transitionFrom: 0 }]);
-});
-
-test('Every intermediate mosque starts the next chapter with its completion notice', () => {
-    for (let index = 0; index < levels.length - 1; index++) {
-        const run = createGameState(200);
-        run.apples = 3; takeKey(run);
-        const calls = [];
-        const scene = { gameState: run, levelIndex: index, touchControls: { reset() {} }, scene: { restart(data) { calls.push(data); } } };
-        GameScene.prototype.reachExit.call(scene);
-        GameScene.prototype.reachExit.call(scene);
-        assert.deepEqual(calls, [{ levelIndex: index + 1, score: 200, transitionFrom: index }]);
-    }
 });
 
 test('Second level resets its mission and hearts, preserves character, sound setting and total score', () => {

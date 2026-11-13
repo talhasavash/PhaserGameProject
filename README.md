@@ -180,7 +180,9 @@ Ana ekranda karakterini ve açılmış numaralı bölümünü seçebilirsin. Ba�
 `progress.js` açılan bölüm sayısını `localStorage` içinde saklar. Aynı cihaz ve tarayıcıda
 sayfa yenilenince korunur; tarayıcı verileri silinirse sıfırlanır, cihazlar arasında eşitlenmez.
 Depolama kapalıysa ilerleme yalnızca mevcut oturumda korunur.
-Oyundaki ☰ düğmesi bölüm seçimine döndürür.
+Sağ üstteki ☰ düğmesi ayar panelini açar ve oyunu duraklatır. Panelde ses,
+yeniden başlatma, tam ekran ve bölüm seçimine dönüş bulunur. Devam et veya ☰ ile
+paneli kapatınca oyun devam eder. Alt ortada araç düğmeleri yoktur.
 Menüye dönerken eski Phaser oyunu ve ekran boyutu izleyicisi temizlenir.
 
 İlk bölümün sabit arka planı `cacheTexture` ile bir kez hazırlanır. Tekrarlanan
@@ -188,7 +190,7 @@ katmanlar `TileSprite` ile çizilir; arka plan nesne sayısı 213'ten 18'e indir
 Bu sayı bir FPS ölçümü değildir; gerçek telefon performansı ayrıca kontrol edilmelidir.
 Önbellekteki görseller bölüm yeniden başlatıldığında tekrar üretilmez.
 
-Dokunma düğmeleri büyük, saydam dolgulu ve açık renk kenarlı üçgenlerdir.
+Yön düğmeleri birbirine yakın, büyük ve saydam üçgenlerdir; zıplama düğmesi dairedir.
 Görselden daha geniş dikdörtgen dokunma alanları rahat basmayı sağlar.
 Oyun alanında açıklama, yer adı veya
 uyarı yazısı yoktur; can, elma, anahtar ve puan simgeler/sayılarla gösterilir.
@@ -198,10 +200,13 @@ uyarı yazısı yoktur; can, elma, anahtar ve puan simgeler/sayılarla gösteril
 verilerini, ayrıca bunları sıraya koyan `levels` dizisini içerir. Dört bölüm aynı `GameScene`
 koduyla çalışır; yeni bölüm eklemek için sahne kodunu kopyalamak gerekmez.
 
-Her bölümde üç elma anahtarı açar. Anahtarla cami girişine gelince sonraki bölüm
-otomatik başlar. Karakter, ses tercihi ve toplam puan korunur; elmalar, anahtar,
-kontrol noktası ve canlar yeni bölüm için sıfırlanır. Geçişte kısa bir bölüm tamamlandı
-mesajı görünür. Dördüncü cami girişinde final ekranı açılır.
+Her bölümde üç elma anahtarı açar. Anahtarla cami girişine gelince oyun durur,
+çocuk gülümseyip 1,2 saniye yıldızlarla parlar. Ardından o bölümün sonuç kartı açılır.
+Sonraki bölüm düğmesine veya Enter'a basılmadan yeni bölüm başlamaz; yeni bölümde
+önceki bitiş mesajı gösterilmez. Karakter, ses tercihi ve toplam puan korunur;
+elmalar, anahtar, kontrol noktası ve canlar yeni bölüm için sıfırlanır.
+Dördüncü cami girişinde aynı kartın final biçimi açılır.
+`background.js` her ortam için ayrı cephe, kubbe, pencere ve minare düzeni çizer.
 R/Yeniden başla mevcut bölümü, finalde Yeniden oyna ise bütün oyunu baştan başlatır;
 açılmış bölüm kilitleri geri kapanmaz.
 
@@ -218,9 +223,10 @@ Yere inmeden 240 ms önce basılan zıplama hatırlanır; kenardan ayrıldıktan
 Zıplama yüksekliği basış süresine bağlıdır. Fiziksel telefonla tekrar kontrol edilmelidir.
 
 Üçüncü bölümde kum tepeleri ve palmiye siluetleri, dördüncüde gece, yıldızlar,
-uzak kubbeler ve kandiller bulunur. Bu iki bölümde ateşler sabit noktalara düşer.
-`fireRain.js` her noktada önce bir saniye yer uyarısı gösterir, sonra ateşi düşürür.
-Her nokta tek bir fizik nesnesini tekrar kullanır; her karede yeni nesne üretilmez.
+uzak kubbeler ve kandiller bulunur. Bu iki bölümde ateşler oyuncunun yakınlarında
+rastgele konum, hız ve bekleme süresiyle düşer. `fireRain.js` önce 1,5 saniye
+kırmızı-sarı halka, ünlem ve dikey ışık gösterir. Uyarı başladıktan sonra hedef sabittir.
+Her atış tek bir fizik nesnesini tekrar kullanır; her karede yeni nesne üretilmez.
 Duraklatma döngüyü de durdurur. Başlangıç, kontrol noktası ve abdest alanları düşüş
 noktalarından uzaktadır. Yeni arka planlar da küçük, önbelleğe alınmış dokular kullanır.
 

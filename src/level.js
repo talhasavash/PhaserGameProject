@@ -83,7 +83,7 @@ export const courtyard = {
     fountains: [{ id: 'fountain-1', x: 1180 }, { id: 'fountain-2', x: 3590 }]
 };
 
-// Çöl yolunda ateşler sabit noktalara düşer; önce yerde bir uyarı görünür.
+// Çöl yolunda rastgele ateş yağmuru; önce belirgin bir uyarı görünür.
 export const desert = {
     name: 'Hilalli Çöl Yolu', theme: 'desert', width: 4720, groundY: 520,
     spawn: { x: 100, y: 480 }, checkpoint: { x: 2300, y: 480 },
@@ -116,9 +116,9 @@ export const desert = {
     belt: { x: 2380, width: 240, speed: -105 },
     fountains: [{ id: 'fountain-1', x: 1230 }, { id: 'fountain-2', x: 3500 }],
     fireRain: [
-        { x: 1060, period: 3400, offset: 0, speed: 270 },
-        { x: 2550, period: 3600, offset: 1200, speed: 290 },
-        { x: 3790, period: 3400, offset: 600, speed: 300 }
+        { period: 3400, offset: 0, speed: 270 },
+        { period: 3600, offset: 1200, speed: 290 },
+        { period: 3400, offset: 600, speed: 300 }
     ]
 };
 
@@ -155,10 +155,10 @@ export const moonGarden = {
     belt: { x: 1210, width: 260, speed: -120 },
     fountains: [{ id: 'fountain-1', x: 1500 }, { id: 'fountain-2', x: 3600 }],
     fireRain: [
-        { x: 1120, period: 3000, offset: 0, speed: 310 },
-        { x: 2520, period: 3200, offset: 900, speed: 320 },
-        { x: 3690, period: 3000, offset: 1800, speed: 330 },
-        { x: 4090, period: 3100, offset: 500, speed: 320 }
+        { period: 3000, offset: 0, speed: 310 },
+        { period: 3200, offset: 900, speed: 320 },
+        { period: 3000, offset: 1800, speed: 330 },
+        { period: 3100, offset: 500, speed: 320 }
     ]
 };
 

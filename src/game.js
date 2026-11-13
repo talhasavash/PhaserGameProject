@@ -8,6 +8,20 @@ import { unlockedLevels } from './progress.js';
 const characterForm = document.getElementById('character-form');
 const startButton = document.getElementById('start-button');
 let gameStarted = false;
+let activeGame = null;
+const settingsButton = document.getElementById('settings-button');
+const settingsPanel = document.getElementById('settings-panel');
+function closeSettings() {
+    if (!settingsPanel.hidden) settingsButton.click();
+}
+settingsButton.onclick = () => {
+    const opening = settingsPanel.hidden;
+    settingsPanel.hidden = !opening;
+    settingsButton.setAttribute('aria-expanded', String(opening));
+    settingsButton.setAttribute('aria-label', opening ? 'Oyun menüsünü kapat' : 'Oyun menüsünü aç');
+    const scene = activeGame?.scene.getScene('Garden');
+    if (scene?.player && !scene.gameState.complete && scene.paused !== opening) scene.togglePause();
+};
 const menuButton = document.getElementById('menu-button');
 const levelGrid = document.getElementById('level-grid');
 // Bölüm sayısı değişince menü de aynı veriden oluşur.
@@ -66,6 +80,7 @@ characterForm.addEventListener('submit', event => {
     const selectedLevel = characterForm.querySelector('input[name="level"]:checked');
     if (!selected || !selectedLevel || Number(selectedLevel.value) >= unlockedLevels(levels.length) || gameStarted) return;
     gameStarted = true;
+    closeSettings();
     document.body.classList.add('playing');
     document.getElementById('touch-controls').hidden = false;
     startButton.disabled = true;
@@ -99,6 +114,7 @@ function startGame(character, levelIndex) {
         title: 'Meyve Oyunu 2026',
         render: { antialias: true, roundPixels: true }
     });
+    activeGame = game;
     const observer = new ResizeObserver(() => {
         const size = view();
         if (game.scale.width !== size.width || game.scale.height !== size.height) {
@@ -108,9 +124,11 @@ function startGame(character, levelIndex) {
     observer.observe(area);
     game.events.once(Phaser.Core.Events.DESTROY, () => observer.disconnect());
     menuButton.onclick = () => {
+        closeSettings();
         menuButton.disabled = true;
         game.events.once(Phaser.Core.Events.DESTROY, () => {
             gameStarted = false;
+            activeGame = null;
             refreshLevelLocks();
             document.body.classList.remove('playing');
             document.getElementById('touch-controls').hidden = true;

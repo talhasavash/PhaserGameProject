@@ -1,24 +1,37 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { fireFrame } from '../src/fireRain.js';
+import { fireFrame, chooseFireX } from '../src/fireRain.js';
 import { levels } from '../src/level.js';
 
-test('Each fireball warns for a second, falls, disappears before the ground, then repeats', () => {
-    for (const level of levels) for (const rain of level.fireRain || []) {
-        const start = rain.period - rain.offset;
-        assert.equal(fireFrame(start, rain).warning, true);
-        assert.equal(fireFrame(start + 999, rain).falling, false);
-        assert.equal(fireFrame(start + 1000, rain).falling, true);
-        assert.equal(fireFrame(start + 1100, rain).warning, false);
-        assert.ok(fireFrame(start + 1200, rain).y > fireFrame(start + 1100, rain).y);
-        assert.equal(fireFrame(start + rain.period - 1, rain).falling, false);
-        assert.deepEqual(fireFrame(start + rain.period, rain), fireFrame(start, rain));
-        assert.ok(Math.abs(rain.x - level.spawn.x) > 100);
-        assert.ok(Math.abs(rain.x - level.checkpoint.x) > 65);
-        for (const fountain of level.fountains) assert.ok(Math.abs(rain.x - fountain.x) > 65);
-    }
+test('A chosen target warns for 1.5 seconds, then falls and finishes without moving its target', () => {
+    const plan = { x: 900, startAt: 2000, speed: 300 };
+    assert.equal(fireFrame(1999, plan).warning, false);
+    assert.equal(fireFrame(2000, plan).warning, true);
+    assert.equal(fireFrame(3499, plan).falling, false);
+    assert.equal(fireFrame(3500, plan).falling, true);
+    assert.equal(fireFrame(3500, plan).warning, false);
+    assert.ok(fireFrame(3800, plan).y > fireFrame(3700, plan).y);
+    assert.equal(fireFrame(5000, plan).falling, false);
+    assert.equal(fireFrame(5000, plan).done, true);
+    assert.equal(plan.x, 900);
 });
 
+test('Random fire targets vary, stay near the player and avoid safe spots and other drops', () => {
+    let seed = 41;
+    const random = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+    const targets = new Set();
+    for (const level of levels.slice(2)) for (let playerX = 100; playerX < level.exit.x; playerX += 70) {
+        const x = chooseFireX(level, playerX, random, [900]);
+        if (x === null) continue;
+        targets.add(Math.round(x));
+        assert.ok(x >= Math.max(180, playerX - 180) && x <= Math.min(level.key.x - 100, playerX + 500));
+        for (const safe of [level.spawn.x, level.checkpoint.x, level.exit.x, ...level.fountains.map(f => f.x)]) assert.ok(Math.abs(x - safe) > 110);
+        assert.ok(Math.abs(x - 900) > 90);
+    }
+    assert.ok(targets.size > 30);
+    assert.equal(chooseFireX(levels[2], levels[2].exit.x, random), null);
+    assert.equal(chooseFireX(levels[2], 100, () => 0), null, 'Do not fall back to an unsafe target');
+});
 test('Four chapters have unique themes and reachable apples before their key and mosque', () => {
     assert.equal(levels.length, 4);
     assert.equal(new Set(levels.map(level => level.theme)).size, 4);

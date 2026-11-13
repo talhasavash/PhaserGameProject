@@ -132,30 +132,57 @@ function createCourtyard(scene, width) {
 }
 
 // Cami görünümünü çiz; giriş kapısını oyun akışının kullanması için geri döndür.
-export function createMosque(scene, x) {
-    for (const side of [-1, 1]) {
-        const towerX = x + side * 106;
-        scene.add.rectangle(towerX, 452, 22, 136, 0xe9e0bc).setDepth(4);
-        scene.add.rectangle(towerX, 411, 32, 7, 0xc5a86a).setDepth(5);
-        scene.add.triangle(towerX, 371, 0, 30, 13, 0, 26, 30, 0x4b897b).setDepth(5);
-        scene.add.rectangle(towerX, 440, 7, 24, 0x6a9d95).setDepth(5);
+export function createMosque(scene, x, theme = 'garden') {
+    // Her bölümün cephesi, kubbe düzeni ve minare sayısı farklıdır.
+    const designs = {
+        garden: { wall: 0xf0e6c5, roof: 0x4b897b, trim: 0xc5a86a, width: 168, top: 455, towers: [-106, 106], domes: [[0, 444, 144, 106]] },
+        courtyard: { wall: 0xe5e8eb, roof: 0x427fa4, trim: 0x77bfc2, width: 218, top: 446, towers: [-132], domes: [[-72, 437, 70, 58], [72, 437, 70, 58], [0, 410, 116, 100]] },
+        desert: { wall: 0xe8bc8c, roof: 0xcb8256, trim: 0xf5dd9c, width: 194, top: 428, towers: [126], domes: [[0, 410, 94, 70]] },
+        night: { wall: 0xe8dff0, roof: 0x7763a7, trim: 0xe8c77a, width: 230, top: 450, towers: [-140, -104, 104, 140], domes: [[-78, 435, 68, 68], [78, 435, 68, 68], [0, 399, 122, 116]] }
+    };
+    const design = designs[theme] || designs.garden;
+    const add = scene.add;
+    for (const [index, offset] of design.towers.entries()) {
+        const top = theme === 'desert' ? 330 : 348 - (index % 2) * 18;
+        const towerX = x + offset;
+        add.rectangle(towerX, (top + 520) / 2, theme === 'desert' ? 30 : 18, 520 - top, design.wall).setDepth(4);
+        for (const y of [top + 36, top + 66]) add.rectangle(towerX, y, 28, 6, design.trim).setDepth(5);
+        if (theme === 'desert') {
+            add.rectangle(towerX, top - 4, 36, 10, design.roof).setDepth(5);
+            add.rectangle(towerX, top + 19, 12, 22, 0x795b55).setDepth(5);
+        } else add.triangle(towerX, top - 15, 0, 30, 13, 0, 26, 30, design.roof).setDepth(5);
     }
-    scene.add.ellipse(x, 444, 144, 106, 0x4b897b).setDepth(4);
-    scene.add.text(x, 369, '☾', { fontFamily: 'Georgia', fontSize: '30px', color: '#bd9950' }).setOrigin(0.5).setDepth(5);
-    scene.add.rectangle(x, 487, 168, 66, 0xf0e6c5).setDepth(5);
-    scene.add.rectangle(x, 455, 174, 8, 0xc5a86a).setDepth(6);
-    for (const side of [-1, 1]) {
-        scene.add.ellipse(x + side * 54, 479, 22, 24, 0x81aaa0).setDepth(6);
-        scene.add.rectangle(x + side * 54, 491, 22, 24, 0x81aaa0).setDepth(6);
+    add.rectangle(x, (design.top + 520) / 2, design.width, 520 - design.top, design.wall).setDepth(5);
+    for (const [offset, y, width, height] of design.domes) {
+        add.ellipse(x + offset, y, width, height, design.roof).setDepth(4);
+        add.rectangle(x + offset, y + height / 3, width, 7, design.trim).setDepth(5);
+        add.text(x + offset, y - height / 2 - 13, '☾', { fontFamily: 'Georgia', fontSize: offset === 0 ? '24px' : '16px', color: '#e8c77a' }).setOrigin(0.5).setDepth(5);
     }
-    scene.add.ellipse(x, 475, 54, 46, 0xc5a86a).setDepth(6);
-    scene.add.rectangle(x, 492, 54, 56, 0xc5a86a).setDepth(6);
-    scene.add.ellipse(x, 477, 42, 36, 0x486b62).setDepth(7);
-    const door = scene.add.rectangle(x, 494, 42, 52, 0x486b62).setDepth(7);
-    scene.add.circle(x + 12, 494, 3, 0xf0ce79).setDepth(8);
+    add.rectangle(x, design.top, design.width + 10, 9, design.trim).setDepth(6);
+    // Renkli pencere kemerleri ve basamaklar.
+    for (const offset of [-66, 66]) {
+        add.ellipse(x + offset, 477, 23, 32, design.roof).setDepth(6);
+        add.rectangle(x + offset, 489, 23, 25, design.roof).setDepth(6);
+        add.rectangle(x + offset, 483, 3, 35, design.trim).setDepth(7);
+        add.rectangle(x + offset, 485, 23, 3, design.trim).setDepth(7);
+    }
+    if (theme === 'courtyard') {
+        const tiles = add.graphics().setDepth(6);
+        tiles.lineStyle(2, design.trim, 0.9);
+        for (let offset = -98; offset <= 98; offset += 14) tiles.strokeRect(x + offset, 450, 10, 10);
+    }
+    if (theme === 'desert') {
+        for (let offset = -88; offset <= 88; offset += 22) add.rectangle(x + offset, 418, 12, 16, design.wall).setDepth(6);
+    }
+    add.rectangle(x, 518, 90, 5, design.trim).setDepth(7);
+    add.ellipse(x, 474, 58, 48, design.trim).setDepth(6);
+    add.rectangle(x, 493, 58, 54, design.trim).setDepth(6);
+    add.ellipse(x, 476, 44, 36, 0x344d56).setDepth(7);
+    const door = add.rectangle(x, 494, 44, 52, 0x344d56).setDepth(7);
+    add.line(x, 494, 0, -19, 0, 23, design.trim).setDepth(8);
+    add.circle(x + 12, 494, 3, 0xf0ce79).setDepth(8);
     return door;
 }
-
 export function createFountain(scene, x) {
     const tiles = scene.add.graphics().setDepth(5);
     tiles.fillStyle(0xe7dfc3);

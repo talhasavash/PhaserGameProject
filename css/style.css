@@ -3,7 +3,10 @@
 html, body, main, .game-shell { width: 100%; height: 100%; margin: 0; overflow: hidden; }
 body { height: 100vh; height: 100dvh; overscroll-behavior: none; }
 .game-shell { position: relative; }
-.game-toolbar { position: absolute; inset: 0 0 auto; height: calc(44px + env(safe-area-inset-top)); padding: calc(5px + env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) 5px; z-index: 3; }
+.game-toolbar { position: absolute; inset: 0 0 auto; height: calc(44px + env(safe-area-inset-top)); padding: calc(5px + env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) 5px; z-index: 5; display: flex; align-items: center; justify-content: flex-end; pointer-events: none; }
+.game-toolbar button, .settings-panel { pointer-events: auto; }
+.settings-panel { position: absolute; right: max(10px, env(safe-area-inset-right)); top: calc(50px + env(safe-area-inset-top)); display: grid; gap: 8px; width: 190px; padding: 12px; border: 1px solid #9bb29a; border-radius: 16px; background: #fff9e8f5; box-shadow: 0 8px 30px #183c3640; }
+.game-toolbar .settings-panel button { font-size: 15px; min-height: 40px; }
 .toolbar-actions { display: flex; justify-content: flex-end; align-items: center; gap: 8px; }
 .build-version { margin-right: auto; color: #d5e3d7; font-size: 10px; }
 button { font: inherit; cursor: pointer; border: 1px solid #789082; border-radius: 8px; background: #f7f6e8; color: #294d46; padding: 7px 12px; touch-action: manipulation; }
@@ -46,13 +49,13 @@ button:focus-visible { outline: 3px solid #e5bb6e; outline-offset: 2px; }
 #start-button { background: #416a54; color: #fff9e8; padding: 12px 28px; font-size: 14px; }
 .character-note { font-size: 12px; color: #63785f; margin: 13px 0 0; }
 .touch-controls { display: none; position: absolute; inset: auto 0 0; padding: 8px max(18px, env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left)); justify-content: space-between; z-index: 2; touch-action: none; user-select: none; -webkit-user-select: none; pointer-events: none; }
-.direction-buttons { display: flex; gap: 16px; }
-.touch-button { position: relative; display: grid; place-items: center; width: clamp(104px, 15vw, 144px); height: clamp(94px, 27dvh, 126px); padding: 4px; border: 0; border-radius: 0; background: transparent; touch-action: none; -webkit-touch-callout: none; pointer-events: auto; }
+.direction-buttons { display: flex; gap: 4px; }
+.touch-button { position: relative; display: grid; place-items: center; width: clamp(114px, 16vw, 156px); height: clamp(106px, 30dvh, 140px); padding: 4px; border: 0; border-radius: 0; background: transparent; touch-action: none; -webkit-touch-callout: none; pointer-events: auto; }
 .touch-button:hover, .touch-button.pressed { background: transparent; }
 .touch-button svg { position: absolute; inset: 4px; width: calc(100% - 8px); height: calc(100% - 8px); display: block; overflow: visible; pointer-events: none; }
-.touch-button path { fill: #fff9e80d; stroke: #fff9e880; stroke-width: 3; stroke-linejoin: round; }
-.touch-button.pressed path { fill: #fff9e82b; stroke: #fff9e8d9; }
-.jump-button { width: clamp(112px, 16vw, 152px); }
+.touch-button path, .touch-button circle { fill: #fff9e80d; stroke: #fff9e880; stroke-width: 3; stroke-linejoin: round; }
+.touch-button.pressed path, .touch-button.pressed circle { fill: #fff9e82b; stroke: #fff9e8d9; }
+.jump-button { width: clamp(124px, 17vw, 164px); }
 .result { position: absolute; inset: 0; z-index: 4; background: #213f3dcc; display: grid; place-items: center; overflow: auto; padding: 16px; }
 .result-card { border-radius: 24px; background: #fff9e8; padding: 28px; text-align: center; max-width: 480px; }
 .result h2 { font: 32px Georgia, serif; margin: 12px 0; }
@@ -63,7 +66,7 @@ button:focus-visible { outline: 3px solid #e5bb6e; outline-offset: 2px; }
 [hidden] { display: none !important; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 @media (any-pointer: coarse), (max-width: 1024px) {
-    body.playing .game-stage { bottom: calc(128px + env(safe-area-inset-bottom)); }
+    body.playing .game-stage { bottom: calc(148px + env(safe-area-inset-bottom)); }
     .touch-controls { display: flex; }
 }
 @media (max-height: 500px) {
@@ -87,10 +90,7 @@ button:focus-visible { outline: 3px solid #e5bb6e; outline-offset: 2px; }
 /* Yatay mobilde ayrı şeritler yerine oyunun toprak kısmını kontrol alanı yap. */
 @media (orientation: landscape) and (any-pointer: coarse), (orientation: landscape) and (max-width: 1024px) {
     body.playing .game-stage { inset: 0; }
-    body.playing .game-toolbar { inset: auto auto calc(18px + env(safe-area-inset-bottom)) 50%; transform: translateX(-50%); width: max-content; height: auto; padding: 0; }
     body.playing .build-version { display: none; }
-    body.playing .toolbar-actions { gap: 4px; }
-    body.playing .game-toolbar button { font-size: 20px; padding: 4px 8px; }
 }
 
 @media (orientation: portrait) {
@@ -98,11 +98,8 @@ button:focus-visible { outline: 3px solid #e5bb6e; outline-offset: 2px; }
 }
 @media (orientation: landscape) and (max-height: 340px) {
     .touch-controls { padding-bottom: calc(4px + env(safe-area-inset-bottom)); }
-    .touch-button { width: 104px; height: 90px; }
-    .jump-button { width: 112px; }
+    .touch-button { width: 114px; height: 100px; }
+    .jump-button { width: 124px; }
     .selection-layout { margin: 8px 0; gap: 12px; }
     .character-note { display: none; }
-}
-@media (orientation: landscape) and (max-width: 700px) {
-    body.playing .game-toolbar { bottom: calc(110px + env(safe-area-inset-bottom)); }
 }

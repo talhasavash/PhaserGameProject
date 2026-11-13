@@ -28,7 +28,6 @@ export class GameScene extends Phaser.Scene {
         if (data.levelIndex !== undefined) this.levelIndex = data.levelIndex;
         if (data.score !== undefined) this.carriedScore = data.score;
         this.level = levels[this.levelIndex];
-        this.transitionFrom = data.transitionFrom;
     }
 
     // Phaser önce preload'u çağırır: görselleri hazırla.
@@ -64,6 +63,8 @@ export class GameScene extends Phaser.Scene {
         this.hurtUntil = 0;
         this.knockbackUntil = 0;
         this.paused = false;
+        this.resultShown = false;
+        document.getElementById('touch-controls').hidden = false;
         this.lastGateHint = -Infinity;
         this.physics.world.setBounds(0, 0, this.level.width, 600);
         createScenery(this, this.level.width, this.level.theme);
@@ -90,13 +91,6 @@ export class GameScene extends Phaser.Scene {
         this.cameras.main.startFollow(this.player, true, 0.09, 0, -190, 0);
         this.createHud();
         this.centerHud();
-        if (this.transitionFrom !== undefined) {
-            const notice = this.add.text(this.scale.width / 2, 58,
-                `${this.transitionFrom + 1}. bölüm tamamlandı!\n${this.levelIndex + 1}. bölüme geçtiniz.`,
-                { ...textStyle, fontSize: '18px', align: 'center', backgroundColor: '#fff9e8', padding: { x: 16, y: 9 } })
-                .setOrigin(0.5, 0).setScrollFactor(0).setDepth(110);
-            this.tweens.add({ targets: notice, alpha: 0, delay: 1800, duration: 450, onComplete: () => notice.destroy() });
-        }
         this.scale.on('resize', this.centerHud, this);
         this.pauseKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
         this.bindPageControls();
@@ -106,6 +100,7 @@ export class GameScene extends Phaser.Scene {
             document.getElementById('pause-button').onclick = null;
             document.getElementById('restart-button').onclick = null;
             document.getElementById('play-again').onclick = null;
+            document.getElementById('next-level').onclick = null;
             document.getElementById('sound-button').onclick = null;
         });
         this.announce(`${this.levelIndex + 1}. bölüm: ${this.level.name}. Üç elmayı bul, anahtarı al ve camiye ulaş.`);
@@ -185,7 +180,7 @@ export class GameScene extends Phaser.Scene {
         this.add.rectangle(x, 476, 6, 88, 0x6b6e52).setDepth(6);
         this.checkpointFlag = this.add.triangle(x + 4, 433, 0, 0, 48, 12, 0, 27, 0xe3c37d).setOrigin(0, 0).setDepth(7);
         const exit = this.level.exit;
-        this.door = createMosque(this, exit.x);
+        this.door = createMosque(this, exit.x, this.level.theme);
         this.exitZone = this.add.zone(exit.x, 480, 68, 80);
         this.physics.add.existing(this.exitZone, true);
     }
@@ -247,19 +242,23 @@ export class GameScene extends Phaser.Scene {
     bindPageControls() {
         const result = document.getElementById('game-result');
         result.hidden = true;
-        document.getElementById('pause-button').textContent = 'Ⅱ';
-        document.getElementById('pause-button').setAttribute('aria-label', 'Duraklat');
+        document.getElementById('pause-button').textContent = 'Devam et';
+        document.getElementById('pause-button').setAttribute('aria-label', 'Devam et');
         document.getElementById('pause-button').disabled = false;
         document.getElementById('restart-button').disabled = false;
         document.getElementById('toolbar-status').textContent = `${this.level.name} seni bekliyor`;
-        document.getElementById('pause-button').onclick = () => this.togglePause();
-        document.getElementById('restart-button').onclick = () => this.restart();
+        document.getElementById('pause-button').onclick = () => document.getElementById('settings-button').click();
+        document.getElementById('restart-button').onclick = () => {
+            document.getElementById('settings-button').click();
+            this.restart();
+        };
         document.getElementById('play-again').onclick = () => this.restart(true);
+        document.getElementById('next-level').onclick = () => this.continueAfterResult();
         const soundButton = document.getElementById('sound-button');
         soundButton.disabled = false;
         this.sound.setMute(this.soundMuted);
         const updateSoundButton = () => {
-            soundButton.textContent = this.soundMuted ? '♪×' : '♪';
+            soundButton.textContent = this.soundMuted ? 'Ses: kapalı' : 'Ses: açık';
             soundButton.setAttribute('aria-label', this.soundMuted ? 'Sesi aç' : 'Sesi kapat');
             soundButton.setAttribute('aria-pressed', String(this.soundMuted));
         };
@@ -350,24 +349,44 @@ export class GameScene extends Phaser.Scene {
     reachExit() {
         if (finishLevel(this.gameState)) {
             unlockNext(this.levelIndex, levels.length);
-            if (this.levelIndex + 1 < levels.length) {
-                this.touchControls.reset();
-                this.scene.restart({ levelIndex: this.levelIndex + 1, score: this.gameState.score, transitionFrom: this.levelIndex });
-                return;
-            }
+            this.touchControls.reset();
+            this.player.setVelocity(0, 0);
+            this.player.setAlpha(1);
             this.physics.pause();
-            this.player.anims.stop();
-            showPlayerExpression(this.player, 'happy', this.elapsed, 2200);
-            this.tweens.pauseAll();
-            document.getElementById('result-score').textContent = `${this.gameState.score} puan · ${levels.length} bölüm tamamlandı`;
-            document.getElementById('game-result').hidden = false;
-            document.getElementById('play-again').focus({ preventScroll: true });
-            this.announce('Tebrikler! Bütün bölümleri bitirdiniz.');
+            showRecovery(this.player, this.elapsed);
+            this.sound.play('key', { volume: 0.22 });
+            document.getElementById('touch-controls').hidden = true;
+            // Önce camide kazanma parlamasını göster, sonra aynı sonuç kartını aç.
+            this.time.delayedCall(1200, () => this.showLevelResult());
             this.updateHud();
         } else if (!this.gameState.complete && this.elapsed - this.lastGateHint > 4000) {
             this.lastGateHint = this.elapsed;
             this.announce(isKeyReady(this.gameState) ? 'Kapı için önce ilerideki altın anahtarı al.' : 'Kapı için üç elmayı tamamla. Geri dönüp keşfedebilirsin.');
         }
+    }
+
+    showLevelResult() {
+        this.resultShown = true;
+        this.tweens.pauseAll();
+        const final = this.levelIndex === levels.length - 1;
+        document.getElementById('result-eyebrow').textContent = final ? 'OYUN TAMAMLANDI' : 'BÖLÜM TAMAMLANDI';
+        document.getElementById('result-title').textContent = final ? 'Tebrikler!' : `${this.levelIndex + 1}. bölümü bitirdiniz!`;
+        document.getElementById('result-message').textContent = final ? 'Bütün bölümleri bitirdiniz.' : `${this.levelIndex + 2}. bölüm artık açık.`;
+        document.getElementById('result-score').textContent = `${this.gameState.score} puan`;
+        document.getElementById('next-level').hidden = final;
+        document.getElementById('play-again').hidden = !final;
+        document.getElementById('game-result').hidden = false;
+        document.getElementById(final ? 'play-again' : 'next-level').focus({ preventScroll: true });
+        this.announce(document.getElementById('result-title').textContent);
+    }
+
+    continueAfterResult() {
+        if (!this.gameState.complete || !this.resultShown) return;
+        this.resultShown = false;
+        if (this.levelIndex === levels.length - 1) { this.restart(true); return; }
+        this.tweens.resumeAll();
+        this.physics.resume();
+        this.scene.restart({ levelIndex: this.levelIndex + 1, score: this.gameState.score });
     }
 
     togglePause() {
@@ -379,8 +398,6 @@ export class GameScene extends Phaser.Scene {
         } else {
             this.physics.resume(); this.tweens.resumeAll(); this.time.paused = false;
         }
-        document.getElementById('pause-button').textContent = this.paused ? '▶' : 'Ⅱ';
-        document.getElementById('pause-button').setAttribute('aria-label', this.paused ? 'Devam et' : 'Duraklat');
     }
 
     restart(fromBeginning = false) {
@@ -398,9 +415,11 @@ export class GameScene extends Phaser.Scene {
     update(time, delta) {
         if (!this.player) return;
         if (Phaser.Input.Keyboard.JustDown(this.player.keys.R)) { this.restart(); return; }
-        if (Phaser.Input.Keyboard.JustDown(this.pauseKey)) this.togglePause();
+        if (Phaser.Input.Keyboard.JustDown(this.pauseKey)) document.getElementById('settings-button').click();
         if (this.gameState.complete) {
-            if (Phaser.Input.Keyboard.JustDown(this.player.keys.ENTER)) this.restart(true);
+            this.elapsed += delta;
+            updatePlayerEffects(this.player, this.elapsed);
+            if (Phaser.Input.Keyboard.JustDown(this.player.keys.ENTER)) this.continueAfterResult();
             return;
         }
         if (this.paused) return;

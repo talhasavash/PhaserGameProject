@@ -10,7 +10,12 @@ fullscreenButton.hidden = !document.documentElement.requestFullscreen;
 fullscreenButton.addEventListener('click', async () => {
     try {
         if (document.fullscreenElement) await document.exitFullscreen();
-        else await document.documentElement.requestFullscreen();
+        else {
+            await document.documentElement.requestFullscreen();
+            if (matchMedia('(any-pointer: coarse)').matches && screen.orientation?.lock) {
+                try { await screen.orientation.lock('landscape'); } catch { /* Elle çevirerek de oynanabilir. */ }
+            }
+        }
     } catch {
         document.getElementById('game-status').textContent = 'Bu tarayıcı tam ekrana geçişe izin vermedi.';
     }
@@ -39,9 +44,12 @@ characterForm.addEventListener('submit', event => {
 });
 
 function startGame(character) {
-    new Phaser.Game({
+    const area = document.getElementById('game');
+    // Yatay ekran genişledikçe dünyanın daha geniş bir parçasını göster; resmi esnetme.
+    function viewWidth() { return Math.max(960, Math.round(600 * area.clientWidth / Math.max(1, area.clientHeight))); }
+    const game = new Phaser.Game({
         type: Phaser.AUTO,
-        width: 960,
+        width: viewWidth(),
         height: 600,
         parent: 'game',
         backgroundColor: '#bce9ed',
@@ -57,4 +65,8 @@ function startGame(character) {
         title: 'Meyve Oyunu 2026',
         render: { antialias: true, roundPixels: true }
     });
+    new ResizeObserver(() => {
+        const width = viewWidth();
+        if (game.scale.width !== width) game.scale.setGameSize(width, 600);
+    }).observe(area);
 }

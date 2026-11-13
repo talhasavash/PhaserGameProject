@@ -108,6 +108,7 @@ export function resetPlayerMovement(player) {
     player.movement.jumpQueued = -Infinity;
     player.movement.jumpConsumed = false;
     player.movement.wasOnGround = false;
+    player.movement.touchJump = false;
     player.setRotation(0);
     player.expression = 'normal';
     player.expressionUntil = 0;
@@ -155,7 +156,14 @@ export function movePlayer(player, time, delta, conveyorSpeed) {
     // 1. Klavyeyi oku: -1 sol, 0 dur, 1 sağ.
     const direction = readDirection(player);
     const jumpHeld = player.cursors.up.isDown || player.keys.W.isDown || player.keys.SPACE.isDown || player.touchKeys?.up.isDown;
-    if (jumpHeld && !movement.wasJumpHeld) movement.jumpQueued = time;
+    if (player.touchKeys?.up.justPressed) {
+        movement.jumpQueued = time;
+        movement.touchJump = true;
+        player.touchKeys.up.justPressed = false;
+    } else if (jumpHeld && !movement.wasJumpHeld) {
+        movement.jumpQueued = time;
+        movement.touchJump = Boolean(player.touchKeys?.up.isDown);
+    }
 
     // 2. Hedef hızı hesapla. Bant etkisini yalnızca yerdeyken ekle.
     let targetSpeed = direction * WALK_SPEED;
@@ -193,7 +201,7 @@ export function movePlayer(player, time, delta, conveyorSpeed) {
         movement.lastGrounded = -Infinity;
         movement.jumpConsumed = true;
     }
-    if (!jumpHeld && movement.wasJumpHeld && player.body.velocity.y < -240) {
+    if (!movement.touchJump && !jumpHeld && movement.wasJumpHeld && player.body.velocity.y < -240) {
         player.setVelocityY(-240); // Tuş erken bırakılırsa zıplama daha kısa olur.
     }
 

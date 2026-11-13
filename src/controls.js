@@ -2,34 +2,53 @@
 // Her parmağın pointerId'si ayrıdır: yürürken başka parmakla zıplanabilir.
 export function bindTouchControls(root = document, page = window) {
     const keys = {};
+    const presses = {};
     const cleanup = [];
     const releases = [];
     for (const [name, id] of [['left', 'move-left'], ['right', 'move-right'], ['up', 'jump']]) {
         const button = root.getElementById(id);
-        const key = { isDown: false, timeDown: 0 };
+        const key = { isDown: false, timeDown: 0, justPressed: false };
         keys[name] = key;
         const fingers = new Set();
         function release(event) {
             if (event) fingers.delete(event.pointerId);
-            else fingers.clear();
+            else { fingers.clear(); key.justPressed = false; }
+            if (event?.type === 'pointercancel') key.justPressed = false;
             key.isDown = fingers.size > 0;
             button.classList.toggle('pressed', key.isDown);
         }
         function press(event) {
-            if (event.button !== 0) return;
+            if (event.type === 'pointerdown' && event.button !== 0) return;
             event.preventDefault();
             fingers.add(event.pointerId);
             key.isDown = true;
             key.timeDown = performance.now();
+            key.justPressed = true; // Çok kısa dokunuşu sonraki oyun karesine kadar sakla.
             button.classList.add('pressed');
             // Parmak dışarı kaysa da bırakma olayını al.
             button.setPointerCapture(event.pointerId);
         }
+        presses[name] = press;
+        function move(event) {
+            if (name === 'up' || !fingers.has(event.pointerId)) return;
+            // Basılı parmağı diğer yön düğmesine kaydırınca yönü değiştir.
+            const otherName = name === 'left' ? 'right' : 'left';
+            const otherId = name === 'left' ? 'move-right' : 'move-left';
+            const otherButton = root.getElementById(otherId);
+            const bounds = otherButton.getBoundingClientRect();
+            if (event.clientX < bounds.left || event.clientX > bounds.right ||
+                event.clientY < bounds.top || event.clientY > bounds.bottom) return;
+            // Yeni düğme bu pointer'ı devralsın; başka parmaklar etkilenmesin.
+            release(event);
+            presses[otherName](event);
+        }
         button.addEventListener('pointerdown', press);
+        button.addEventListener('pointermove', move);
         for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) button.addEventListener(type, release);
         releases.push(() => release());
         cleanup.push(() => {
             button.removeEventListener('pointerdown', press);
+            button.removeEventListener('pointermove', move);
             for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) button.removeEventListener(type, release);
         });
     }

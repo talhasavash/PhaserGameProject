@@ -2,7 +2,7 @@ const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const root = path.resolve(__dirname, '..');
+const root = path.resolve(__dirname, '..', process.env.PREVIEW_DIST === '1' ? 'dist' : '.');
 const port = Number(process.env.PORT || 8095);
 const publicFolders = new Set(['assets', 'css', 'lib', 'src']);
 const contentTypes = {

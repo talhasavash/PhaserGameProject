@@ -10,15 +10,23 @@ Mobil desteği korumak için klavye ve dokunmatik giriş aynı hareket koduna ba
 
 Adres: https://talhasavash.github.io/PhaserGameProject/
 
-GitHub Pages, `main` dalının kök klasörünü ücretsiz yayımlar. `.nojekyll`, dosyaların
-doğrudan sunulmasını sağlar. Bu dala push yapıldığında yayın otomatik güncellenir;
-bilgisayarın veya yerel Node.js sunucusunun açık kalması gerekmez.
+`main` dalına push yapılınca **Publish game** iş akışı testleri çalıştırır ve
+`scripts/build-site.cjs` ile hazırlanan `dist` klasörünü GitHub Pages'e ücretsiz yayımlar.
+Ek yükleme gerekmez; bilgisayarın veya yerel Node.js sunucusunun açık kalması gerekmez.
+İşlem anlık değildir: GitHub'daki Actions ekranında başarılı olunca sayfayı yenile.
+Açık oyun kendiliğinden yeniden başlamaz. Sol üstteki `Demo · ...` bilgisi yayındaki commit'i gösterir.
+Yayın kopyasında JS, CSS ve görsel adreslerine commit bilgisi eklenir; kaynak kod değişmeden
+eski tarayıcı önbelleğiyle yeni dosyaların karışması önlenir. `dist` Git'e eklenmez.
 
 Oyun sayfası ekranı kaplar; dışarıda başlık, açıklama veya site alt bilgisi yoktur.
 Destekleyen tarayıcılarda **Tam ekran** düğmesi tarayıcı çubuklarını da gizler.
 Telefon/tablette dokunmatik sol, sağ ve zıplama düğmeleri görünür. İki parmakla
 aynı anda yürüyüp zıplanabilir. Yatay kullanım daha büyük bir oyun görüntüsü sağlar;
-oyun oranı korunur, görüntü kırpılmaz. Fiziksel cihaz kontrolü ayrıca yapılmalıdır.
+oyun oranı korunur, görüntü kırpılmaz. Yatay ekranda oyun alanı genişliği ekrana uyar;
+kontroller karakteri örtmesin diye ayrı alt alandadır. Dikey telefonda görüntü oranı korunur.
+Tam ekranda destekleyen telefonlarda yatay yön istenir. Fiziksel cihaz kontrolü ayrıca yapılmalıdır.
+Dokunmatik zıplama tek dokunuşla tam yüksekliktedir; kısa dokunuşlar da saklanır.
+Klavye zıplamasında tuşu erken bırakınca kısa zıplama özelliği devam eder.
 
 ## JavaScript mi, Phaser mı?
 

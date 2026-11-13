@@ -66,9 +66,12 @@ export class GameScene extends Phaser.Scene {
         this.cameras.main.setBounds(0, 0, garden.width, 600);
         this.cameras.main.startFollow(this.player, true, 0.09, 1, -190, 0);
         this.createHud();
+        this.centerHud();
+        this.scale.on('resize', this.centerHud, this);
         this.pauseKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
         this.bindPageControls();
         this.events.once('shutdown', () => {
+            this.scale.off('resize', this.centerHud, this);
             this.touchControls.destroy();
             document.getElementById('pause-button').onclick = null;
             document.getElementById('restart-button').onclick = null;
@@ -186,13 +189,19 @@ export class GameScene extends Phaser.Scene {
     }
 
     createHud() {
+        this.hud = this.add.container(0, 0).setScrollFactor(0).setDepth(100);
         // HUD: can ve puan gibi ekran bilgileri. ScrollFactor(0) ile kameradan bağımsız kalır.
         const bg = this.add.graphics().setScrollFactor(0).setDepth(100);
         bg.fillStyle(0xfffcf0, 0.96);
         bg.fillRoundedRect(18, 16, 924, 92, 16);
         bg.lineStyle(1, 0x94b7a0, 0.4);
         bg.strokeRoundedRect(18, 16, 924, 92, 16);
-        const label = (x, y, content, size = 16) => this.add.text(x, y, content, { ...textStyle, fontSize: `${size}px`, fontStyle: 'bold' }).setScrollFactor(0).setDepth(101);
+        const label = (x, y, content, size = 16) => {
+            const text = this.add.text(x, y, content, { ...textStyle, fontSize: `${size}px`, fontStyle: 'bold' }).setScrollFactor(0).setDepth(101);
+            this.hud.add(text);
+            return text;
+        };
+        this.hud.add(bg);
         label(38, 30, '01  MEYVE BAHÇESİ', 18);
         this.heartsText = label(345, 30, '', 22);
         this.appleText = label(500, 33, '', 17);
@@ -201,10 +210,19 @@ export class GameScene extends Phaser.Scene {
         this.hintText = this.add.text(38, 67, '', { ...textStyle, fontSize: '14px' }).setScrollFactor(0).setDepth(101);
         this.progressTrack = this.add.rectangle(810, 82, 230, 5, 0xdce8d9).setScrollFactor(0).setDepth(101);
         this.progressFill = this.add.rectangle(695, 82, 1, 5, 0x649272).setOrigin(0, 0.5).setScrollFactor(0).setDepth(102);
+        this.hud.add([this.hintText, this.progressTrack, this.progressFill]);
         this.toast = this.add.text(480, 135, '', {
             ...textStyle, fontSize: '17px', fontStyle: 'bold', align: 'center',
             backgroundColor: '#fff3d4', padding: { x: 18, y: 12 }
         }).setOrigin(0.5, 0).setScrollFactor(0).setDepth(110).setVisible(false);
+    }
+
+    centerHud() {
+        const hudScale = this.scale.width / 960;
+        this.hud.setScale(hudScale);
+        this.toast.x = this.scale.width / 2;
+        this.toast.y = Math.min(135 * hudScale, 320);
+        this.toast.setScale(hudScale);
     }
 
     bindPageControls() {

@@ -3,6 +3,8 @@ import { createGameState, isKeyReady, recordFruit, takeKey, finishLevel, healAtF
 import { createPlayer, movePlayer, resetPlayerMovement, showPlayerExpression, showRecovery, updatePlayerEffects } from './player.js';
 import { createScenery, createMosque, createFountain } from './background.js';
 import { bindTouchControls } from './controls.js';
+import { createFireRain, updateFireRain } from './fireRain.js';
+import { unlockNext } from './progress.js';
 
 const textStyle = { fontFamily: 'Trebuchet MS, sans-serif', color: '#294e4c' };
 const COLLECTIBLE_SCALE = 0.75;
@@ -26,6 +28,7 @@ export class GameScene extends Phaser.Scene {
         if (data.levelIndex !== undefined) this.levelIndex = data.levelIndex;
         if (data.score !== undefined) this.carriedScore = data.score;
         this.level = levels[this.levelIndex];
+        this.transitionFrom = data.transitionFrom;
     }
 
     // Phaser önce preload'u çağırır: görselleri hazırla.
@@ -67,6 +70,7 @@ export class GameScene extends Phaser.Scene {
         this.createTerrain();
         this.createCollectibles();
         this.createHazards();
+        createFireRain(this);
         this.createLandmarks();
         this.createHealingSpots();
         this.player = createPlayer(this, this.level.spawn.x, this.level.spawn.y, this.character);
@@ -78,6 +82,7 @@ export class GameScene extends Phaser.Scene {
         this.physics.add.collider(this.player, this.solids);
         this.physics.add.overlap(this.player, this.fruits, this.collectFruit, null, this);
         this.physics.add.overlap(this.player, this.hazards, this.hitHazard, null, this);
+        this.physics.add.overlap(this.player, this.fireballs, this.hitHazard, null, this);
         this.physics.add.overlap(this.player, this.keySprite, this.collectKey, null, this);
         this.physics.add.overlap(this.player, this.exitZone, this.reachExit, null, this);
         this.physics.add.overlap(this.player, this.fountains, this.useFountain, null, this);
@@ -85,6 +90,13 @@ export class GameScene extends Phaser.Scene {
         this.cameras.main.startFollow(this.player, true, 0.09, 0, -190, 0);
         this.createHud();
         this.centerHud();
+        if (this.transitionFrom !== undefined) {
+            const notice = this.add.text(this.scale.width / 2, 58,
+                `${this.transitionFrom + 1}. bölüm tamamlandı!\n${this.levelIndex + 1}. bölüme geçtiniz.`,
+                { ...textStyle, fontSize: '18px', align: 'center', backgroundColor: '#fff9e8', padding: { x: 16, y: 9 } })
+                .setOrigin(0.5, 0).setScrollFactor(0).setDepth(110);
+            this.tweens.add({ targets: notice, alpha: 0, delay: 1800, duration: 450, onComplete: () => notice.destroy() });
+        }
         this.scale.on('resize', this.centerHud, this);
         this.pauseKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
         this.bindPageControls();
@@ -337,19 +349,20 @@ export class GameScene extends Phaser.Scene {
 
     reachExit() {
         if (finishLevel(this.gameState)) {
+            unlockNext(this.levelIndex, levels.length);
             if (this.levelIndex + 1 < levels.length) {
                 this.touchControls.reset();
-                this.scene.restart({ levelIndex: this.levelIndex + 1, score: this.gameState.score });
+                this.scene.restart({ levelIndex: this.levelIndex + 1, score: this.gameState.score, transitionFrom: this.levelIndex });
                 return;
             }
             this.physics.pause();
             this.player.anims.stop();
             showPlayerExpression(this.player, 'happy', this.elapsed, 2200);
             this.tweens.pauseAll();
-            document.getElementById('result-score').textContent = `${this.gameState.score} puan · 2 bölüm tamamlandı`;
+            document.getElementById('result-score').textContent = `${this.gameState.score} puan · ${levels.length} bölüm tamamlandı`;
             document.getElementById('game-result').hidden = false;
             document.getElementById('play-again').focus({ preventScroll: true });
-            this.announce('Keşif tamamlandı! İki bölümün anahtarlarını alıp camiye ulaştın.');
+            this.announce('Tebrikler! Bütün bölümleri bitirdiniz.');
             this.updateHud();
         } else if (!this.gameState.complete && this.elapsed - this.lastGateHint > 4000) {
             this.lastGateHint = this.elapsed;
@@ -392,6 +405,7 @@ export class GameScene extends Phaser.Scene {
         }
         if (this.paused) return;
         this.elapsed += delta;
+        updateFireRain(this);
         const onBelt = this.player.x >= this.level.belt.x && this.player.x <= this.level.belt.x + this.level.belt.width && this.player.body.bottom >= this.level.groundY - 3;
         let conveyorSpeed = 0;
         if (onBelt) conveyorSpeed = this.level.belt.speed;

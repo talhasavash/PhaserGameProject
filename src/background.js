@@ -2,6 +2,7 @@
 // Sabit bahçe çizimlerini bir kez dokuya çevirip tekrar kullanırız.
 export function createScenery(scene, width, theme = 'garden') {
     if (theme === 'courtyard') { createCourtyard(scene, width); return; }
+    if (theme === 'desert' || theme === 'night') { createThemedScenery(scene, width, theme); return; }
     scene.cameras.main.setBackgroundColor('#c6edef');
     cacheTexture(scene, 'garden-cloud', 128, 64, g => {
         g.fillStyle(0xf5faf3);
@@ -54,6 +55,46 @@ function cacheTexture(scene, key, width, height, draw) {
     draw(graphics);
     graphics.generateTexture(key, width, height);
     graphics.destroy();
+}
+
+function createThemedScenery(scene, width, theme) {
+    const night = theme === 'night';
+    const sky = night ? 0x243856 : 0xf2d6ac;
+    scene.cameras.main.setBackgroundColor(sky);
+    scene.add.circle(620, 150, 43, night ? 0xffefba : 0xffe399).setScrollFactor(0.08).setDepth(-90);
+    if (night) scene.add.circle(637, 135, 37, sky).setScrollFactor(0.08).setDepth(-89);
+    const key = `${theme}-skyline`;
+    cacheTexture(scene, key, 1024, 512, g => {
+        if (night) {
+            g.fillStyle(0xf7e5ad, 0.85);
+            for (let i = 0; i < 24; i++) g.fillCircle((i * 149) % 1024, 30 + (i * 53) % 180, 2);
+        }
+        g.fillStyle(night ? 0x435b73 : 0xd8b37f);
+        for (let x = 0; x <= 1024; x += 512) g.fillEllipse(x, 470, 840, 240);
+        g.fillStyle(night ? 0x334d64 : 0xc49b6e);
+        // Uzak kubbeler ve minareler, yalnızca dekor olarak kullanılır.
+        for (let x = 140; x < 1024; x += 512) {
+            g.fillEllipse(x, 345, 130, 96); g.fillRect(x - 65, 345, 130, 150);
+            g.fillRect(x + 88, 290, 15, 205); g.fillTriangle(x + 83, 290, x + 95, 262, x + 108, 290);
+        }
+    });
+    scene.add.tileSprite(0, 0, width + 1024, 512, key).setOrigin(0).setScrollFactor(0.35).setDepth(-60);
+    const foreground = `${theme}-motifs`;
+    cacheTexture(scene, foreground, 512, 256, g => {
+        if (night) {
+            g.fillStyle(0x49796e); g.fillEllipse(120, 154, 42, 170); g.fillRect(116, 175, 8, 81);
+            g.fillStyle(0xc3a46e); g.fillRect(290, 110, 3, 146); g.fillRect(290, 110, 45, 4);
+            g.fillStyle(0xffd77e); g.fillRoundedRect(319, 120, 20, 28, 5);
+        } else {
+            g.fillStyle(0x8c7752); g.fillRect(120, 140, 10, 116);
+            g.fillStyle(0x71947a); g.fillEllipse(88, 139, 85, 22); g.fillEllipse(161, 139, 85, 22);
+            g.fillEllipse(125, 119, 26, 70);
+        }
+    });
+    scene.add.tileSprite(0, 264, width + 512, 256, foreground).setOrigin(0).setScrollFactor(0.8).setDepth(-20);
+    scene.add.rectangle(width / 2, 560, width, 80, night ? 0x596976 : 0xb88a60).setDepth(-5);
+    scene.add.rectangle(width / 2, 526, width, 14, night ? 0x7fa99a : 0xe9c58c).setDepth(-4);
+    scene.add.rectangle(width / 2, 520, width, 5, night ? 0x416e69 : 0xb89260).setDepth(-3);
 }
 
 function createCourtyard(scene, width) {

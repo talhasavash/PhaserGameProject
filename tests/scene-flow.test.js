@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createGameState, recordFruit, takeKey } from '../src/rules.js';
-import { garden, courtyard } from '../src/level.js';
+import { garden, courtyard, levels } from '../src/level.js';
 
 // Exercise scene transitions without requiring WebGL in Node.
 globalThis.Phaser = { Scene: class {} };
@@ -58,7 +58,7 @@ test('The key and exit open the result screen exactly once', () => {
     takeKey(run);
     let pauseCount = 0;
     const scene = {
-        gameState: run, elapsed: 10000, levelIndex: 1,
+        gameState: run, elapsed: 10000, levelIndex: levels.length - 1,
         physics: { pause() { pauseCount += 1; } },
         player: { anims: { stop() {} }, setTexture() {} },
         tweens: { pauseAll() {} }, announce() {}, updateHud() {}
@@ -104,7 +104,19 @@ test('First mosque automatically starts the second level exactly once with score
     };
     GameScene.prototype.reachExit.call(scene);
     GameScene.prototype.reachExit.call(scene);
-    assert.deepEqual(calls, [{ levelIndex: 1, score: 90 }]);
+    assert.deepEqual(calls, [{ levelIndex: 1, score: 90, transitionFrom: 0 }]);
+});
+
+test('Every intermediate mosque starts the next chapter with its completion notice', () => {
+    for (let index = 0; index < levels.length - 1; index++) {
+        const run = createGameState(200);
+        run.apples = 3; takeKey(run);
+        const calls = [];
+        const scene = { gameState: run, levelIndex: index, touchControls: { reset() {} }, scene: { restart(data) { calls.push(data); } } };
+        GameScene.prototype.reachExit.call(scene);
+        GameScene.prototype.reachExit.call(scene);
+        assert.deepEqual(calls, [{ levelIndex: index + 1, score: 200, transitionFrom: index }]);
+    }
 });
 
 test('Second level resets its mission and hearts, preserves character, sound setting and total score', () => {

@@ -1,6 +1,7 @@
 import { GameScene } from './GameScene.js';
 import { gameView } from './view.js';
 import { levels } from './level.js';
+import { unlockedLevels } from './progress.js';
 
 // Önce HTML formundan karakter seçilir; ardından Phaser başlatılır.
 // "import", başka bir dosyanın dışarı açtığı (export) kodu kullanmamızı sağlar.
@@ -24,6 +25,15 @@ levels.forEach((level, index) => {
     name.textContent = level.name;
     card.append(number, name); label.append(input, card); levelGrid.append(label);
 });
+function refreshLevelLocks() {
+    const unlocked = unlockedLevels(levels.length);
+    for (const input of levelGrid.querySelectorAll('input')) {
+        input.disabled = Number(input.value) >= unlocked;
+        input.parentElement.classList.toggle('locked', input.disabled);
+        input.setAttribute('aria-label', `${Number(input.value) + 1} ${levels[Number(input.value)].name}${input.disabled ? ' · Kilitli' : ''}`);
+    }
+}
+refreshLevelLocks();
 const fullscreenButton = document.getElementById('fullscreen-button');
 fullscreenButton.hidden = !document.documentElement.requestFullscreen;
 fullscreenButton.addEventListener('click', async () => {
@@ -54,7 +64,7 @@ characterForm.addEventListener('submit', event => {
     event.preventDefault();
     const selected = characterForm.querySelector('input[name="character"]:checked');
     const selectedLevel = characterForm.querySelector('input[name="level"]:checked');
-    if (!selected || !selectedLevel || gameStarted) return;
+    if (!selected || !selectedLevel || Number(selectedLevel.value) >= unlockedLevels(levels.length) || gameStarted) return;
     gameStarted = true;
     document.body.classList.add('playing');
     document.getElementById('touch-controls').hidden = false;
@@ -101,6 +111,7 @@ function startGame(character, levelIndex) {
         menuButton.disabled = true;
         game.events.once(Phaser.Core.Events.DESTROY, () => {
             gameStarted = false;
+            refreshLevelLocks();
             document.body.classList.remove('playing');
             document.getElementById('touch-controls').hidden = true;
             document.getElementById('game-result').hidden = true;

@@ -75,6 +75,8 @@ PhaserGameProject/
 │   ├── controls.js        Çoklu dokunma, bırakma ve odak kaybı yönetimi
 │   ├── level.js           Platform, meyve ve düşman konumları
 │   ├── rules.js           Puan, can, elma, anahtar ve bitiş kuralları
+│   ├── progress.js        Tarayıcıda açılan bölümleri saklama
+│   ├── fireRain.js        Önceden uyarı veren, tekrar kullanılan ateş topları
 │   └── background.js      Arka plan, ağaç, bulut ve tabela çizimleri
 ├── assets/
 │   ├── images/            Oyunun kullandığı SVG görseller
@@ -171,10 +173,14 @@ HTTP kullan; HTML dosyasını çift tıklayarak açma (oyun ES modülleri kullan
 - Dururken sallanma yoktur. Zıplama pozundaki kaldırılmış kol iki karakterde de başın yanında açıkça görünür.
 - Bant sola taşır; bu bir buz sürtünmesi değildir.
 
-## İki bölümlü akış
+## Dört bölümlü akış
 
-Ana ekranda karakterini ve numaralı bölümünü seçebilirsin. Şimdilik 1 ve 2 açıktır;
-menü `levels` dizisinden üretilir. Oyundaki ☰ düğmesi bölüm seçimine döndürür.
+Ana ekranda karakterini ve açılmış numaralı bölümünü seçebilirsin. Başlangıçta yalnızca
+1 açıktır; her bölüm bitince sonraki açılır. Menü `levels` dizisinden üretilir.
+`progress.js` açılan bölüm sayısını `localStorage` içinde saklar. Aynı cihaz ve tarayıcıda
+sayfa yenilenince korunur; tarayıcı verileri silinirse sıfırlanır, cihazlar arasında eşitlenmez.
+Depolama kapalıysa ilerleme yalnızca mevcut oturumda korunur.
+Oyundaki ☰ düğmesi bölüm seçimine döndürür.
 Menüye dönerken eski Phaser oyunu ve ekran boyutu izleyicisi temizlenir.
 
 İlk bölümün sabit arka planı `cacheTexture` ile bir kez hazırlanır. Tekrarlanan
@@ -182,17 +188,22 @@ katmanlar `TileSprite` ile çizilir; arka plan nesne sayısı 213'ten 18'e indir
 Bu sayı bir FPS ölçümü değildir; gerçek telefon performansı ayrıca kontrol edilmelidir.
 Önbellekteki görseller bölüm yeniden başlatıldığında tekrar üretilmez.
 
-Dokunma düğmeleri ekran boyutuna göre büyür. Oyun alanında açıklama, yer adı veya
+Dokunma düğmeleri büyük, saydam dolgulu ve açık renk kenarlı üçgenlerdir.
+Görselden daha geniş dikdörtgen dokunma alanları rahat basmayı sağlar.
+Oyun alanında açıklama, yer adı veya
 uyarı yazısı yoktur; can, elma, anahtar ve puan simgeler/sayılarla gösterilir.
 
-`src/level.js`, `garden` (Meyve Bahçesi) ve `courtyard` (Kandilli Cami Avlusu)
-verilerini, ayrıca bunları sıraya koyan `levels` dizisini içerir. İki bölüm aynı `GameScene`
+`src/level.js`, `garden` (Meyve Bahçesi), `courtyard` (Kandilli Cami Avlusu),
+`desert` (Hilalli Çöl Yolu), `moonGarden` (Yıldızlı Kubbe Bahçesi)
+verilerini, ayrıca bunları sıraya koyan `levels` dizisini içerir. Dört bölüm aynı `GameScene`
 koduyla çalışır; yeni bölüm eklemek için sahne kodunu kopyalamak gerekmez.
 
-Her bölümde üç elma anahtarı açar. Anahtarla ilk cami girişine gelince ikinci bölüm
+Her bölümde üç elma anahtarı açar. Anahtarla cami girişine gelince sonraki bölüm
 otomatik başlar. Karakter, ses tercihi ve toplam puan korunur; elmalar, anahtar,
-kontrol noktası ve canlar yeni bölüm için sıfırlanır. İkinci cami girişinde final ekranı açılır.
-R/Yeniden başla mevcut bölümü, finalde Bir kez daha keşfet ise bütün oyunu baştan başlatır.
+kontrol noktası ve canlar yeni bölüm için sıfırlanır. Geçişte kısa bir bölüm tamamlandı
+mesajı görünür. Dördüncü cami girişinde final ekranı açılır.
+R/Yeniden başla mevcut bölümü, finalde Yeniden oyna ise bütün oyunu baştan başlatır;
+açılmış bölüm kilitleri geri kapanmaz.
 
 İkinci bölümde kemerli bir avlu, kandiller, basamaklı yüksek platformlar, daha hızlı
 hayvanlar, iki hareketli taş ve daha güçlü bir bant vardır. Yüksek yerlere çıkınca kamera
@@ -206,7 +217,12 @@ yalnızca `changedTouches` listesindeki parmakları günceller. Farede Pointer E
 Yere inmeden 240 ms önce basılan zıplama hatırlanır; kenardan ayrıldıktan sonra 140 ms tolerans vardır.
 Zıplama yüksekliği basış süresine bağlıdır. Fiziksel telefonla tekrar kontrol edilmelidir.
 
-Kalıcı kayıt ve yeni senaryolar daha sonra eklenebilir.
+Üçüncü bölümde kum tepeleri ve palmiye siluetleri, dördüncüde gece, yıldızlar,
+uzak kubbeler ve kandiller bulunur. Bu iki bölümde ateşler sabit noktalara düşer.
+`fireRain.js` her noktada önce bir saniye yer uyarısı gösterir, sonra ateşi düşürür.
+Her nokta tek bir fizik nesnesini tekrar kullanır; her karede yeni nesne üretilmez.
+Duraklatma döngüyü de durdurur. Başlangıç, kontrol noktası ve abdest alanları düşüş
+noktalarından uzaktadır. Yeni arka planlar da küçük, önbelleğe alınmış dokular kullanır.
 
 ## Kontroller ve Git
 

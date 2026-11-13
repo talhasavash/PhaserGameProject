@@ -19,13 +19,15 @@ button:focus-visible { outline: 3px solid #e5bb6e; outline-offset: 2px; }
 .selection-layout { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 24px; margin: 18px 0; }
 .level-options { border: 0; margin: 0; padding: 0; }
 .level-options legend { width: 100%; margin-bottom: 12px; font-size: 14px; font-weight: bold; }
-.level-grid { display: flex; justify-content: center; gap: 16px; }
+.level-grid { display: grid; grid-template-columns: repeat(2, 112px); justify-content: center; gap: 14px 16px; }
 .level-option { position: relative; cursor: pointer; width: 112px; }
 .level-option input { position: absolute; opacity: 0; width: 1px; height: 1px; }
 .level-card { display: flex; flex-direction: column; align-items: center; gap: 10px; font-size: 12px; }
 .level-card strong { display: grid; place-items: center; width: 74px; height: 74px; border-radius: 50%; background: #d3dfce; border: 3px solid #fffdf3; color: #416a54; font-size: 32px; box-shadow: 0 3px 0 #a8bca2; }
 .level-option input:checked + .level-card strong { background: #416a54; color: #fff9e8; box-shadow: 0 3px 0 #244d39, 0 0 0 3px #c49c59; }
 .level-option input:focus-visible + .level-card strong { outline: 3px solid #b47e47; outline-offset: 4px; }
+.level-option.locked { cursor: default; opacity: .5; }
+.level-option.locked .level-card strong::after { content: '🔒'; position: absolute; font-size: 14px; margin: 46px 0 0 42px; }
 .eyebrow { font-size: 10px; letter-spacing: 2.5px; font-weight: bold; margin: 0 0 12px; }
 .character-form h2 { font: 36px/1.1 Georgia, serif; margin: 0 0 9px; }
 .character-form h2 span { color: #b27a4c; }
@@ -45,10 +47,12 @@ button:focus-visible { outline: 3px solid #e5bb6e; outline-offset: 2px; }
 .character-note { font-size: 12px; color: #63785f; margin: 13px 0 0; }
 .touch-controls { display: none; position: absolute; inset: auto 0 0; padding: 8px max(18px, env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left)); justify-content: space-between; z-index: 2; touch-action: none; user-select: none; -webkit-user-select: none; pointer-events: none; }
 .direction-buttons { display: flex; gap: 16px; }
-.touch-button { width: clamp(88px, 12vw, 116px); height: clamp(80px, 22dvh, 108px); font-size: 34px; border-radius: 28px; border: 2px solid #fff9e8b0; background: #eaf0ddb8; touch-action: none; -webkit-touch-callout: none; pointer-events: auto; }
-.touch-button.pressed { background: #e3bd6c; transform: translateY(2px); }
+.touch-button { position: relative; display: grid; place-items: center; width: clamp(104px, 15vw, 144px); height: clamp(94px, 27dvh, 126px); padding: 4px; border: 0; border-radius: 0; background: transparent; touch-action: none; -webkit-touch-callout: none; pointer-events: auto; }
+.touch-button:hover, .touch-button.pressed { background: transparent; }
+.touch-button svg { position: absolute; inset: 4px; width: calc(100% - 8px); height: calc(100% - 8px); display: block; overflow: visible; pointer-events: none; }
+.touch-button path { fill: #fff9e80d; stroke: #fff9e880; stroke-width: 3; stroke-linejoin: round; }
+.touch-button.pressed path { fill: #fff9e82b; stroke: #fff9e8d9; }
 .jump-button { width: clamp(112px, 16vw, 152px); }
-.jump-button span { font-size: 14px; }
 .result { position: absolute; inset: 0; z-index: 4; background: #213f3dcc; display: grid; place-items: center; overflow: auto; padding: 16px; }
 .result-card { border-radius: 24px; background: #fff9e8; padding: 28px; text-align: center; max-width: 480px; }
 .result h2 { font: 32px Georgia, serif; margin: 12px 0; }
@@ -71,6 +75,10 @@ button:focus-visible { outline: 3px solid #e5bb6e; outline-offset: 2px; }
     .character-portrait { height: 80px; width: 80px; }
     .character-portrait img { width: 60px; height: 75px; }
     .character-note { margin: 6px 0; }
+    .level-card strong { width: 52px; height: 52px; font-size: 25px; }
+    .level-card { gap: 4px; font-size: 10px; }
+    .level-grid { gap: 8px 10px; }
+    .level-options legend { margin-bottom: 7px; }
     .result-card { padding: 12px 24px; }
     .result h2 { font-size: 24px; }
     .result p { margin: 6px 0; }
@@ -90,7 +98,11 @@ button:focus-visible { outline: 3px solid #e5bb6e; outline-offset: 2px; }
 }
 @media (orientation: landscape) and (max-height: 340px) {
     .touch-controls { padding-bottom: calc(4px + env(safe-area-inset-bottom)); }
-    .touch-button { height: 76px; }
+    .touch-button { width: 104px; height: 90px; }
+    .jump-button { width: 112px; }
     .selection-layout { margin: 8px 0; gap: 12px; }
     .character-note { display: none; }
+}
+@media (orientation: landscape) and (max-width: 700px) {
+    body.playing .game-toolbar { bottom: calc(110px + env(safe-area-inset-bottom)); }
 }

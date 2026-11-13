@@ -64,7 +64,7 @@ export class GameScene extends Phaser.Scene {
         this.physics.add.overlap(this.player, this.exitZone, this.reachExit, null, this);
         this.physics.add.overlap(this.player, this.fountains, this.useFountain, null, this);
         this.cameras.main.setBounds(0, 0, garden.width, 600);
-        this.cameras.main.startFollow(this.player, true, 0.09, 1, -190, 0);
+        this.cameras.main.startFollow(this.player, true, 0.09, 0, -190, 0);
         this.createHud();
         this.centerHud();
         this.scale.on('resize', this.centerHud, this);
@@ -154,6 +154,7 @@ export class GameScene extends Phaser.Scene {
 
     createLandmarks() {
         const intro = this.add.container(48, 202).setDepth(10);
+        this.intro = intro;
         intro.add([
             this.add.text(0, 0, '01 / MEYVE BAHÇESİ', { ...textStyle, fontSize: '15px', fontStyle: 'bold', letterSpacing: 3 }),
             this.add.text(0, 29, 'Küçük bir keşfe çık.', { ...textStyle, fontSize: '32px', fontStyle: 'bold' }),
@@ -193,27 +194,26 @@ export class GameScene extends Phaser.Scene {
         // HUD: can ve puan gibi ekran bilgileri. ScrollFactor(0) ile kameradan bağımsız kalır.
         const bg = this.add.graphics().setScrollFactor(0).setDepth(100);
         bg.fillStyle(0xfffcf0, 0.96);
-        bg.fillRoundedRect(18, 16, 924, 92, 16);
+        bg.fillRoundedRect(18, 8, 924, 40, 12);
         bg.lineStyle(1, 0x94b7a0, 0.4);
-        bg.strokeRoundedRect(18, 16, 924, 92, 16);
+        bg.strokeRoundedRect(18, 8, 924, 40, 12);
         const label = (x, y, content, size = 16) => {
             const text = this.add.text(x, y, content, { ...textStyle, fontSize: `${size}px`, fontStyle: 'bold' }).setScrollFactor(0).setDepth(101);
             this.hud.add(text);
             return text;
         };
         this.hud.add(bg);
-        label(38, 30, '01  MEYVE BAHÇESİ', 18);
-        this.heartsText = label(345, 30, '', 22);
-        this.appleText = label(500, 33, '', 17);
-        this.keyText = label(690, 33, '', 16);
-        this.scoreText = label(831, 33, '', 16);
-        this.hintText = this.add.text(38, 67, '', { ...textStyle, fontSize: '14px' }).setScrollFactor(0).setDepth(101);
-        this.progressTrack = this.add.rectangle(810, 82, 230, 5, 0xdce8d9).setScrollFactor(0).setDepth(101);
-        this.progressFill = this.add.rectangle(695, 82, 1, 5, 0x649272).setOrigin(0, 0.5).setScrollFactor(0).setDepth(102);
+        this.heartsText = label(34, 16, '', 19);
+        this.appleText = label(190, 17, '', 16);
+        this.keyText = label(390, 17, '', 16);
+        this.scoreText = label(590, 17, '', 16);
+        this.hintText = this.add.text(38, 67, '', { ...textStyle, fontSize: '14px' }).setScrollFactor(0).setVisible(false);
+        this.progressTrack = this.add.rectangle(810, 28, 230, 4, 0xdce8d9).setScrollFactor(0).setDepth(101);
+        this.progressFill = this.add.rectangle(695, 28, 1, 4, 0x649272).setOrigin(0, 0.5).setScrollFactor(0).setDepth(102);
         this.hud.add([this.hintText, this.progressTrack, this.progressFill]);
         this.toast = this.add.text(480, 135, '', {
             ...textStyle, fontSize: '17px', fontStyle: 'bold', align: 'center',
-            backgroundColor: '#fff3d4', padding: { x: 18, y: 12 }
+            backgroundColor: '#fff3d4', padding: { x: 12, y: 7 }
         }).setOrigin(0.5, 0).setScrollFactor(0).setDepth(110).setVisible(false);
     }
 
@@ -221,8 +221,12 @@ export class GameScene extends Phaser.Scene {
         const hudScale = this.scale.width / 960;
         this.hud.setScale(hudScale);
         this.toast.x = this.scale.width / 2;
-        this.toast.y = Math.min(135 * hudScale, 320);
+        this.toast.y = 58 * hudScale;
         this.toast.setScale(hudScale);
+        // Zemini aynı yerde tut: zıplarken ekran yukarı-aşağı sallanmasın.
+        this.cameras.main.scrollY = Math.max(0, 600 - this.scale.height);
+        this.cameras.main.setFollowOffset(-Math.min(190, this.scale.width * 0.2), 0);
+        this.intro.setVisible(this.scale.height >= 600);
     }
 
     bindPageControls() {

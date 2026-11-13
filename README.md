@@ -24,6 +24,10 @@ Telefon/tablette dokunmatik sol, sağ ve zıplama düğmeleri görünür. İki p
 aynı anda yürüyüp zıplanabilir. Yatay kullanım daha büyük bir oyun görüntüsü sağlar;
 oyun oranı korunur, görüntü kırpılmaz. Yatay ekranda oyun alanı genişliği ekrana uyar;
 kontroller karakteri örtmesin diye ayrı alt alandadır. Dikey telefonda görüntü oranı korunur.
+Yatay telefonda 600 yerine 360 dünya birimi yükseklik gösterilir: karakter ve nesneler
+yaklaşık %67 daha büyük görünür, ekran daha az uzak alan gösterir. Tablet görünümü 480 birimdir.
+Bu değerler `src/view.js` içindedir. Kamera zemine göre sabittir; zıplarken dikey kaymaz.
+Can/elma/anahtar/puan bilgileri ince bir üst satırdadır.
 Tam ekranda destekleyen telefonlarda yatay yön istenir. Fiziksel cihaz kontrolü ayrıca yapılmalıdır.
 Dokunmatik zıplama tek dokunuşla tam yüksekliktedir; kısa dokunuşlar da saklanır.
 Klavye zıplamasında tuşu erken bırakınca kısa zıplama özelliği devam eder.

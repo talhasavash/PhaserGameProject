@@ -1,4 +1,5 @@
 import { GameScene } from './GameScene.js';
+import { gameView } from './view.js';
 
 // Önce HTML formundan karakter seçilir; ardından Phaser başlatılır.
 // "import", başka bir dosyanın dışarı açtığı (export) kodu kullanmamızı sağlar.
@@ -45,12 +46,13 @@ characterForm.addEventListener('submit', event => {
 
 function startGame(character) {
     const area = document.getElementById('game');
-    // Yatay ekran genişledikçe dünyanın daha geniş bir parçasını göster; resmi esnetme.
-    function viewWidth() { return Math.max(960, Math.round(600 * area.clientWidth / Math.max(1, area.clientHeight))); }
+    const touchLayout = matchMedia('(any-pointer: coarse), (max-width: 1024px)');
+    function view() { return gameView(area.clientWidth, area.clientHeight, touchLayout.matches); }
+    const initialView = view();
     const game = new Phaser.Game({
         type: Phaser.AUTO,
-        width: viewWidth(),
-        height: 600,
+        width: initialView.width,
+        height: initialView.height,
         parent: 'game',
         backgroundColor: '#bce9ed',
         scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
@@ -66,7 +68,9 @@ function startGame(character) {
         render: { antialias: true, roundPixels: true }
     });
     new ResizeObserver(() => {
-        const width = viewWidth();
-        if (game.scale.width !== width) game.scale.setGameSize(width, 600);
+        const size = view();
+        if (game.scale.width !== size.width || game.scale.height !== size.height) {
+            game.scale.setGameSize(size.width, size.height);
+        }
     }).observe(area);
 }

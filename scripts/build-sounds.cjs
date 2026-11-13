@@ -6,6 +6,7 @@ fs.mkdirSync(folder, { recursive: true });
 const sampleRate = 22050;
 
 function saveSound(name, notes) {
+    if (process.argv.includes('--boss-only') && !['boss-jump', 'boss-land'].includes(name)) return;
     const samples = [];
     for (const [start, end, seconds] of notes) {
         const count = Math.round(seconds * sampleRate);
@@ -15,7 +16,9 @@ function saveSound(name, notes) {
             phase += 2 * Math.PI * frequency / sampleRate;
             // Kısa giriş/çıkış, patlama ve tıklama sesini önler.
             const envelope = Math.min(1, i / 130, (count - 1 - i) / 550);
-            samples.push(Math.sin(phase) * envelope * 0.55);
+            let wave = Math.sin(phase);
+            if (name === 'boss-land') wave = (wave * 0.7 + Math.sin(phase * 2) * 0.2 + Math.sin(phase * 3) * 0.1) * Math.exp(-3 * i / count);
+            samples.push(wave * envelope * 0.55);
         }
     }
     const dataSize = samples.length * 2;
@@ -34,4 +37,6 @@ saveSound('collect', [[660, 740, 0.06], [880, 880, 0.09]]);
 saveSound('hurt', [[180, 85, 0.18]]);
 saveSound('heal', [[523, 523, 0.07], [659, 659, 0.07], [784, 784, 0.10]]);
 saveSound('key', [[784, 784, 0.08], [1047, 1047, 0.13]]);
-console.log('5 kısa oyun sesi üretildi.');
+saveSound('boss-jump', [[110, 240, 0.16]]);
+saveSound('boss-land', [[180, 55, 0.23]]);
+console.log(process.argv.includes('--boss-only') ? '2 muhafız sesi üretildi.' : '7 kısa oyun sesi üretildi.');

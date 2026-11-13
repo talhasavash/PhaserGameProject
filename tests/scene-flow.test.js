@@ -103,7 +103,7 @@ test('Respawn restores hearts at the flag and preserves collected fruit and key'
     run.hearts = 0;
     let position;
     const scene = {
-        gameState: run, elapsed: 9000, level: garden,
+        gameState: run, elapsed: 9000, level: garden, hazards: { getChildren: () => [] },
         player: { movement: {}, anims: { stop() {} }, setTexture() {}, setVelocity() {}, setRotation() {}, setPosition() {}, body: { reset(x, y) { position = { x, y }; } } },
         cameras: { main: { flash() {} } }, announce() {}, updateHud() {}
     };

@@ -225,11 +225,15 @@ birlikte taşınır; havalanınca altından geçmek mümkündür. Muhafızlara s
 veya onları yenmek gerekmez; zamanlamayla geçmek yeterlidir.
 
 Muhafızların dördü farklı SVG görünümü kullanır. Son turuncu muhafız, oyuncu
-450 dünya birimi yakınına geldiğinde öfkelenmeye başlar. 18 saniyede yüzü değişir,
-rengi kızarır ve zıplama saati en çok 1.6 kat hızlanır. Saat kareler boyunca
+450 dünya birimi yakınına geldiğinde öfkelenmeye başlar. Mesafe azaldıkça öfke
+artar; temas veya çarpma gerekmez. Yakınında beklemek de öfkeyi artırır; en geç
+18 saniyede yüzü değişir, rengi kızarır ve zıplama saati en çok 1.6 kat hızlanır. Saat kareler boyunca
 biriktirilir; hız değişirken zıplamanın ortasında konum atlaması olmaz. Öfke ve
 zıplama duraklatmada ilerlemez; bölüm yeniden başlayınca sıfırlanır.
-Tam öfkede bile muhafızın altından geçiş süresi test edilir.
+Tam öfkede bile muhafızın altından geçiş süresi test edilir. Can bitip kontrol
+noktasına dönüldüğünde de öfke, renk ve hız sıfırlanır. Muhafızların kalkış ve
+iniş sesleri yalnızca geçiş anında çalar; uzak muhafızlar duyulmaz. Ses kapatma
+düğmesi bunları da kapatır. `build-sounds.cjs --boss-only` bu iki WAV'ı üretir.
 
 6. bölümün son yapısında ahşap pencere bölmeleri yerine taş kemerli açık renkli
 vitraylar vardır. Lafzatullah görseli `allah-plaque.svg` içinde standart Arapça

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { bossLift, bossMood } from '../src/boss.js';
+import { bossLift, bossMood, bossStep, resetBossRage } from '../src/boss.js';
 import { levels } from '../src/level.js';
 import { verses } from '../src/verses.js';
 
@@ -39,6 +39,12 @@ test('The final guard only grows angry after engagement and its speed and red ti
     assert.equal(warming.angry, false);
     assert.equal(angry.angry, true);
     assert.deepEqual(bossMood(999999, 1000), angry, 'Difficulty has a fixed upper limit');
+    const distant = bossMood(1000, 1000, 440);
+    const approaching = bossMood(1000, 1000, 300);
+    const nearby = bossMood(1000, 1000, 140);
+    assert.ok(distant.anger < approaching.anger && approaching.anger < nearby.anger);
+    assert.ok(distant.speed < approaching.speed && approaching.speed < nearby.speed);
+    assert.equal(nearby.angry, true, 'The face changes before contact, without taking damage');
 });
 
 test('Every chapter has a sourced verse; citations remain in data rather than on the result card', () => {
@@ -48,4 +54,32 @@ test('Every chapter has a sourced verse; citations remain in data rather than on
         assert.match(verse.reference, /\d+\/\d+/);
         assert.equal(new URL(verse.source).hostname, 'kuran.diyanet.gov.tr');
     }
+});
+
+test('Jump and landing effects play once per transition at normal and angry speeds', () => {
+    for (const guard of levels[10].enemies) for (const fps of [30, 60, 120]) {
+        const speed = guard.rage ? 1.6 : 1;
+        const end = guard.jump.period * 3;
+        let clock = 0;
+        const sounds = [];
+        while (clock < end) {
+            const next = Math.min(end, clock + 1000 / fps * speed);
+            const step = bossStep(clock, next, guard.jump);
+            if (step.sound) sounds.push(step.sound);
+            clock = next;
+        }
+        assert.equal(sounds.filter(sound => sound === 'boss-jump').length, 3);
+        assert.equal(sounds.filter(sound => sound === 'boss-land').length, 3);
+    }
+});
+
+test('Respawn resets the last guardian to its calm look and normal jump clock', () => {
+    const patrol = { rage: true, engagedAt: 1000, jumpClock: 50000 };
+    const guard = { getData: () => patrol, setTint(value) { this.tint = value; }, setTexture(value) { this.texture = value; } };
+    resetBossRage([guard, { getData: () => ({ rage: false }) }]);
+    assert.equal(guard.tint, 0xffffff);
+    assert.equal(guard.texture, 'ogre-ember');
+    assert.equal(patrol.jumpClock, 0);
+    assert.equal(patrol.engagedAt, null);
+    assert.equal(bossMood(60000, patrol.engagedAt).speed, 1);
 });

@@ -6,7 +6,7 @@ import { bindTouchControls } from './controls.js';
 import { createFireRain, updateFireRain } from './fireRain.js';
 import { unlockNext } from './progress.js';
 import { verses } from './verses.js';
-import { bossLift, bossMood } from './boss.js';
+import { bossStep, bossMood, resetBossRage } from './boss.js';
 
 const textStyle = { fontFamily: 'Trebuchet MS, sans-serif', color: '#294e4c' };
 const COLLECTIBLE_SCALE = 0.75;
@@ -63,7 +63,7 @@ export class GameScene extends Phaser.Scene {
         this.load.svg('mat', 'assets/images/mat.svg', { width: 36, height: 52 });
         this.load.svg('lantern', 'assets/images/lantern.svg', { width: 40, height: 52 });
         this.load.svg('crescent', 'assets/images/crescent.svg', { width: 44, height: 46 });
-        for (const effect of ['jump', 'collect', 'hurt', 'heal', 'key']) {
+        for (const effect of ['jump', 'collect', 'hurt', 'heal', 'key', 'boss-jump', 'boss-land']) {
             this.load.audio(effect, `assets/audio/${effect}.wav`);
         }
     }
@@ -393,6 +393,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     respawn(point = null) {
+        resetBossRage(this.hazards.getChildren());
         if (!point) point = this.gameState.checkpointActive ? this.level.checkpoint : this.level.spawn;
         this.gameState.hearts = 3;
         this.player.setPosition(point.x, point.y);
@@ -514,15 +515,25 @@ export class GameScene extends Phaser.Scene {
                 let jumpSpeed = 1;
                 if (patrol.rage) {
                     if (patrol.engagedAt === null && Math.abs(this.player.x - hazard.x) < 450) patrol.engagedAt = this.elapsed;
-                    const mood = bossMood(this.elapsed, patrol.engagedAt);
+                    const mood = bossMood(this.elapsed, patrol.engagedAt, Math.abs(this.player.x - hazard.x));
                     jumpSpeed = mood.speed;
                     hazard.setTint(mood.tint);
                     hazard.setTexture(mood.angry ? 'ogre-ember-angry' : 'ogre-ember');
                 }
                 // Saati biriktirmek, hız değişirken zıplamanın ortasında sıçramayı önler.
+                const previousClock = patrol.jumpClock;
                 patrol.jumpClock += delta * jumpSpeed;
+                const step = bossStep(previousClock, patrol.jumpClock, patrol.jump);
+                if (step.sound) {
+                    const distance = Math.abs(this.player.x - hazard.x);
+                    const range = Math.max(500, this.scale.width * 0.7);
+                    if (distance < range) {
+                        const volume = (step.sound === 'boss-land' ? 0.24 : 0.14) * (1 - distance / range);
+                        this.sound.play(step.sound, { volume });
+                    }
+                }
                 // Gövde ve görsel birlikte taşınır; hava boşluğunda görünmez çarpışma kalmaz.
-                hazard.body.reset(hazard.x, patrol.baseY - bossLift(patrol.jumpClock, patrol.jump));
+                hazard.body.reset(hazard.x, patrol.baseY - step.lift);
                 hazard.getData('shadow').setPosition(hazard.x, 517);
             }
             if (hazard.x >= patrol.maxX) patrol.direction = -1;

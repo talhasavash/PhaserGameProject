@@ -1,4 +1,4 @@
-import { levels } from '../world/level.js';
+import { levels, worldForLevel, chapterNumber } from '../world/level.js';
 import { createGameState, isKeyReady, recordFruit, takeKey, finishLevel, healAtFountain } from './rules.js';
 import { createPlayer, movePlayer, resetPlayerMovement, showPlayerExpression, showRecovery, updatePlayerEffects } from './player.js';
 import { createScenery, createMosque, createFountain } from '../world/background.js';
@@ -11,6 +11,8 @@ import { createTerrain } from '../world/terrain.js';
 import { createHazards, updateHazards } from './hazards.js';
 import { createHud, centerHud, updateHud, updateProgress } from '../ui/hud.js';
 import { loadGameAssets } from '../data/assets.js';
+import { createColumns, updateColumns } from './columns.js';
+import { createWorldGate } from '../world/world1Scenery.js';
 
 const COLLECTIBLE_SCALE = 0.75;
 const ITEM_MESSAGES = {
@@ -54,6 +56,7 @@ export class GameScene extends Phaser.Scene {
         this.createCollectibles();
         createHazards(this);
         createFireRain(this);
+        createColumns(this);
         this.createLandmarks();
         this.createHealingSpots();
         this.player = createPlayer(this, this.level.spawn.x, this.level.spawn.y, this.character);
@@ -70,7 +73,7 @@ export class GameScene extends Phaser.Scene {
         this.bindPageControls();
         this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.shutdownScene, this);
         this.events.once(Phaser.Scenes.Events.DESTROY, this.shutdownScene, this);
-        this.announce(`${this.levelIndex + 1}. bölüm: ${this.level.name}. Üç yıldızı bul, anahtarı al ve camiye ulaş.`);
+        this.announce(`World ${worldForLevel(this.levelIndex).id} · ${chapterNumber(this.levelIndex)}. bölüm: ${this.level.name}. Üç yıldızı bul, anahtarı al ve ${this.level.exitLabel || 'camiye'} ulaş.`);
         this.updateHud();
     }
 
@@ -104,6 +107,9 @@ export class GameScene extends Phaser.Scene {
         this.physics.add.overlap(this.player, this.keySprite, this.collectKey, null, this);
         this.physics.add.overlap(this.player, this.exitZone, this.reachExit, null, this);
         this.physics.add.overlap(this.player, this.fountains, this.useFountain, null, this);
+        // Kolon bir tehlike olduğu kadar katı engeldir: zıplarken de içinden geçilmez.
+        this.physics.add.collider(this.player, this.columns, this.hitHazard, null, this);
+        this.physics.add.overlap(this.player, this.columns, this.hitHazard, null, this);
     }
 
     shutdownScene() {
@@ -139,7 +145,9 @@ export class GameScene extends Phaser.Scene {
         this.add.rectangle(x, 476, 6, 88, 0x6b6e52).setDepth(6);
         this.checkpointFlag = this.add.triangle(x + 4, 433, 0, 0, 48, 12, 0, 27, 0xe3c37d).setOrigin(0, 0).setDepth(7);
         const exit = this.level.exit;
-        this.door = createMosque(this, exit.x, this.level.theme);
+        this.door = this.level.columns
+            ? createWorldGate(this, exit.x, this.level.theme)
+            : createMosque(this, exit.x, this.level.theme);
         this.exitZone = this.add.zone(exit.x, 480, 68, 80);
         this.physics.add.existing(this.exitZone, true);
     }
@@ -231,7 +239,7 @@ export class GameScene extends Phaser.Scene {
         this.sound.play('key', { volume: 0.20 });
         this.keySprite.disableBody(true, true);
         this.door.open();
-        this.announce('Anahtar sende! Şimdi cami girişine ulaş.');
+        this.announce(`Anahtar sende! Şimdi ${this.level.exitLabel || 'cami girişine'} ulaş.`);
         this.updateHud();
     }
 
@@ -250,7 +258,9 @@ export class GameScene extends Phaser.Scene {
         player.recoveryUntil = 0; // Yeni çarpma, önceki sevinç efektini bitirsin.
         this.knockbackUntil = this.elapsed + 260;
         player.setVelocity(player.x < hazard.x ? -210 : 210, -230);
-        this.announce('Biraz mesafe bırak ve zıpla. Kısa süre korunuyorsun.');
+        this.announce(hazard.getData?.('column')
+            ? 'Kolonun yükselmesini bekle, altından yürüyerek geç. Kısa süre korunuyorsun.'
+            : 'Biraz mesafe bırak ve zıpla. Kısa süre korunuyorsun.');
         this.updateHud();
     }
 
@@ -292,9 +302,13 @@ export class GameScene extends Phaser.Scene {
         this.resultShown = true;
         this.tweens.pauseAll();
         const final = this.levelIndex === levels.length - 1;
+        const world = worldForLevel(this.levelIndex);
+        const nextWorld = final ? null : worldForLevel(this.levelIndex + 1);
+        const newWorld = nextWorld && nextWorld.id !== world.id;
         document.getElementById('result-eyebrow').textContent = final ? 'OYUN TAMAMLANDI' : 'BÖLÜM TAMAMLANDI';
-        document.getElementById('result-title').textContent = final ? 'Tebrikler!' : `${this.levelIndex + 1}. bölümü bitirdiniz!`;
-        document.getElementById('result-message').textContent = final ? 'Bütün bölümleri bitirdiniz.' : `${this.levelIndex + 2}. bölüm artık açık.`;
+        document.getElementById('result-title').textContent = final ? 'Tebrikler!' : newWorld ? `World ${world.id} tamamlandı!` : `${chapterNumber(this.levelIndex)}. bölümü bitirdiniz!`;
+        document.getElementById('result-message').textContent = final ? 'Bütün dünyaları bitirdiniz.' : newWorld ? `World ${nextWorld.id} açıldı: ${nextWorld.title}.` : `${chapterNumber(this.levelIndex) + 1}. bölüm artık açık.`;
+        document.getElementById('next-level').textContent = newWorld ? `World ${nextWorld.id}'e geç →` : 'Sonraki bölüm →';
         document.getElementById('result-verse').textContent = verses[this.levelIndex].text;
         document.getElementById('result-score').textContent = `${this.gameState.score} puan`;
         document.getElementById('next-level').hidden = final;
@@ -355,6 +369,7 @@ export class GameScene extends Phaser.Scene {
         if (this.lost || this.paused) return;
         this.elapsed += delta;
         updateFireRain(this);
+        updateColumns(this);
         this.updatePlayer(delta);
         this.updateCamera(delta);
         updateHazards(this, delta);
@@ -366,9 +381,9 @@ export class GameScene extends Phaser.Scene {
 
     updatePlayer(delta) {
         const onGround = this.player.body.bottom >= this.level.groundY - 3;
-        const belt = this.level.belt;
-        const onBelt = onGround && this.player.x >= belt.x && this.player.x <= belt.x + belt.width;
-        const conveyorSpeed = onBelt ? belt.speed : 0;
+        const belt = (this.level.belts || [this.level.belt]).find(strip =>
+            onGround && this.player.x >= strip.x && this.player.x <= strip.x + strip.width);
+        const conveyorSpeed = belt ? belt.speed : 0;
         const onIce = onGround &&
             (this.level.ice || []).some(ice => this.player.x >= ice.x && this.player.x <= ice.x + ice.width);
         if (this.elapsed > this.knockbackUntil && !this.falling) {
@@ -393,9 +408,9 @@ export class GameScene extends Phaser.Scene {
     }
 
     updateConveyor(delta) {
-        const { x, width } = this.level.belt;
         for (const mark of this.beltMarks) {
-            mark.x = Phaser.Math.Wrap(mark.x - 35 * delta / 1000, x, x + width);
+            const { x, width, speed } = mark.getData('belt');
+            mark.x = Phaser.Math.Wrap(mark.x + Math.sign(speed) * 35 * delta / 1000, x, x + width);
         }
     }
 

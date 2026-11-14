@@ -1,6 +1,6 @@
 import { GameScene } from './gameplay/GameScene.js';
 import { gameView } from './ui/view.js';
-import { levels } from './world/level.js';
+import { levels, worlds, worldForLevel } from './world/level.js';
 import { unlockedLevels } from './data/progress.js';
 
 // Önce HTML formundan karakter seçilir; ardından Phaser başlatılır.
@@ -11,9 +11,11 @@ const settingsButton = document.getElementById('settings-button');
 const settingsPanel = document.getElementById('settings-panel');
 const menuButton = document.getElementById('menu-button');
 const levelGrid = document.getElementById('level-grid');
+const worldTabs = document.getElementById('world-tabs');
 const fullscreenButton = document.getElementById('fullscreen-button');
 let gameStarted = false;
 let activeGame = null;
+let selectedWorld = 0;
 
 function closeSettings() {
     if (!settingsPanel.hidden) settingsButton.click();
@@ -28,8 +30,28 @@ function toggleSettings() {
 }
 
 // Bölüm sayısı değişince menü de aynı veriden oluşur.
-function createLevelMenu() {
-    levels.forEach((level, index) => {
+function createWorldMenu() {
+    for (const world of worlds) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.dataset.world = world.id;
+        button.onclick = () => {
+            selectedWorld = world.id;
+            createLevelMenu();
+            refreshLevelLocks();
+            updateStartButton();
+        };
+        worldTabs.append(button);
+    }
+}
+
+function createLevelMenu(preferredIndex) {
+    const world = worlds[selectedWorld];
+    levelGrid.replaceChildren();
+    levelGrid.dataset.world = world.id;
+    document.getElementById('world-title').textContent = `${world.title} · ${world.count} bölüm`;
+    levels.slice(world.start, world.start + world.count).forEach((level, localIndex) => {
+        const index = world.start + localIndex;
         const label = document.createElement('label');
         label.className = 'level-option';
         const input = document.createElement('input');
@@ -37,11 +59,12 @@ function createLevelMenu() {
         input.name = 'level';
         input.value = index;
         input.required = true;
-        input.defaultChecked = index === 0;
+        input.defaultChecked = index === (preferredIndex ?? world.start);
         const card = document.createElement('span');
         card.className = 'level-card';
         const number = document.createElement('strong');
-        number.textContent = index + 1;
+        number.textContent = localIndex + 1;
+        label.dataset.theme = level.theme;
         if (level.boss) label.classList.add('boss-level');
         card.append(number);
         label.append(input, card);
@@ -51,13 +74,21 @@ function createLevelMenu() {
 
 function refreshLevelLocks() {
     const unlocked = unlockedLevels(levels.length);
+    for (const button of worldTabs.querySelectorAll('button')) {
+        const world = worlds[Number(button.dataset.world)];
+        button.disabled = world.start >= unlocked;
+        button.setAttribute('aria-pressed', String(world.id === selectedWorld));
+        button.textContent = `World ${world.id}${button.disabled ? ' 🔒' : ''}`;
+        button.setAttribute('aria-label', `World ${world.id}${button.disabled ? ' · World 0 tamamlanınca açılır' : ''}`);
+    }
     for (const input of levelGrid.querySelectorAll('input')) {
         const index = Number(input.value);
         input.disabled = index >= unlocked;
         input.parentElement.classList.toggle('locked', input.disabled);
         const bossLabel = levels[index].boss ? ' · Boss' : '';
         const lockLabel = input.disabled ? ' · Kilitli' : '';
-        input.setAttribute('aria-label', `${index + 1}. bölüm${bossLabel}${lockLabel}`);
+        const localNumber = index - worlds[selectedWorld].start + 1;
+        input.setAttribute('aria-label', `${localNumber}. bölüm${bossLabel}${lockLabel}`);
     }
 }
 
@@ -138,11 +169,14 @@ function startGame(character, levelIndex) {
 }
 
 function returnToMenu(game) {
+    const currentIndex = game.scene.getScene('Garden').levelIndex;
     closeSettings();
     menuButton.disabled = true;
     game.events.once(Phaser.Core.Events.DESTROY, () => {
         gameStarted = false;
         activeGame = null;
+        selectedWorld = worldForLevel(currentIndex).id;
+        createLevelMenu(currentIndex);
         refreshLevelLocks();
         document.body.classList.remove('playing');
         document.getElementById('touch-controls').hidden = true;
@@ -159,6 +193,7 @@ function returnToMenu(game) {
     game.destroy(true);
 }
 
+createWorldMenu();
 createLevelMenu();
 refreshLevelLocks();
 characterForm.reset();

@@ -1,0 +1,69 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { levels, worlds, worldForLevel, chapterNumber, bossGate } from '../src/world/level.js';
+import { readUnlocked, unlockNext } from '../src/data/progress.js';
+import { columnFrame, columnTiming, RAISED_BOTTOM, CLOSED_BOTTOM } from '../src/gameplay/columns.js';
+
+test('World 0 keeps its old indexes and boss; World 1 restarts chapter numbering', () => {
+    assert.deepEqual(worlds.map(world => [world.id, world.start, world.count]), [[0, 0, 11], [1, 11, 3]]);
+    assert.equal(levels[10], bossGate);
+    assert.equal(worldForLevel(10).id, 0);
+    assert.equal(chapterNumber(10), 11);
+    assert.equal(worldForLevel(11).id, 1);
+    assert.equal(chapterNumber(11), 1);
+    assert.equal(chapterNumber(13), 3);
+    assert.deepEqual(levels.slice(11).map(level => level.name), ['Lav Vadisi', 'Mekanik Fabrika', 'Kara Kale']);
+});
+
+test('Existing saved progress is retained; completing the old boss unlocks World 1', () => {
+    let saved = '11';
+    const storage = { getItem() { return saved; }, setItem(key, value) { saved = value; } };
+    globalThis.window = { localStorage: storage };
+    assert.equal(readUnlocked(storage, levels.length), 11);
+    assert.equal(unlockNext(10, levels.length), 12);
+    assert.equal(saved, '12');
+    assert.equal(unlockNext(11, levels.length), 13);
+    assert.equal(unlockNext(12, levels.length), 14);
+    assert.equal(unlockNext(13, levels.length), 14);
+});
+
+test('Columns warn before slamming, remain closed, then retract continuously', () => {
+    const column = levels[11].columns[0];
+    const t = columnTiming(column);
+    const fallAt = t.open + t.warning;
+    const closedAt = fallAt + t.fall;
+    const riseAt = closedAt + t.closed;
+    const end = riseAt + t.rise;
+    assert.deepEqual(columnFrame(0, column), { bottom: RAISED_BOTTOM, state: 'open' });
+    assert.equal(columnFrame(t.open, column).state, 'warning');
+    assert.equal(columnFrame(fallAt, column).bottom, RAISED_BOTTOM);
+    assert.equal(columnFrame(closedAt, column).bottom, CLOSED_BOTTOM);
+    assert.equal(columnFrame(riseAt, column).state, 'rising');
+    assert.ok(columnFrame(riseAt + 500, column).bottom < CLOSED_BOTTOM);
+    assert.deepEqual(columnFrame(end, column), columnFrame(0, column));
+    let previous = columnFrame(0, column).bottom;
+    for (let time = 10; time < end; time += 10) {
+        const bottom = columnFrame(time, column).bottom;
+        assert.ok(bottom >= RAISED_BOTTOM && bottom <= CLOSED_BOTTOM);
+        assert.ok(Math.abs(bottom - previous) < 10, 'No teleporting at phase boundaries');
+        previous = bottom;
+    }
+});
+
+test('Every column has a fair walk-under window, a safe waiting area and an unjumpable top', () => {
+    for (const level of levels.slice(11)) {
+        assert.ok(level.columns.length >= 3);
+        for (const column of level.columns) {
+            assert.ok(columnTiming(column).open > (column.width + 24) / 185 * 1000 + 500);
+            assert.ok(level.groundY - RAISED_BOTTOM > 54, 'Standing player clears the raised base');
+            assert.ok(RAISED_BOTTOM - 512 < 0, 'Column extends beyond the top of the world');
+            assert.ok(column.x > 500 && column.x < level.key.x - 80);
+            assert.ok((level.gaps || []).every(gap => column.x + column.width / 2 < gap.x || column.x - column.width / 2 > gap.x + gap.width));
+            assert.ok(Math.abs(column.x - level.checkpoint.x) > 100);
+        }
+    }
+    const presses = levels[12].columns;
+    assert.notEqual(columnFrame(2400, presses[0]).state, columnFrame(2400, presses[1]).state);
+    assert.ok(levels[12].belts.some(belt => belt.speed > 0));
+    assert.ok(levels[12].belts.some(belt => belt.speed < 0));
+});

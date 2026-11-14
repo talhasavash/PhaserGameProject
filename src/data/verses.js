@@ -1,6 +1,6 @@
 // Diyanet meallerinden kısa alıntılar. Üç nokta, ayetin yalnızca bir bölümünün alındığını gösterir.
 // Metinler oyun puanıyla ilişkilendirilmez; bölüm sonunda okuyabilmek için süre sınırı yoktur.
-export const verses = [
+const worldZeroVerses = [
     { text: 'İnsanlara güzel söz söyleyin…', reference: 'Bakara 2/83 · Mealden alıntı', source: 'https://kuran.diyanet.gov.tr/mushaf/kuran-meal-1/bakara-suresi-2/ayet-82/kuran-yolu-meali-5' },
     { text: 'Müminler ancak kardeştirler…', reference: 'Hucurât 49/10 · Mealden alıntı', source: 'https://kuran.diyanet.gov.tr/tefsir/Hucurat-suresi/4622/10-ayet-tefsiri' },
     { text: 'Yiyin için fakat israf etmeyin.', reference: 'A’râf 7/31 · Mealden alıntı', source: 'https://kuran.diyanet.gov.tr/mushaf/kuran-meal-1/araf-suresi-7/ayet-31/diyanet-isleri-baskanligi-meali-1' },
@@ -13,3 +13,6 @@ export const verses = [
     { text: 'Rabbinin nimetine gelince; işte onu anlat.', reference: 'Duhâ 93/11 · Ayet meali', source: 'https://kuran.diyanet.gov.tr/mushaf/meal-2/duha-suresi-93/ayet-11/diyanet-isleri-baskanligi-meali-1' },
     { text: 'O halde önemli bir işi bitirince hemen diğerine koyul.', reference: 'İnşirâh 94/7 · Ayet meali', source: 'https://kuran.diyanet.gov.tr/mushaf/kuran-meal-2/insirah-suresi-94/ayet-1/kuran-yolu-meali-5' }
 ];
+
+// Yeni dünyada da doğrulanmış mevcut kısa alıntılar kullanılır.
+export const verses = [...worldZeroVerses, worldZeroVerses[6], worldZeroVerses[5], worldZeroVerses[10]];

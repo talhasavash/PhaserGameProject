@@ -32,9 +32,9 @@ test('Random fire targets vary, stay near the player and avoid safe spots and ot
     assert.equal(chooseFireX(levels[2], levels[2].exit.x, random), null);
     assert.equal(chooseFireX(levels[2], 100, () => 0), null, 'Do not fall back to an unsafe target');
 });
-test('Eleven chapters have unique themes and reachable stars before their key and mosque', () => {
-    assert.equal(levels.length, 11);
-    assert.equal(new Set(levels.map(level => level.theme)).size, 11);
+test('Fourteen chapters have unique themes and reachable stars before their key and exit', () => {
+    assert.equal(levels.length, 14);
+    assert.equal(new Set(levels.map(level => level.theme)).size, 14);
     const maxRise = 590 ** 2 / (2 * 1600);
     for (const level of levels) {
         const reached = [];
@@ -47,7 +47,9 @@ test('Eleven chapters have unique themes and reachable stars before their key an
         assert.equal(apples.length, 3);
         assert.equal(new Set(level.fruits.map(item => item.id)).size, level.fruits.length);
         for (const apple of apples) {
-            assert.ok(reached.some(p => apple.x > p.x && apple.x < p.x + p.width && p.y - apple.y < 60), level.name);
+            const onGround = apple.y >= level.groundY - 60 &&
+                (level.gaps || []).every(gap => apple.x < gap.x || apple.x > gap.x + gap.width);
+            assert.ok(onGround || reached.some(p => apple.x > p.x && apple.x < p.x + p.width && p.y - apple.y < 60), level.name);
             assert.ok(apple.x < level.key.x);
         }
         assert.ok(level.key.x < level.exit.x && level.exit.x < level.width);

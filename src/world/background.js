@@ -1,7 +1,9 @@
 import { createChapterScenery } from './chapterScenery.js';
+import { createWorldOneScenery } from './world1Scenery.js';
 // Bu dosya yalnızca görünümü çizer; oyun kurallarını değiştirmez.
 // Sabit bahçe çizimlerini bir kez dokuya çevirip tekrar kullanırız.
 export function createScenery(scene, width, theme = 'garden') {
+    if (createWorldOneScenery(scene, width, theme)) return;
     if (theme === 'courtyard') { createCourtyard(scene, width); return; }
     if (theme === 'desert' || theme === 'night') { createThemedScenery(scene, width, theme); return; }
     if (createChapterScenery(scene, width, theme)) return;

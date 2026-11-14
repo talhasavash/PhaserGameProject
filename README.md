@@ -81,13 +81,16 @@ PhaserGameProject/
 │   │   ├── rules.js             Puan, can ve görev kuralları
 │   │   ├── hazards.js           Düşman oluşturma ve hareketleri
 │   │   ├── boss.js              Muhafız zıplaması ve öfkesi
-│   │   └── fireRain.js          Ateş topları ve gölge uyarısı
+│   │   ├── fireRain.js          Ateş topları ve gölge uyarısı
+│   │   └── columns.js           İnip yükselen katı kolonlar ve zamanlama
 │   ├── world/                  Bölümler ve ortam
 │   │   ├── level.js             Bölüm tanımları ve nesne konumları
 │   │   ├── terrain.js           Zemin, çukurlar, buz ve platform gövdeleri
 │   │   ├── platforms.js         Bölüme özel basamak çizimleri
 │   │   ├── background.js        Arka plan, cami ve abdest alanı çizimleri
-│   │   └── chapterScenery.js    Diğer ortamların arka planları
+│   │   ├── chapterScenery.js    Diğer ortamların arka planları
+│   │   ├── world1.js            Lav Vadisi, Mekanik Fabrika ve Kara Kale verileri
+│   │   └── world1Scenery.js     Yeni dünya çizimleri ve farklı çıkışlar
 │   ├── ui/
 │   │   ├── hud.js               Bölüm numarası, can, görev ve puan
 │   │   └── view.js              Telefon/tablet için dünya boyutu
@@ -265,10 +268,15 @@ HTTP kullan; HTML dosyasını çift tıklayarak açma (oyun ES modülleri kullan
 - Dururken sallanma yoktur. Zıplama pozundaki kaldırılmış kol iki karakterde de başın yanında açıkça görünür.
 - Bant sola taşır; bu bir buz sürtünmesi değildir.
 
-## On bir bölümlü akış
+## Dünyalar ve bölüm akışı
 
-Başlangıçta yalnızca 1 açıktır; her bölüm bitince sonraki açılır. Ana ekranda yalnızca
-numaralar görünür. 11. bölüm altın renkli özel bir çemberdir. Menü `levels` dizisinden
+World 0 mevcut 11 bölümü, World 1 yeni üç bölümü içerir. Ana menüde önce dünya,
+sonra o dünyadaki bölüm seçilir. World 1 başlangıçta kilitlidir; World 0 boss
+bölümü tamamlanınca açılır. Bölüm numaraları her dünyada yeniden 1’den başlar;
+HUD üzerinde W0·11, W1·1 gibi görünür.
+
+Başlangıçta yalnızca World 0 / 1 açıktır; her bölüm bitince sonraki açılır. Ana ekranda yalnızca
+numaralar görünür. World 0'ın 11. bölümü altın renkli özel bir çemberdir. Menü `levels` dizisinden
 üretilir. `progress.js` açılan bölüm sayısını `localStorage` içinde saklar. Önceden
 4 bölüm açmış bir tarayıcı yeni sürümde de 4'ten devam eder; kayıt silinmez.
 Tarayıcı verileri silinirse ilerleme sıfırlanır; farklı cihazlara eşitlenmez.
@@ -287,12 +295,31 @@ Tarayıcı verileri silinirse ilerleme sıfırlanır; farklı cihazlara eşitlen
 | 10 | Bayram bahçesi; önceki engellerin birleşimi ve daralan geçişler |
 | 11 | Boss; büyük zıplayan muhafızların altından geçerek son camiye ulaşma |
 
+World 1'in bölümleri farklı geçişler ve yeni düşmanlar sunar:
+
+| World 1 bölümü | Ortam ve oynanış |
+| --- | --- |
+| 1 · Lav Vadisi | Lav boşlukları, semenderler, inip yükselen taş kolonlar ve ışıklı çıkış geçidi |
+| 2 · Mekanik Fabrika | Ters yönlü bantlar, robotlar, fazları farklı presler ve asansör çıkışı |
+| 3 · Kara Kale | Dar koridorlar, zırhlı böcekler, yarasalar, kolon çiftleri ve yükselen kale kapısı |
+
+Kolonlar fizik gövdesine sahiptir; tavana kadar uzanırlar. Açıkken alttaki boşluk
+yürümeye yeter ama zıplayan karakter kolona çarpar. İnişten önce 650 ms parlak
+zemin izi görülür. Kolon hızlı iner, yerde bekler ve yavaşça yükselir. Açık süre,
+genişlik ve başlangıç fazı bölüm verisindedir. Oyun saati durunca kolonlar da durur;
+bölüm yeniden başlayınca zamanlama sıfırlanır. Fabrikadaki bantlar iki yönde de
+çalışır. Bu davranışlar Phaser collider/overlap ve fizik gövdeleriyle uygulanır.
+
+Eski kayıt anahtarı ve World 0 indisleri korunur. Önceden 11. bölüme ulaşmış bir
+kullanıcı World 1'i açmak için boss'u tamamlar; açılan eski bölümler kapanmaz.
+
 Her bölümde 3 görev yıldızı bulunur. Diğer nesneler sadece puan verir. Anahtar
-alınınca caminin iki kapı kanadı yana açılır ve giriş aydınlanır. Camiye ulaşınca çocuk
+alınınca cami, geçit, asansör veya kale kapısı açılır ve giriş aydınlanır. Çıkışa ulaşınca çocuk
 önce 1,2 saniye yıldızlarla parlar, sonra tamamlanma mesajı ve kısa ayet aynı sonuç
 kartında görünür. Ayrı bir okuma ekranı veya görünür kaynak bağlantısı yoktur.
-Kart kendiliğinden kapanmaz; Sonraki bölüm veya Enter ile ilerlenir. 11'in sonunda
-Ana ekrana dön görünür; düğme veya Enter bölüm seçimine döndürür, 1. bölümü
+Kart kendiliğinden kapanmaz; Sonraki bölüm veya Enter ile ilerlenir. World 0 / 11
+sonunda World 1’e geç düğmesi çıkar; aynı sahne yeni dünyanın verileriyle kurulur.
+World 1 / 3 sonunda Ana ekrana dön görünür; düğme veya Enter bölüm seçimine döndürür, 1. bölümü
 kendiliğinden başlatmaz. Açılan bölümler korunur. Kaynak ve sure/ayet numaraları denetlenebilmesi için
 `src/data/verses.js` içinde saklanır; Diyanet meallerinden kısa alıntılar kullanılır.
 Üç nokta ayetin yalnızca bir kısmının alındığını gösterir.

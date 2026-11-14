@@ -1,3 +1,4 @@
+import { worldOneLevels } from './world1.js';
 // Bu dosya sadece bölümün verisidir; hareket veya çarpışma kodu içermez.
 // x sağa, y aşağı doğru artar. Platformların y değeri üst yüzeyleridir.
 export const garden = {
@@ -396,4 +397,18 @@ export const bossGate = trail({
     ice: [{ x: 4380, width: 380 }]
 });
 
-export const levels = [garden, courtyard, desert, moonGarden, forest, mosqueHall, snowPass, river, canyon, festival, bossGate];
+export const worldZeroLevels = [garden, courtyard, desert, moonGarden, forest, mosqueHall, snowPass, river, canyon, festival, bossGate];
+// Kayıtlar aynı sıralamayı kullanır: eski 0–10 indisleri değişmez.
+export const levels = [...worldZeroLevels, ...worldOneLevels];
+export const worlds = [
+    { id: 0, title: 'Bahçeler ve Geçitler', start: 0, count: worldZeroLevels.length },
+    { id: 1, title: 'Gölge Diyarları', start: worldZeroLevels.length, count: worldOneLevels.length }
+];
+
+export function worldForLevel(index) {
+    return worlds.find(world => index >= world.start && index < world.start + world.count);
+}
+
+export function chapterNumber(index) {
+    return index - worldForLevel(index).start + 1;
+}

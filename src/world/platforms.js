@@ -11,7 +11,10 @@ export const platformThemes = {
     river: { body: 0x759591, edge: 0xd5c596, detail: 0x436f74 },
     canyon: { body: 0xa97870, edge: 0xd7afa0, detail: 0x7f616b },
     festival: { body: 0x9d78a5, edge: 0xe6c879, detail: 0xf9e6b0 },
-    boss: { body: 0x59677f, edge: 0xc7ad70, detail: 0x93a4b4 }
+    boss: { body: 0x59677f, edge: 0xc7ad70, detail: 0x93a4b4 },
+    lava: { body: 0x564252, edge: 0xf5ac67, detail: 0xbf6c59 },
+    factory: { body: 0x52717f, edge: 0xe2c374, detail: 0xa9c4c7 },
+    castle: { body: 0x67627f, edge: 0xb5a8d0, detail: 0x3f3d59 }
 };
 
 export function createPlatformArt(scene, platform, theme) {
@@ -85,6 +88,20 @@ function drawStep(g, width, theme) {
         g.fillStyle(p.edge); g.fillRoundedRect(x, 0, width, 6, 3); g.fillRect(x + 6, 22, width - 12, 3);
         g.fillStyle(p.detail);
         for (let xx = x + 14; xx < end - 6; xx += 24) { g.fillCircle(xx, 14, 3); g.fillRect(xx - 1, 27, 2, 5); }
+    } else if (theme === 'lava') {
+        g.fillPoints([{ x, y: 0 }, { x: end, y: 0 }, { x: end - 14, y: 25 }, { x: x + 9, y: 30 }], true);
+        g.fillStyle(p.edge); g.fillRect(x, 0, width, 5);
+        g.lineStyle(2, p.detail); g.lineBetween(x + width / 2, 5, x + width / 2 - 8, 24);
+    } else if (theme === 'factory') {
+        g.fillRect(x, 0, width, 24);
+        g.lineStyle(2, p.detail); g.strokeRect(x + 4, 5, width - 8, 15);
+        g.fillStyle(p.edge);
+        for (let xx = x; xx < end - 12; xx += 24) g.fillTriangle(xx, 0, xx + 14, 0, xx + 7, 7);
+    } else if (theme === 'castle') {
+        g.fillRoundedRect(x, 0, width, 28, 3);
+        g.fillStyle(p.edge); g.fillRect(x, 0, width, 5);
+        g.lineStyle(2, p.detail);
+        for (let xx = x + 12; xx < end; xx += 28) g.strokeRect(xx, 10, Math.min(24, end - xx), 12);
     } else {
         g.fillPoints([{ x, y: 0 }, { x: end, y: 0 }, { x: end - 8, y: 28 }, { x: x + 8, y: 28 }], true);
         g.fillStyle(p.edge); g.fillRect(x, 0, width, 5);

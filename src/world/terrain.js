@@ -10,7 +10,9 @@ export function createTerrain(scene) {
         if (width > 0) scene.solids.add(scene.add.rectangle(start + width / 2, 570, width, 100).setVisible(false));
         if (gap.width > 0) {
             const water = scene.level.theme === 'river';
-            scene.add.rectangle(gap.x + gap.width / 2, 560, gap.width, 86, water ? 0x397b91 : 0x263342).setDepth(3);
+            const lava = scene.level.theme === 'lava';
+            const color = lava ? 0xe66d48 : water ? 0x397b91 : 0x263342;
+            scene.add.rectangle(gap.x + gap.width / 2, 560, gap.width, 86, color).setDepth(3);
             scene.add.rectangle(gap.x + gap.width / 2, 528, gap.width - 6, 5, water ? 0x82ccd1 : 0x465167).setDepth(4);
             for (const side of [gap.x - 4, gap.x + gap.width + 4]) scene.add.rectangle(side, 560, 8, 80, 0x816e62).setDepth(4);
         }
@@ -36,10 +38,16 @@ export function createTerrain(scene) {
         scene.solids.add(ground);
         createPlatformArt(scene, platform, scene.level.theme);
     }
-    const belt = scene.level.belt;
-    scene.add.rectangle(belt.x + belt.width / 2, 524, belt.width, 17, 0x466b72).setDepth(7);
     scene.beltMarks = [];
-    for (let i = 0; i < 10; i++) {
-        scene.beltMarks.push(scene.add.text(belt.x + i * 22, 508, '‹', { fontFamily: 'Trebuchet MS, sans-serif', color: '#d2e7c8', fontSize: '23px' }).setDepth(8));
+    for (const belt of scene.level.belts || [scene.level.belt]) {
+        if (belt.speed === 0) continue;
+        scene.add.rectangle(belt.x + belt.width / 2, 524, belt.width, 17, 0x466b72).setDepth(7);
+        for (let offset = 0; offset < belt.width; offset += 22) {
+            const mark = scene.add.text(belt.x + offset, 508, belt.speed < 0 ? '‹' : '›', {
+                fontFamily: 'Trebuchet MS, sans-serif', color: '#d2e7c8', fontSize: '23px'
+            }).setDepth(8);
+            mark.setData('belt', belt);
+            scene.beltMarks.push(mark);
+        }
     }
 }

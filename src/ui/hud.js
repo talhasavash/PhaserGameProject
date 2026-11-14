@@ -1,3 +1,4 @@
+import { worldForLevel, chapterNumber } from '../world/level.js';
 const textStyle = { fontFamily: 'Trebuchet MS, sans-serif', color: '#294e4c' };
 const HUD_WIDTH = 600;
 const HUD_PROGRESS_WIDTH = 96;
@@ -17,11 +18,11 @@ export function createHud(scene) {
         return text;
     };
     scene.hud.add(bg);
-    scene.hud.add(scene.add.circle(18, 14, 10, 0xedd59c).setScrollFactor(0).setDepth(101));
-    label(18, 6, String(scene.levelIndex + 1), 14).setOrigin(0.5, 0).setColor('#684b23');
-    scene.heartsText = label(42, 5, '', 16);
-    scene.hud.add(scene.add.image(118, 14, 'star').setDisplaySize(15, 15).setScrollFactor(0).setDepth(101));
-    scene.starText = label(134, 6, '', 14);
+    scene.hud.add(scene.add.rectangle(31, 14, 54, 20, 0xedd59c).setRounded(5).setScrollFactor(0).setDepth(101));
+    label(31, 7, `W${worldForLevel(scene.levelIndex).id}·${chapterNumber(scene.levelIndex)}`, 12).setOrigin(0.5, 0).setColor('#684b23');
+    scene.heartsText = label(70, 5, '', 16);
+    scene.hud.add(scene.add.image(146, 14, 'star').setDisplaySize(15, 15).setScrollFactor(0).setDepth(101));
+    scene.starText = label(162, 6, '', 14);
     scene.hud.add(scene.add.image(230, 14, 'key').setDisplaySize(21, 13).setScrollFactor(0).setDepth(101));
     scene.keyText = label(245, 6, '', 14);
     scene.scoreText = label(390, 6, '', 14);

@@ -91,6 +91,11 @@ test('Every mosque celebrates before showing a result; only Continue starts the 
         assert.equal(elements.get('next-level').hidden, final);
         assert.equal(elements.get('play-again').hidden, !final);
         assert.equal(elements.get(final ? 'play-again' : 'next-level').focused, true);
+        if (index === 10) {
+            assert.equal(elements.get('result-title').textContent, 'World 0 tamamlandı!');
+            assert.equal(elements.get('next-level').textContent, "World 1'e geç →");
+            assert.match(elements.get('result-message').textContent, /World 1 açıldı/);
+        }
         GameScene.prototype.continueAfterResult.call(scene);
         GameScene.prototype.continueAfterResult.call(scene);
         assert.deepEqual(calls, final ? ['menu'] : [{ levelIndex: index + 1, score: 120 }]);
@@ -180,7 +185,7 @@ test('Taking the key opens the mosque once and does not finish the chapter remot
     const run = createGameState();
     run.stars = 3;
     let opened = 0;
-    const scene = { gameState: run, sound: { play() {} }, keySprite: { disableBody() {} }, door: { open() { opened++; } }, announce() {}, updateHud() {} };
+    const scene = { level: garden, gameState: run, sound: { play() {} }, keySprite: { disableBody() {} }, door: { open() { opened++; } }, announce() {}, updateHud() {} };
     GameScene.prototype.collectKey.call(scene);
     GameScene.prototype.collectKey.call(scene);
     assert.equal(opened, 1);

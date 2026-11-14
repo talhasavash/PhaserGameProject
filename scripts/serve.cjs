@@ -12,7 +12,8 @@ const contentTypes = {
     '.png': 'image/png',
     '.svg': 'image/svg+xml',
     '.mp3': 'audio/mpeg',
-    '.wav': 'audio/wav'
+    '.wav': 'audio/wav',
+    '.webmanifest': 'application/manifest+json'
 };
 
 const server = http.createServer(async (request, response) => {
@@ -28,7 +29,7 @@ const server = http.createServer(async (request, response) => {
         relativePath = pathname === '/' ? 'index.html' : pathname.slice(1);
         const segments = relativePath.split(/[\\/]/);
         if (segments.some(segment => segment.startsWith('.')) ||
-            (relativePath !== 'index.html' && !publicFolders.has(segments[0]))) {
+            (!['index.html', 'manifest.webmanifest', 'sw.js'].includes(relativePath) && !publicFolders.has(segments[0]))) {
             response.writeHead(404);
             response.end('Not found');
             return;

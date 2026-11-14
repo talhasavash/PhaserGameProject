@@ -2,6 +2,7 @@ import { GameScene } from './gameplay/GameScene.js';
 import { gameView } from './ui/view.js';
 import { levels, worlds, worldForLevel } from './world/level.js';
 import { unlockedLevels } from './data/progress.js';
+import { setupPwa } from './ui/pwa.js';
 
 // Önce HTML formundan karakter seçilir; ardından Phaser başlatılır.
 // "import", başka bir dosyanın dışarı açtığı (export) kodu kullanmamızı sağlar.
@@ -192,6 +193,7 @@ function returnToMenu(game) {
     game.destroy(true);
 }
 
+setupPwa();
 createWorldMenu();
 createLevelMenu();
 refreshLevelLocks();

@@ -5,8 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#183c36">
     <title>Meyve Oyunu 2026</title>
-    <link rel="icon" href="data:,">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" href="assets/icons/icon-192.png" type="image/png">
+    <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/menu.css">
     <script defer src="lib/phaser.min.js"></script>
     <script type="module" src="src/game.js"></script>
 </head>
@@ -19,6 +24,7 @@
                     aria-controls="settings-panel">☰
             </button>
             <div id="settings-panel" class="settings-panel" hidden>
+                <button id="install-button" type="button" hidden>Ana ekrana ekle</button>
                 <button id="sound-button" type="button" aria-label="Sesi kapat" aria-pressed="false" disabled>♪</button>
                 <button id="menu-button" type="button" aria-label="Bölüm seçimine dön" hidden>Bölüm seç</button>
                 <button id="pause-button" type="button" aria-label="Devam et" disabled>Devam et</button>
@@ -31,9 +37,7 @@
                  aria-label="Çocuk karakterle oynanan, klavyeyle kontrol edilen platform oyunu"></div>
             <section id="character-select" class="character-select" aria-labelledby="character-title">
                 <form id="character-form" class="character-form">
-                    <p class="eyebrow">BİSMİLLÂHİRRAHMÂNİRRAHÎM</p>
-                    <h2 id="character-title" tabindex="-1">MEYVE BAHÇESİ<span></span></h2>
-                    <p class="character-subtitle">Meyve Bahçesinde yolculuk yapmak istermisin?</p>
+                    <h2 id="character-title" tabindex="-1"><span aria-hidden="true">✦</span> MEYVE BAHÇESİ</h2>
                     <div class="selection-layout">
                         <fieldset class="character-options">
                             <legend class="sr-only">Oynayacağın karakter</legend>
@@ -50,13 +54,12 @@
                                 class="character-check" aria-hidden="true">✓</span></span></label>
                         </fieldset>
                         <fieldset class="level-options">
-                            <legend>Dünya ve bölüm seç</legend>
+                            <legend class="sr-only">Dünya ve bölüm seç</legend>
                             <div id="world-tabs" class="world-tabs" role="group" aria-label="Dünya seç"></div>
                             <div id="level-grid" class="level-grid"></div>
                             </fieldset>
                     </div>
-                    <button id="start-button" type="submit" disabled>Maceraya başla →</button>
-                    <p class="character-note">talha savash 2026</p>
+                    <button id="start-button" type="submit" disabled><span aria-hidden="true">▶</span> OYNA</button>
                 </form>
             </section>
             <section id="fall-result" class="result" aria-labelledby="fall-title" hidden>

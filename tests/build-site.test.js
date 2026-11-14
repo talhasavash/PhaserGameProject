@@ -45,4 +45,20 @@ test('Published modules resolve across folders, share a version, and leave sourc
     const assets = fs.readFileSync(path.join(output, 'data', 'assets.js'), 'utf8');
     assert.ok(assets.includes('assets/images/${key}.svg?v=1234567'));
     assert.ok(assets.includes('assets/audio/${key}.wav?v=1234567'));
+    const manifest = JSON.parse(fs.readFileSync(path.join(root, 'dist/manifest.webmanifest'), 'utf8'));
+    assert.equal(manifest.start_url, './');
+    assert.equal(manifest.scope, './');
+    assert.equal(manifest.display, 'standalone');
+    for (const icon of manifest.icons) {
+        const bytes = fs.readFileSync(path.join(root, 'dist', icon.src));
+        assert.equal(bytes.readUInt32BE(16), Number(icon.sizes.split('x')[0]));
+    }
+    const worker = fs.readFileSync(path.join(root, 'dist/sw.js'), 'utf8');
+    const precache = JSON.parse(worker.match(/const PRECACHE = (\[.*\]);/)[1]);
+    assert.ok(precache.includes('./src/game.js?v=1234567'));
+    assert.ok(precache.includes('./lib/phaser.min.js?v=1234567'));
+    assert.ok(precache.includes('./assets/images/child-0.svg?v=1234567'));
+    assert.ok(precache.includes('./assets/audio/jump.wav?v=1234567'));
+    for (const file of precache) assert.ok(fs.existsSync(path.join(root, 'dist', file.split('?')[0])), file);
+    assert.ok(html.includes('name="game-release"'));
 });

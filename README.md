@@ -389,6 +389,28 @@ SVG'lerine dokunulmaz.
 
 ## Kontroller ve Git
 
+### Ana ekrana kurulum (PWA)
+
+Oyun APK gerektirmez. Android Chrome menüsünden **Uygulamayı yükle / Ana ekrana ekle**
+seçilebilir; tarayıcı kurulum olanağı sunduğunda oyunun ☰ menüsünde de kurulum düğmesi
+görünür. iPhone/iPad'de Safari paylaşım menüsünden **Ana Ekrana Ekle** kullanılır.
+Ana ekran simgesiyle açıldığında adres çubuğu olmadan çalışır. Yatay ekran tercihi
+manifestte belirtilir; uygulanması tarayıcıya bağlıdır.
+
+`manifest.webmanifest` uygulama adını, simgeleri ve göreli yayın yolunu tanımlar.
+`src/ui/pwa.js` kurulumu ve service worker kaydını yönetir. `scripts/service-worker.js`
+yayın sırasında `dist/sw.js` olur; bütün oyun kaynakları ilk çevrimiçi açılışta
+önbelleğe alınır. İndirme tamamlandıktan sonra internet olmadan da oynanabilir.
+Çevrimiçi açılışta güncel dosyalar istenir; açık oyun zorla yenilenmez. Yeni worker
+açık eski sekmeler kapanınca etkinleşir. Tarayıcı verilerini temizlemek çevrimdışı
+kopyayı ve bölüm ilerlemesini siler.
+
+Geliştirmede (`npm start`) service worker kaydedilmez; böylece kod değişikliklerini
+önbellek gizlemez. PWA denemek için `node scripts/build-site.cjs` ardından PowerShell'de
+`$env:PREVIEW_DIST='1'; npm start` kullanılabilir. HTTPS yayını veya localhost gerekir.
+`scripts/build-icon.cjs`, mevcut kız/erkek SVG'lerinden simgenin vektörünü üretir;
+192 ve 512 piksel PNG karşılıkları `assets/icons` içinde tutulur.
+
 ```sh
 node scripts/check.cjs
 node --test tests/*.test.js

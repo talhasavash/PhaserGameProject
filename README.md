@@ -44,11 +44,15 @@ Hem dokunmatik hem klavye zıplamasında erken bırakmak kısa, basılı tutmak 
 JavaScript programlama dilimizdir. Phaser, JavaScript ile kullandığımız oyun kütüphanesidir.
 İkisini birlikte kullanıyoruz.
 
-Kullanılan Phaser sürümü **3.90.0**. Kütüphane `lib/phaser.min.js` içinde yerel olarak tutulur;
-oyun açılırken CDN'den indirilmez. Dosya, [resmî sürüm sayfasında](https://phaser.io/download/release/v3.90.0)
-belirtilen [sabit sürümlü CDN adresinden](https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.min.js) alınmıştır.
+Kullanılan Phaser sürümü **4.2.1**. Kütüphane `lib/phaser.min.js` içinde yerel olarak tutulur;
+oyun açılırken CDN'den indirilmez. Dosya, [resmî sürüm sayfasında](https://phaser.io/download/release/v4.2.1)
+belirtilen [sabit sürümlü CDN adresinden](https://cdn.jsdelivr.net/npm/phaser@4.2.1/dist/phaser.min.js) alınmıştır.
 Bu dosyayı elle düzenlemiyoruz; kendi oyun kodumuz `src` klasöründedir.
 Phaser'ın MIT lisansı `lib/PHASER-LICENSE.md` dosyasındadır.
+3.90.0'dan 4.2.1'e geçişte mevcut standart Scene, Arcade Physics, animasyon ve
+Graphics API'leri korundu. Özel WebGL pipeline veya DynamicTexture kullanılmadığı
+için oyun kodunda uyarlama gerekmedi. Yeni WebGL çizicisi motorla birlikte aktiftir.
+Geçiş rehberi: https://github.com/phaserjs/phaser/blob/v4.2.1/changelog/v4/4.0/MIGRATION-GUIDE.md
 
 | İş | Sorumlusu |
 | --- | --- |
@@ -111,13 +115,59 @@ Eski görsel ve sesler silinmedi; `assets/legacy` içinde korundu. Oyun bu klas�
 
 ## Kodu hangi sırayla okuyalım?
 
-1. **index.html:** İki script'e bak. Önce Phaser, ardından `src/game.js` yüklenir.
-2. **src/game.js:** `new Phaser.Game(...)` oyunu başlatır. Boyut, yerçekimi ve kullanılacak ekran burada seçilir.
-3. **src/gameplay/GameScene.js:** Önce `preload`, `create` ve `update` fonksiyonlarına bak. Bunlar görevleri küçük fonksiyonlara dağıtır.
-4. **src/gameplay/player.js:** Tuş okumadan hız vermeye kadar hareket kodunu takip et.
-5. **src/world/level.js:** Bir platformun veya meyvenin `x`, `y` değerini değiştirip sonucu gör.
-6. **src/gameplay/rules.js:** Meyve toplanınca puanın ve görev durumunun nasıl değiştiğini incele.
-7. **src/world/background.js:** Görünümü değiştirmek istediğinde bak.
+Çalışma sırası ile öğrenme sırası aynı olmak zorunda değil. İlk okumada aşağıdaki
+sırayı izle; çağrılan her yardımcı fonksiyonun içine hemen girmek gerekmez.
+
+| Sıra | Dosya | Önce neye bakmalı? |
+| --- | --- | --- |
+| 1 | `index.html` | Oyun alanı, menü ve iki script etiketi |
+| 2 | `src/game.js` | `startSelectedGame` ve `startGame`; seçimin Phaser'a aktarılması |
+| 3 | `src/gameplay/GameScene.js` | Yalnızca `init`, `preload`, `create`, `update`; ana akış |
+| 4 | `src/data/assets.js` | Görsel/ses anahtarları ve Phaser Loader |
+| 5 | `src/world/level.js`, `terrain.js` | Bölüm verilerinin fizik zeminine dönüşmesi |
+| 6 | `src/gameplay/player.js`, `controls.js` | Girdi, hızlanma, zıplama ve animasyon; ardından mobil parmak takibi |
+| 7 | `src/gameplay/rules.js` | Puan, yıldız, anahtar ve can; sonra GameScene'deki temas metotlarına dön |
+| 8 | `src/ui/hud.js`, `view.js` | Durumun ekranda gösterilmesi ve mobil ekran ölçüsü |
+| 9 | `src/gameplay/hazards.js`, `boss.js`, `fireRain.js` | Devriye, boss öfkesi/zıplaması ve ateş zamanlaması |
+| 10 | `src/world/background.js`, `chapterScenery.js`, `platforms.js` | Ortam çizimleri ve doku önbelleği |
+| 11 | `src/data/progress.js`, `verses.js` | Bölüm kilitleri, localStorage ve sonuç metinleri |
+
+İlk küçük deneme: `world/level.js` içindeki bir meyvenin `x` konumunu değiştir.
+Ardından `gameplay/player.js` içindeki `WALK_SPEED` değerini küçük miktarda değiştir.
+Son olarak bir yıldızın `collectFruit → recordFruit → updateHud` yolunu takip et.
+`lib/phaser.min.js` kütüphanenin sıkıştırılmış dosyasıdır; öğrenmek için onu okumuyoruz.
+
+### Yeni klasörlerle çalışma akışı
+
+Yerelde `scripts/serve.cjs`, internette GitHub Pages dosyaları sunar. Oyun mantığı
+tarayıcıda çalışır; her hareket için sunucuya istek gönderilmez.
+
+```mermaid
+flowchart TD
+    A["Node.js sunucusu / GitHub Pages"] --> B["index.html: Phaser ve src/game.js yüklenir"]
+    B --> C["game.js: karakter ve bölüm seçimi"]
+    D["world/level.js + data/progress.js: bölümler ve kilitler"] --> C
+    C --> E["new Phaser.Game + ui/view.js: ekran ve fizik"]
+    E --> F["gameplay/GameScene.js: init → preload"]
+    F --> G["data/assets.js: görsel ve ses yükle"]
+    G --> H["GameScene.create: bölümü kur"]
+    H --> I["world/: zemin, platform ve arka plan"]
+    H --> J["gameplay/: karakter ve tehlikeler"]
+    H --> K["ui/hud.js: puan ve görev çubuğu"]
+    I --> L["GameScene.update: her karede oyun mantığı"]
+    J --> L
+    K --> L
+    L --> M["player + controls: girdi, hız ve zıplama"]
+    M --> N["hazards + boss + fireRain: tehlikeler"]
+    N --> O["Phaser: fizik, temas, animasyon, kamera ve çizim"]
+    O --> L
+    O --> P["Temas metotları + rules.js: toplama, can, anahtar"]
+    P -->|"Anahtarla camiye ulaş"| Q["data/progress.js: sonraki bölümün kilidini kaydet"]
+    Q --> R["Parlama ve sonuç kartı: data/verses.js"]
+    R --> S{"Son bölüm mü?"}
+    S -->|"Hayır: Sonraki bölüm"| F
+    S -->|"Evet: Ana ekrana dön"| C
+```
 
 ### Phaser'ın üç temel aşaması
 

@@ -394,8 +394,9 @@ SVG'lerine dokunulmaz.
 Oyun APK gerektirmez. Android Chrome menüsünden **Uygulamayı yükle / Ana ekrana ekle**
 seçilebilir; tarayıcı kurulum olanağı sunduğunda oyunun ☰ menüsünde de kurulum düğmesi
 görünür. iPhone/iPad'de Safari paylaşım menüsünden **Ana Ekrana Ekle** kullanılır.
-Ana ekran simgesiyle açıldığında adres çubuğu olmadan çalışır. Yatay ekran tercihi
-manifestte belirtilir; uygulanması tarayıcıya bağlıdır.
+Ana ekran simgesiyle açıldığında adres çubuğu olmadan çalışır. Manifestte ekran yönü
+`any` olarak ayarlanır; açılışta zorunlu döndürme yapılmaz. Oyundaki tam ekran
+düğmesi kullanıldığında yatay yön kilidi tarayıcı destekliyorsa istenir.
 
 `manifest.webmanifest` uygulama adını, simgeleri ve göreli yayın yolunu tanımlar.
 Başlangıç adresi doğrudan `./index.html` dosyasıdır; uygulama kimliği `./` olarak

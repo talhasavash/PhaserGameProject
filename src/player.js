@@ -146,16 +146,28 @@ export function readDirection(player) {
     return direction;
 }
 
+// update tarafından çağrılır: girdi → hız → zıplama → görünüm.
 export function movePlayer(player, time, delta, conveyorSpeed, grip = 1) {
     const movement = player.movement;
     const grounded = player.body.blocked.down || player.body.touching.down;
+    // Uzun bir kare, hareketi birden ileri sıçratmasın.
+    const seconds = Math.min(delta, 50) / 1000;
     if (grounded) {
         movement.lastGrounded = time;
         if (!movement.wasOnGround) movement.jumpConsumed = false;
     }
-
-    // 1. Klavyeyi oku: -1 sol, 0 dur, 1 sağ.
     const direction = readDirection(player);
+    const jumpHeld = readJumpInput(player, time);
+    updateHorizontalSpeed(player, direction, grounded, seconds, conveyorSpeed, grip);
+    updateJump(player, time, jumpHeld);
+    updatePlayerAnimation(player, time, direction, grounded);
+    updatePlayerLean(player, direction, grounded, seconds);
+    movement.wasJumpHeld = jumpHeld;
+    movement.wasOnGround = grounded;
+}
+
+function readJumpInput(player, time) {
+    const movement = player.movement;
     const jumpHeld = player.cursors.up.isDown || player.keys.W.isDown || player.keys.SPACE.isDown || player.touchKeys?.up.isDown;
     if (player.touchKeys?.up.justPressed) {
         movement.jumpQueued = time;
@@ -165,8 +177,11 @@ export function movePlayer(player, time, delta, conveyorSpeed, grip = 1) {
         movement.jumpQueued = time;
         movement.touchJump = Boolean(player.touchKeys?.up.isDown);
     }
+    return jumpHeld;
+}
 
-    // 2. Hedef hızı hesapla. Bant etkisini yalnızca yerdeyken ekle.
+function updateHorizontalSpeed(player, direction, grounded, seconds, conveyorSpeed, grip) {
+    // Bant yalnızca yerde etkili; buz hızlanmayı ve freni azaltır.
     let targetSpeed = direction * WALK_SPEED;
     let acceleration = AIR_ACCELERATION;
     if (grounded) {
@@ -184,18 +199,19 @@ export function movePlayer(player, time, delta, conveyorSpeed, grip = 1) {
     // Buz: yerdeki hız değişimi küçülür; zıplama ve havada kontrol aynı kalır.
     if (grounded) acceleration *= grip;
 
-    // delta: bir önceki kareden beri geçen süre. Farklı bilgisayarlarda hız aynı kalır.
-    const seconds = Math.min(delta, 50) / 1000;
+    // Saniyeye bağlı sınır, farklı kare hızlarında aynı hareketi sağlar.
     const maxChange = acceleration * seconds;
-    let speedChange = targetSpeed - player.body.velocity.x;
-    speedChange = Phaser.Math.Clamp(speedChange, -maxChange, maxChange);
-    player.setVelocityX(player.body.velocity.x + speedChange);
+    const speed = player.body.velocity.x;
+    player.setVelocityX(Phaser.Math.Clamp(targetSpeed, speed - maxChange, speed + maxChange));
     // Süzülmenin sonundaki çok küçük hızı sıfırla; dururken piksel titremesi olmasın.
     if (direction === 0 && grounded && conveyorSpeed === 0 && Math.abs(player.body.velocity.x) < 5) {
         player.setVelocityX(0);
     }
+}
 
-    // 3. Zıplamak için yukarı hız ver. Yerçekimini Phaser uygular.
+function updateJump(player, time, jumpHeld) {
+    // Kenardan ayrılma ve erken basış toleransları zıplamayı kolaylaştırır.
+    const movement = player.movement;
     const nearGround = time - movement.lastGrounded < EDGE_JUMP_TIME;
     const jumpRequested = time - movement.jumpQueued < EARLY_JUMP_TIME;
     if (!movement.jumpConsumed && nearGround && jumpRequested) {
@@ -211,8 +227,9 @@ export function movePlayer(player, time, delta, conveyorSpeed, grip = 1) {
     if (!jumpHeld && (releasedKeyboardJump || releasedTouchJump) && player.body.velocity.y < -240) {
         player.setVelocityY(-240); // Tuş erken bırakılırsa zıplama daha kısa olur.
     }
+}
 
-    // 4. Hareketin durumuna göre görseli seç. Animasyonu Phaser oynatır.
+function updatePlayerAnimation(player, time, direction, grounded) {
     const expression = currentExpression(player, time);
     const prefix = characterPrefix(expression, player.character);
     if (direction !== 0) player.setFlipX(direction < 0);
@@ -227,15 +244,15 @@ export function movePlayer(player, time, delta, conveyorSpeed, grip = 1) {
         player.anims.stop();
         player.setTexture(`${prefix}0`);
     }
+}
 
+function updatePlayerLean(player, direction, grounded, seconds) {
     // Hafif gövde eğimi dönüşü daha canlı gösterir; çarpışma kutusu değişmez.
-    let targetLean = player.body.velocity.x / WALK_SPEED * 0.065;
+    const targetLean = player.body.velocity.x / WALK_SPEED * 0.065;
     const leanChange = Math.min(seconds * 12, 1);
     if (direction === 0 && grounded && player.body.velocity.x === 0) {
         player.setRotation(0); // Bekleme pozunda sallanma veya nefes döngüsü yok.
     } else {
-        player.setRotation(player.rotation + (targetLean - player.rotation) * leanChange);
+        player.setRotation(Phaser.Math.Linear(player.rotation, targetLean, leanChange));
     }
-    movement.wasJumpHeld = jumpHeld;
-    movement.wasOnGround = grounded;
 }

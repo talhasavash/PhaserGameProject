@@ -70,9 +70,14 @@ PhaserGameProject/
 ├── css/style.css          Sayfanın görünümü
 ├── src/                   Yazdığımız aktif oyun kodu: alt klasör yok
 │   ├── game.js            Giriş noktası, ekran ve fizik ayarları
-│   ├── GameScene.js       Phaser ekranı; bölümün kurulması ve oyun akışı
+│   ├── GameScene.js       Phaser ekranı; kurulum, temaslar ve bölüm geçişi
+│   ├── assets.js          Phaser Loader ile görsel ve ses yükleme listeleri
+│   ├── terrain.js         Zemin, gerçek çukurlar, buz ve platform gövdeleri
+│   ├── hazards.js         Düşman oluşturma, devriye ve muhafız hareketleri
+│   ├── hud.js             Bölüm numarası, can, görev, puan ve ilerleme çubuğu
 │   ├── player.js          Karakter oluşturma, yürüme ve zıplama
 │   ├── controls.js        Çoklu dokunma, bırakma ve odak kaybı yönetimi
+│   ├── view.js            Telefon/tablet ekranına uygun dünya boyutu
 │   ├── level.js           Platform, meyve ve düşman konumları
 │   ├── platforms.js       Bölüme özel basamak çizimleri ve doku önbelleği
 │   ├── rules.js           Puan, can, elma, anahtar ve bitiş kuralları
@@ -104,7 +109,7 @@ Eski görsel ve sesler silinmedi; `assets/legacy` içinde korundu. Oyun bu klas�
 
 1. **index.html:** İki script'e bak. Önce Phaser, ardından `src/game.js` yüklenir.
 2. **src/game.js:** `new Phaser.Game(...)` oyunu başlatır. Boyut, yerçekimi ve kullanılacak ekran burada seçilir.
-3. **src/GameScene.js:** Şimdilik sadece `preload`, `create` ve `update` fonksiyonlarına bak.
+3. **src/GameScene.js:** Önce `preload`, `create` ve `update` fonksiyonlarına bak. Bunlar görevleri küçük fonksiyonlara dağıtır.
 4. **src/player.js:** Tuş okumadan hız vermeye kadar hareket kodunu takip et.
 5. **src/level.js:** Bir platformun veya meyvenin `x`, `y` değerini değiştirip sonucu gör.
 6. **src/rules.js:** Meyve toplanınca puanın ve görev durumunun nasıl değiştiğini incele.
@@ -135,8 +140,32 @@ this.cameras.main.startFollow(player);       // Kamera karakteri izlesin.
 Kodda basit değişken, nesne, dizi, `if` ve döngülerle ilerliyoruz.
 Hareket kodundaki kısa zaman toleransları, kenardan geç basılan veya yere inmeden önce
 basılan zıplamaların algılanması içindir. Hız ve süre sabitleri `player.js` başındadır.
+`movePlayer` sırasıyla girdiyi okur, yatay hızı, zıplamayı, animasyonu ve gövde eğimini günceller.
 Görsel üretim aracı `scripts/build-art.cjs`, yalnızca SVG dosyalarını yeniden üretir;
 oyun kodunu öğrenmek için bu araçtan başlamak gerekmez.
+
+## Kodun görevleri ve Phaser kullanımı
+
+Dosyaları tek seviyede tutuyoruz; her dosyanın belirgin bir görevi var. Yeni sınıf,
+bağımlılık veya karmaşık bir katman sistemi eklenmedi. Bölüm tanımları `level.js`
+içinde veri olarak kalır; yeni bölüm eklemek için ana oyun döngüsü değiştirilmez.
+
+- `GameScene.preload` → `assets.js`: görselleri ve sesleri Phaser Loader'a verir.
+- `GameScene.create` → dünyayı kurar, karakteri oluşturur ve Phaser collider/overlap bağlantılarını yapar.
+- `GameScene.update` → karakter, kamera, düşmanlar, bant, kontrol noktası ve ilerlemeyi günceller.
+- `hazards.js` → devriye, zıplama, öfke ve ses görevleri ayrı kısa fonksiyonlardır.
+- `hud.js` → Phaser Container, Text ve Graphics kullanır. `terrain.js` sabit fizik gruplarını kurar.
+
+Phaser'ın Arcade Physics, animasyon, kamera, tween, ses ve zamanlayıcı sistemlerini
+kullanıyoruz. Hız sınırını `Phaser.Math.Clamp`, yumuşak geçişleri `Phaser.Math.Linear`,
+bant oklarının dolaşımını `Phaser.Math.Wrap` sağlar. Phaser'ın SHUTDOWN ve DESTROY
+olayları hem bölüm değişiminde hem menüye dönüşte giriş/ekran dinleyicilerini temizler.
+
+Zıplama toleransı, kısa/uzun zıplama, buzda fren ve son basılan yönün önceliği
+oyuna özel küçük JavaScript fonksiyonlarıdır. Bunları fizik motoruna bırakmak aynı
+hareket hissini sağlamaz. `rules.js` puan/görev kurallarını, `progress.js` tarayıcı
+kaydını yönetir; bu işler için Phaser'a bağımlılık gerekmez. HTML menüler ve mobil
+butonlar tarayıcı olaylarını kullanır; çoklu dokunma testleri korunur.
 
 ## IntelliJ ile çalıştırma
 
@@ -173,7 +202,7 @@ HTTP kullan; HTML dosyasını çift tıklayarak açma (oyun ES modülleri kullan
 - Abdest alanları eksikse bir can doldurur; her biri bölümde bir kez kullanılabilir. Canlar doluysa hak harcanmaz.
 - Can kazanıldığında 2,2 saniye gülümseme ve karakteri takip eden yıldız parıltıları görünür.
 - Çarpınca yüz 1,5 saniye üzgün olur. İfadeler yürüme ve zıplama sırasında da devam eder.
-- Boyut ayarları: `player.js` içindeki `PLAYER_SCALE` ve `GameScene.js` içindeki `COLLECTIBLE_SCALE`, `ENEMY_SCALE`.
+- Boyut ayarları: `player.js` içindeki `PLAYER_SCALE` ve `GameScene.js` içindeki `COLLECTIBLE_SCALE` ve `hazards.js` içindeki `ENEMY_SCALE`.
 - Dururken sallanma yoktur. Zıplama pozundaki kaldırılmış kol iki karakterde de başın yanında açıkça görünür.
 - Bant sola taşır; bu bir buz sürtünmesi değildir.
 

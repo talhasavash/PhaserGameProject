@@ -7,49 +7,61 @@ import { unlockedLevels } from './progress.js';
 // "import", başka bir dosyanın dışarı açtığı (export) kodu kullanmamızı sağlar.
 const characterForm = document.getElementById('character-form');
 const startButton = document.getElementById('start-button');
-let gameStarted = false;
-let activeGame = null;
 const settingsButton = document.getElementById('settings-button');
 const settingsPanel = document.getElementById('settings-panel');
+const menuButton = document.getElementById('menu-button');
+const levelGrid = document.getElementById('level-grid');
+const fullscreenButton = document.getElementById('fullscreen-button');
+let gameStarted = false;
+let activeGame = null;
+
 function closeSettings() {
     if (!settingsPanel.hidden) settingsButton.click();
 }
-settingsButton.onclick = () => {
+function toggleSettings() {
     const opening = settingsPanel.hidden;
     settingsPanel.hidden = !opening;
     settingsButton.setAttribute('aria-expanded', String(opening));
     settingsButton.setAttribute('aria-label', opening ? 'Oyun menüsünü kapat' : 'Oyun menüsünü aç');
     const scene = activeGame?.scene.getScene('Garden');
     if (scene?.player && !scene.gameState.complete && scene.paused !== opening) scene.togglePause();
-};
-const menuButton = document.getElementById('menu-button');
-const levelGrid = document.getElementById('level-grid');
+}
+
 // Bölüm sayısı değişince menü de aynı veriden oluşur.
-levels.forEach((level, index) => {
-    const label = document.createElement('label');
-    label.className = 'level-option';
-    const input = document.createElement('input');
-    input.type = 'radio'; input.name = 'level'; input.value = index; input.required = true;
-    input.defaultChecked = index === 0;
-    const card = document.createElement('span');
-    card.className = 'level-card';
-    const number = document.createElement('strong');
-    number.textContent = index + 1;
-    if (level.boss) label.classList.add('boss-level');
-    card.append(number); label.append(input, card); levelGrid.append(label);
-});
+function createLevelMenu() {
+    levels.forEach((level, index) => {
+        const label = document.createElement('label');
+        label.className = 'level-option';
+        const input = document.createElement('input');
+        input.type = 'radio';
+        input.name = 'level';
+        input.value = index;
+        input.required = true;
+        input.defaultChecked = index === 0;
+        const card = document.createElement('span');
+        card.className = 'level-card';
+        const number = document.createElement('strong');
+        number.textContent = index + 1;
+        if (level.boss) label.classList.add('boss-level');
+        card.append(number);
+        label.append(input, card);
+        levelGrid.append(label);
+    });
+}
+
 function refreshLevelLocks() {
     const unlocked = unlockedLevels(levels.length);
     for (const input of levelGrid.querySelectorAll('input')) {
-        input.disabled = Number(input.value) >= unlocked;
+        const index = Number(input.value);
+        input.disabled = index >= unlocked;
         input.parentElement.classList.toggle('locked', input.disabled);
-        input.setAttribute('aria-label', `${Number(input.value) + 1}. bölüm${levels[Number(input.value)].boss ? ' · Boss' : ''}${input.disabled ? ' · Kilitli' : ''}`);
+        const bossLabel = levels[index].boss ? ' · Boss' : '';
+        const lockLabel = input.disabled ? ' · Kilitli' : '';
+        input.setAttribute('aria-label', `${index + 1}. bölüm${bossLabel}${lockLabel}`);
     }
 }
-refreshLevelLocks();
-const fullscreenButton = document.getElementById('fullscreen-button');
-fullscreenButton.hidden = !document.documentElement.requestFullscreen;
-fullscreenButton.addEventListener('click', async () => {
+
+async function toggleFullscreen() {
     try {
         if (document.fullscreenElement) await document.exitFullscreen();
         else {
@@ -61,19 +73,19 @@ fullscreenButton.addEventListener('click', async () => {
     } catch {
         document.getElementById('game-status').textContent = 'Bu tarayıcı tam ekrana geçişe izin vermedi.';
     }
-});
-document.addEventListener('fullscreenchange', () => {
+}
+
+function updateFullscreenButton() {
     fullscreenButton.textContent = document.fullscreenElement ? '⤢' : '⛶';
     fullscreenButton.setAttribute('aria-label', document.fullscreenElement ? 'Tam ekrandan çık' : 'Tam ekran');
-});
+}
 
-characterForm.reset();
-characterForm.addEventListener('change', () => {
+function updateStartButton() {
     startButton.disabled = !characterForm.querySelector('input[name="character"]:checked') ||
         !characterForm.querySelector('input[name="level"]:checked');
-});
+}
 
-characterForm.addEventListener('submit', event => {
+function startSelectedGame(event) {
     event.preventDefault();
     const selected = characterForm.querySelector('input[name="character"]:checked');
     const selectedLevel = characterForm.querySelector('input[name="level"]:checked');
@@ -88,7 +100,7 @@ characterForm.addEventListener('submit', event => {
     document.getElementById('toolbar-status').textContent = 'Bahçe hazırlanıyor…';
     menuButton.hidden = false;
     startGame(selected.value, Number(selectedLevel.value));
-});
+}
 
 function startGame(character, levelIndex) {
     const area = document.getElementById('game');
@@ -122,24 +134,37 @@ function startGame(character, levelIndex) {
     });
     observer.observe(area);
     game.events.once(Phaser.Core.Events.DESTROY, () => observer.disconnect());
-    menuButton.onclick = () => {
-        closeSettings();
-        menuButton.disabled = true;
-        game.events.once(Phaser.Core.Events.DESTROY, () => {
-            gameStarted = false;
-            activeGame = null;
-            refreshLevelLocks();
-            document.body.classList.remove('playing');
-            document.getElementById('touch-controls').hidden = true;
-            document.getElementById('game-result').hidden = true;
-            document.getElementById('fall-result').hidden = true;
-            document.getElementById('character-select').hidden = false;
-            document.getElementById('game-stage').classList.add('choosing');
-            for (const id of ['sound-button', 'pause-button', 'restart-button']) document.getElementById(id).disabled = true;
-            menuButton.hidden = true; menuButton.disabled = false;
-            startButton.disabled = false;
-            document.getElementById('character-title').focus();
-        });
-        game.destroy(true);
-    };
+    menuButton.onclick = () => returnToMenu(game);
 }
+
+function returnToMenu(game) {
+    closeSettings();
+    menuButton.disabled = true;
+    game.events.once(Phaser.Core.Events.DESTROY, () => {
+        gameStarted = false;
+        activeGame = null;
+        refreshLevelLocks();
+        document.body.classList.remove('playing');
+        document.getElementById('touch-controls').hidden = true;
+        document.getElementById('game-result').hidden = true;
+        document.getElementById('fall-result').hidden = true;
+        document.getElementById('character-select').hidden = false;
+        document.getElementById('game-stage').classList.add('choosing');
+        for (const id of ['sound-button', 'pause-button', 'restart-button']) document.getElementById(id).disabled = true;
+        menuButton.hidden = true;
+        menuButton.disabled = false;
+        startButton.disabled = false;
+        document.getElementById('character-title').focus();
+    });
+    game.destroy(true);
+}
+
+createLevelMenu();
+refreshLevelLocks();
+characterForm.reset();
+characterForm.addEventListener('change', updateStartButton);
+characterForm.addEventListener('submit', startSelectedGame);
+settingsButton.onclick = toggleSettings;
+fullscreenButton.hidden = !document.documentElement.requestFullscreen;
+fullscreenButton.addEventListener('click', toggleFullscreen);
+document.addEventListener('fullscreenchange', updateFullscreenButton);

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { updateHazards } from '../src/hazards.js';
+import { updateHazards } from '../src/gameplay/hazards.js';
 
 function hazardForTest(overrides = {}) {
     const patrol = { type: 'fox', minX: 100, maxX: 200, speed: 80, direction: 1, baseY: 480, ...overrides };

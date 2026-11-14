@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readDirection, movePlayer, currentExpression, showPlayerExpression, showRecovery, updatePlayerEffects } from '../src/player.js';
+import { readDirection, movePlayer, currentExpression, showPlayerExpression, showRecovery, updatePlayerEffects } from '../src/gameplay/player.js';
 
 globalThis.Phaser = { Math: { Linear: (start, end, amount) => start + (end - start) * amount, Clamp: (value, min, max) => Math.max(min, Math.min(max, value)) } };
 

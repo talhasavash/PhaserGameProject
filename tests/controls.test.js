@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { bindTouchControls } from '../src/controls.js';
+import { bindTouchControls } from '../src/gameplay/controls.js';
 
 function fixture(nativeTouch = false) {
     const root = new EventTarget();

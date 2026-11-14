@@ -1,4 +1,4 @@
-import { FRUIT_TYPES } from './rules.js';
+import { FRUIT_TYPES } from '../gameplay/rules.js';
 
 // Aynı boyutta yüklenen SVG'ler birlikte listelenir. Boyutlar fizik kutusu değildir.
 const IMAGE_GROUPS = [

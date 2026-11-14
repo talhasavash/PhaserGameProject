@@ -1,16 +1,16 @@
-import { levels } from './level.js';
+import { levels } from '../world/level.js';
 import { createGameState, isKeyReady, recordFruit, takeKey, finishLevel, healAtFountain } from './rules.js';
 import { createPlayer, movePlayer, resetPlayerMovement, showPlayerExpression, showRecovery, updatePlayerEffects } from './player.js';
-import { createScenery, createMosque, createFountain } from './background.js';
+import { createScenery, createMosque, createFountain } from '../world/background.js';
 import { bindTouchControls } from './controls.js';
 import { createFireRain, updateFireRain } from './fireRain.js';
-import { unlockNext } from './progress.js';
-import { verses } from './verses.js';
+import { unlockNext } from '../data/progress.js';
+import { verses } from '../data/verses.js';
 import { resetBossRage } from './boss.js';
-import { createTerrain } from './terrain.js';
+import { createTerrain } from '../world/terrain.js';
 import { createHazards, updateHazards } from './hazards.js';
-import { createHud, centerHud, updateHud, updateProgress } from './hud.js';
-import { loadGameAssets } from './assets.js';
+import { createHud, centerHud, updateHud, updateProgress } from '../ui/hud.js';
+import { loadGameAssets } from '../data/assets.js';
 
 const COLLECTIBLE_SCALE = 0.75;
 const ITEM_MESSAGES = {

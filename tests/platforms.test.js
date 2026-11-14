@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createPlatformArt, platformThemes } from '../src/platforms.js';
-import { levels } from '../src/level.js';
+import { createPlatformArt, platformThemes } from '../src/world/platforms.js';
+import { levels } from '../src/world/level.js';
 
 test('Every chapter has a platform skin, and cached steps use one small image per platform', () => {
     const textures = new Map();

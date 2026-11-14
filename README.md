@@ -26,7 +26,7 @@ oyun oranı korunur, görüntü esnetilmez. Yatay mobilde oyun bütün ekranı k
 düğmeler karakterin altında kalan toprak alanındadır. Dikey telefonda görüntü oranı korunur.
 Yatay telefonda 600 yerine 320 dünya birimi yükseklik gösterilir; üst/alt şeritler de
 kaldırıldığı için karakter ve nesneler daha büyük görünür. Tablet görünümü 480 birimdir.
-Bu değerler `src/view.js` içindedir. Kamera zemine göre sabittir; zıplarken dikey kaymaz.
+Bu değerler `src/ui/view.js` içindedir. Kamera zemine göre sabittir; zıplarken dikey kaymaz.
 Bölüm numarası/can/yıldız/anahtar/puan bilgileri ince bir üst satırdadır.
 Üst satır ekran genişliğinin yaklaşık %63'ünü kaplar. Küçük nota düğmesi sesleri açıp kapatır.
 Zıplama, toplama, çarpma, can yenileme ve anahtar alma kısa ses efektleri kullanır.
@@ -68,25 +68,29 @@ fizik gövdesini zamana göre hareket ettiren Phaser'dır.
 PhaserGameProject/
 ├── index.html             Sayfa; Phaser'ı ve src/game.js dosyasını yükler
 ├── css/style.css          Sayfanın görünümü
-├── src/                   Yazdığımız aktif oyun kodu: alt klasör yok
-│   ├── game.js            Giriş noktası, ekran ve fizik ayarları
-│   ├── GameScene.js       Phaser ekranı; kurulum, temaslar ve bölüm geçişi
-│   ├── assets.js          Phaser Loader ile görsel ve ses yükleme listeleri
-│   ├── terrain.js         Zemin, gerçek çukurlar, buz ve platform gövdeleri
-│   ├── hazards.js         Düşman oluşturma, devriye ve muhafız hareketleri
-│   ├── hud.js             Bölüm numarası, can, görev, puan ve ilerleme çubuğu
-│   ├── player.js          Karakter oluşturma, yürüme ve zıplama
-│   ├── controls.js        Çoklu dokunma, bırakma ve odak kaybı yönetimi
-│   ├── view.js            Telefon/tablet ekranına uygun dünya boyutu
-│   ├── level.js           Platform, meyve ve düşman konumları
-│   ├── platforms.js       Bölüme özel basamak çizimleri ve doku önbelleği
-│   ├── rules.js           Puan, can, elma, anahtar ve bitiş kuralları
-│   ├── progress.js        Tarayıcıda açılan bölümleri saklama
-│   ├── fireRain.js        Seyrek düşen ateş topları ve beyaz gölge uyarısı
-│   ├── boss.js            Büyük muhafızların zıplama yayı
-│   ├── chapterScenery.js  Yeni ortamların önbelleğe alınan arka planları
-│   ├── verses.js          Sonuç kartlarındaki ayet alıntıları ve kaynak verileri
-│   └── background.js      Arka plan, ağaç, bulut ve tabela çizimleri
+├── src/
+│   ├── game.js                 Giriş noktası, menü, ekran ve fizik ayarları
+│   ├── gameplay/               Oyun davranışları
+│   │   ├── GameScene.js         Phaser sahnesi; kurulum ve bölüm akışı
+│   │   ├── player.js            Karakter, hızlanma, zıplama ve animasyon
+│   │   ├── controls.js          Mobil çoklu dokunma
+│   │   ├── rules.js             Puan, can ve görev kuralları
+│   │   ├── hazards.js           Düşman oluşturma ve hareketleri
+│   │   ├── boss.js              Muhafız zıplaması ve öfkesi
+│   │   └── fireRain.js          Ateş topları ve gölge uyarısı
+│   ├── world/                  Bölümler ve ortam
+│   │   ├── level.js             Bölüm tanımları ve nesne konumları
+│   │   ├── terrain.js           Zemin, çukurlar, buz ve platform gövdeleri
+│   │   ├── platforms.js         Bölüme özel basamak çizimleri
+│   │   ├── background.js        Arka plan, cami ve abdest alanı çizimleri
+│   │   └── chapterScenery.js    Diğer ortamların arka planları
+│   ├── ui/
+│   │   ├── hud.js               Bölüm numarası, can, görev ve puan
+│   │   └── view.js              Telefon/tablet için dünya boyutu
+│   └── data/
+│       ├── assets.js            Phaser Loader görsel ve ses listeleri
+│       ├── progress.js          Tarayıcıda bölüm ilerlemesini saklama
+│       └── verses.js            Sonuç kartlarındaki ayet verileri
 ├── assets/
 │   ├── images/            Oyunun kullandığı SVG görseller
 │   └── legacy/            Özgün projeden korunan, şu an yüklenmeyen görsel ve sesler
@@ -109,11 +113,11 @@ Eski görsel ve sesler silinmedi; `assets/legacy` içinde korundu. Oyun bu klas�
 
 1. **index.html:** İki script'e bak. Önce Phaser, ardından `src/game.js` yüklenir.
 2. **src/game.js:** `new Phaser.Game(...)` oyunu başlatır. Boyut, yerçekimi ve kullanılacak ekran burada seçilir.
-3. **src/GameScene.js:** Önce `preload`, `create` ve `update` fonksiyonlarına bak. Bunlar görevleri küçük fonksiyonlara dağıtır.
-4. **src/player.js:** Tuş okumadan hız vermeye kadar hareket kodunu takip et.
-5. **src/level.js:** Bir platformun veya meyvenin `x`, `y` değerini değiştirip sonucu gör.
-6. **src/rules.js:** Meyve toplanınca puanın ve görev durumunun nasıl değiştiğini incele.
-7. **src/background.js:** Görünümü değiştirmek istediğinde bak.
+3. **src/gameplay/GameScene.js:** Önce `preload`, `create` ve `update` fonksiyonlarına bak. Bunlar görevleri küçük fonksiyonlara dağıtır.
+4. **src/gameplay/player.js:** Tuş okumadan hız vermeye kadar hareket kodunu takip et.
+5. **src/world/level.js:** Bir platformun veya meyvenin `x`, `y` değerini değiştirip sonucu gör.
+6. **src/gameplay/rules.js:** Meyve toplanınca puanın ve görev durumunun nasıl değiştiğini incele.
+7. **src/world/background.js:** Görünümü değiştirmek istediğinde bak.
 
 ### Phaser'ın üç temel aşaması
 
@@ -144,9 +148,14 @@ basılan zıplamaların algılanması içindir. Hız ve süre sabitleri `player.
 Görsel üretim aracı `scripts/build-art.cjs`, yalnızca SVG dosyalarını yeniden üretir;
 oyun kodunu öğrenmek için bu araçtan başlamak gerekmez.
 
+Yayın betiği `src` altındaki klasörleri de dolaşır; `./` ve `../` importlarına aynı
+commit sürümünü ekler. Eski klasör düzeninden kalan dosyalar yalnızca üretilen
+`dist/src` içinde temizlenir. `tests/build-site.test.js` yayın kopyasının importlarını,
+sürüm bilgisini ve kaynak dosyaların değişmediğini kontrol eder.
+
 ## Kodun görevleri ve Phaser kullanımı
 
-Dosyaları tek seviyede tutuyoruz; her dosyanın belirgin bir görevi var. Yeni sınıf,
+Dosyalar gameplay, world, ui ve data klasörlerinde görevlerine göre gruplanır. Yeni sınıf,
 bağımlılık veya karmaşık bir katman sistemi eklenmedi. Bölüm tanımları `level.js`
 içinde veri olarak kalır; yeni bölüm eklemek için ana oyun döngüsü değiştirilmez.
 
@@ -235,7 +244,7 @@ kartında görünür. Ayrı bir okuma ekranı veya görünür kaynak bağlantıs
 Kart kendiliğinden kapanmaz; Sonraki bölüm veya Enter ile ilerlenir. 11'in sonunda
 Ana ekrana dön görünür; düğme veya Enter bölüm seçimine döndürür, 1. bölümü
 kendiliğinden başlatmaz. Açılan bölümler korunur. Kaynak ve sure/ayet numaraları denetlenebilmesi için
-`src/verses.js` içinde saklanır; Diyanet meallerinden kısa alıntılar kullanılır.
+`src/data/verses.js` içinde saklanır; Diyanet meallerinden kısa alıntılar kullanılır.
 Üç nokta ayetin yalnızca bir kısmının alındığını gösterir.
 
 `GameScene` bütün bölümlerde aynıdır. Phaser `init(data)` ile bölüm numarası ve

@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
-import { loadGameAssets } from '../src/assets.js';
-import { levels } from '../src/level.js';
+import { loadGameAssets } from '../src/data/assets.js';
+import { levels } from '../src/world/level.js';
 
 test('Both characters load existing assets and every chapter item and enemy has a texture', () => {
     for (const character of ['boy', 'girl']) {

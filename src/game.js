@@ -1,7 +1,7 @@
-import { GameScene } from './GameScene.js';
-import { gameView } from './view.js';
-import { levels } from './level.js';
-import { unlockedLevels } from './progress.js';
+import { GameScene } from './gameplay/GameScene.js';
+import { gameView } from './ui/view.js';
+import { levels } from './world/level.js';
+import { unlockedLevels } from './data/progress.js';
 
 // Önce HTML formundan karakter seçilir; ardından Phaser başlatılır.
 // "import", başka bir dosyanın dışarı açtığı (export) kodu kullanmamızı sağlar.

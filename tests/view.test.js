@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { gameView } from '../src/view.js';
+import { gameView } from '../src/ui/view.js';
 
 test('Landscape phone fills its game area with a closer, undistorted view', () => {
     const view = gameView(873, 393, true);

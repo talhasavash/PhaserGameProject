@@ -1,11 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createGameState, recordFruit, takeKey } from '../src/rules.js';
-import { garden, courtyard, levels } from '../src/level.js';
+import { createGameState, recordFruit, takeKey } from '../src/gameplay/rules.js';
+import { garden, courtyard, levels } from '../src/world/level.js';
 
 // Exercise scene transitions without requiring WebGL in Node.
 globalThis.Phaser = { Scene: class {} };
-const { GameScene } = await import('../src/GameScene.js');
+const { GameScene } = await import('../src/gameplay/GameScene.js');
 
 test('Selecting a numbered level starts that scene directly', () => {
     const scene = new GameScene('boy', 1);

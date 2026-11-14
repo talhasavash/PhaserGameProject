@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { levels, worlds, worldForLevel, chapterNumber, bossGate } from '../src/world/level.js';
 import { readUnlocked, unlockNext } from '../src/data/progress.js';
-import { columnFrame, columnTiming, prepareColumn, RAISED_BOTTOM, CLOSED_BOTTOM } from '../src/gameplay/columns.js';
+import { columnFrame, columnTiming, prepareColumn, visibleColumn, RAISED_BOTTOM, CLOSED_BOTTOM } from '../src/gameplay/columns.js';
 
 test('World 0 keeps its old indexes and boss; World 1 restarts chapter numbering', () => {
     assert.deepEqual(worlds.map(world => [world.id, world.start, world.count]), [[0, 0, 11], [1, 11, 3]]);
@@ -100,4 +100,17 @@ test('Every column has a fair walk-under window, a safe waiting area and an unju
     assert.notEqual(columnFrame(2400, presses[0]).state, columnFrame(2400, presses[1]).state);
     assert.ok(levels[12].belts.some(belt => belt.speed > 0));
     assert.ok(levels[12].belts.some(belt => belt.speed < 0));
+});
+
+test('Raised columns remain visible above the player on phones without changing their speed', () => {
+    for (const height of [320, 480, 600]) {
+        for (const raisedBottom of [140, 150, 210, 270, 340]) {
+            const original = { raisedBottom, openMs: 2100 };
+            const visible = visibleColumn(original, height);
+            assert.ok(visible.raisedBottom >= 600 - height + 50);
+            assert.ok(CLOSED_BOTTOM - visible.raisedBottom >= 100);
+            assert.deepEqual(columnTiming(visible), columnTiming(original));
+            assert.equal(original.raisedBottom, raisedBottom);
+        }
+    }
 });

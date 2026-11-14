@@ -134,6 +134,7 @@ function startSelectedGame(event) {
 }
 
 function startGame(character, levelIndex) {
+    document.body.dataset.character = character;
     const area = document.getElementById('game');
     const touchLayout = matchMedia('(any-pointer: coarse), (max-width: 1024px)');
     function view() { return gameView(area.clientWidth, area.clientHeight, touchLayout.matches); }

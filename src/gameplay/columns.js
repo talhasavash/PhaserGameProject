@@ -14,6 +14,14 @@ export function prepareColumn(definition, random = Math.random) {
     return { ...definition, raisedBottom };
 }
 
+// Telefon kamerası dünyanın üstünü kırpar. Presin alt ucu beklerken de görünür kalsın.
+export function visibleColumn(definition, viewHeight, groundY = CLOSED_BOTTOM) {
+    const top = Math.max(0, 600 - viewHeight);
+    const original = definition.raisedBottom ?? RAISED_BOTTOM;
+    const visibleBottom = top + 56 + Math.max(0, original - 140) * 0.25;
+    return { ...definition, raisedBottom: Math.min(groundY - 100, Math.max(original, visibleBottom)) };
+}
+
 // Oyun saati durunca kolon da durur. Bölüm yeniden kurulunca fazı sıfırlanır.
 export function columnFrame(elapsed, column) {
     const timing = columnTiming(column);
@@ -56,7 +64,7 @@ export function createColumns(scene) {
     }
     for (const source of definitions) {
         const definition = prepareColumn(source);
-        const frame = columnFrame(0, definition);
+        const frame = columnFrame(0, visibleColumn(definition, scene.scale.height, scene.level.groundY));
         const column = scene.columns.create(definition.x, frame.bottom - COLUMN_HEIGHT / 2, key).setDepth(13);
         column.setScale(definition.width / 80, 1);
         column.body.setSize(80, COLUMN_HEIGHT);
@@ -68,7 +76,7 @@ export function createColumns(scene) {
 export function updateColumns(scene) {
     for (const column of scene.columns.getChildren()) {
         const data = column.getData('column');
-        const frame = columnFrame(scene.elapsed, data.definition);
+        const frame = columnFrame(scene.elapsed, visibleColumn(data.definition, scene.scale.height, scene.level.groundY));
         column.body.reset(data.definition.x, frame.bottom - COLUMN_HEIGHT / 2);
         data.lamp.setPosition(column.x, frame.bottom - 14);
         data.lamp.setFillStyle(frame.state === 'open' ? 0x91dfb1 : 0xffa66b);

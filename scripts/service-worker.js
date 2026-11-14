@@ -21,16 +21,18 @@ self.addEventListener('fetch', event => {
     const url = new URL(event.request.url);
     if (event.request.method !== 'GET' || url.origin !== APP_ROOT.origin || !url.pathname.startsWith(APP_ROOT.pathname)) return;
     event.respondWith((async () => {
-        const cache = await caches.open(CACHE_NAME);
+        const cache = await caches.open(CACHE_NAME).catch(() => null);
         // Çevrimiçiyken her açılışta güncel yayın; bağlantı yoksa son kayıt.
         try {
-            const response = await fetch(event.request, { cache: 'no-store' });
-            if (response.ok) await cache.put(event.request, response.clone());
+            const response = await fetch(event.request, { cache: 'no-store', signal: AbortSignal.timeout(event.request.mode === 'navigate' ? 4000 : 15000) });
+            if (!response.ok && event.request.mode === 'navigate') throw new Error('Navigation failed');
+            // Depolama doluysa bile çevrimiçi yanıtı kullanabiliriz.
+            if (response.ok && cache) await cache.put(event.request, response.clone()).catch(() => {});
             return response;
         } catch {
-            const saved = await cache.match(event.request);
+            const saved = await cache?.match(event.request);
             if (saved) return saved;
-            if (event.request.mode === 'navigate') return (await cache.match(new URL('index.html', APP_ROOT))) || Response.error();
+            if (event.request.mode === 'navigate') return (await cache?.match(new URL('index.html', APP_ROOT))) || Response.error();
             return Response.error();
         }
     })());

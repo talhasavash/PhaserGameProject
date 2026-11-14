@@ -4,7 +4,7 @@
   "short_name": "Meyve Bahçesi",
   "description": "Çocuklar için meyve toplama ve keşif oyunu.",
   "lang": "tr",
-  "start_url": "./",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "landscape",

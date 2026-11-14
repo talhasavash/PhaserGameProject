@@ -46,7 +46,7 @@ test('Published modules resolve across folders, share a version, and leave sourc
     assert.ok(assets.includes('assets/images/${key}.svg?v=1234567'));
     assert.ok(assets.includes('assets/audio/${key}.wav?v=1234567'));
     const manifest = JSON.parse(fs.readFileSync(path.join(root, 'dist/manifest.webmanifest'), 'utf8'));
-    assert.equal(manifest.start_url, './');
+    assert.equal(manifest.start_url, './index.html');
     assert.equal(manifest.scope, './');
     assert.equal(manifest.display, 'standalone');
     for (const icon of manifest.icons) {

@@ -398,6 +398,9 @@ Ana ekran simgesiyle açıldığında adres çubuğu olmadan çalışır. Yatay 
 manifestte belirtilir; uygulanması tarayıcıya bağlıdır.
 
 `manifest.webmanifest` uygulama adını, simgeleri ve göreli yayın yolunu tanımlar.
+Başlangıç adresi doğrudan `./index.html` dosyasıdır; uygulama kimliği `./` olarak
+korunur. Sayfa isteği dört saniyede sonuçlanmazsa kayıtlı açılış sayfası kullanılır.
+Önbelleğe yazılamaması, başarılı bir çevrimiçi açılışı engellemez.
 `src/ui/pwa.js` kurulumu ve service worker kaydını yönetir. `scripts/service-worker.js`
 yayın sırasında `dist/sw.js` olur; bütün oyun kaynakları ilk çevrimiçi açılışta
 önbelleğe alınır. İndirme tamamlandıktan sonra internet olmadan da oynanabilir.

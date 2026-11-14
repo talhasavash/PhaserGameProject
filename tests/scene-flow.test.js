@@ -92,9 +92,9 @@ test('Every mosque celebrates before showing a result; only Continue starts the 
         assert.equal(elements.get('play-again').hidden, !final);
         assert.equal(elements.get(final ? 'play-again' : 'next-level').focused, true);
         if (index === 10) {
-            assert.equal(elements.get('result-title').textContent, 'World 0 tamamlandı!');
-            assert.equal(elements.get('next-level').textContent, "World 1'e geç →");
-            assert.match(elements.get('result-message').textContent, /World 1 açıldı/);
+            assert.equal(elements.get('result-title').textContent, 'Dünya 0 tamamlandı!');
+            assert.equal(elements.get('next-level').textContent, "Dünya 1'e geç →");
+            assert.match(elements.get('result-message').textContent, /Dünya 1 açıldı/);
         }
         GameScene.prototype.continueAfterResult.call(scene);
         GameScene.prototype.continueAfterResult.call(scene);

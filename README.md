@@ -270,13 +270,13 @@ HTTP kullan; HTML dosyasını çift tıklayarak açma (oyun ES modülleri kullan
 
 ## Dünyalar ve bölüm akışı
 
-World 0 mevcut 11 bölümü, World 1 yeni üç bölümü içerir. Ana menüde önce dünya,
-sonra o dünyadaki bölüm seçilir. World 1 başlangıçta kilitlidir; World 0 boss
+Dünya 0 mevcut 11 bölümü, Dünya 1 yeni üç bölümü içerir. Ana menüde önce dünya,
+sonra o dünyadaki bölüm seçilir. Dünya 1 başlangıçta kilitlidir; Dünya 0 boss
 bölümü tamamlanınca açılır. Bölüm numaraları her dünyada yeniden 1’den başlar;
-HUD üzerinde W0·11, W1·1 gibi görünür.
+HUD üzerinde D0·11, D1·1 gibi görünür. Menüde dünya/bölüm adları yerine yalnızca numaralar gösterilir.
 
-Başlangıçta yalnızca World 0 / 1 açıktır; her bölüm bitince sonraki açılır. Ana ekranda yalnızca
-numaralar görünür. World 0'ın 11. bölümü altın renkli özel bir çemberdir. Menü `levels` dizisinden
+Başlangıçta yalnızca Dünya 0 / 1 açıktır; her bölüm bitince sonraki açılır. Ana ekranda yalnızca
+numaralar görünür. Dünya 0'ın 11. bölümü altın renkli özel bir çemberdir. Menü `levels` dizisinden
 üretilir. `progress.js` açılan bölüm sayısını `localStorage` içinde saklar. Önceden
 4 bölüm açmış bir tarayıcı yeni sürümde de 4'ten devam eder; kayıt silinmez.
 Tarayıcı verileri silinirse ilerleme sıfırlanır; farklı cihazlara eşitlenmez.
@@ -295,31 +295,34 @@ Tarayıcı verileri silinirse ilerleme sıfırlanır; farklı cihazlara eşitlen
 | 10 | Bayram bahçesi; önceki engellerin birleşimi ve daralan geçişler |
 | 11 | Boss; büyük zıplayan muhafızların altından geçerek son camiye ulaşma |
 
-World 1'in bölümleri farklı geçişler ve yeni düşmanlar sunar:
+Dünya 1'in bölümleri farklı geçişler ve yeni düşmanlar sunar:
 
-| World 1 bölümü | Ortam ve oynanış |
+| Dünya 1 bölümü | Ortam ve oynanış |
 | --- | --- |
 | 1 · Lav Vadisi | Lav boşlukları, semenderler, inip yükselen taş kolonlar ve ışıklı çıkış geçidi |
 | 2 · Mekanik Fabrika | Ters yönlü bantlar, robotlar, fazları farklı presler ve asansör çıkışı |
 | 3 · Kara Kale | Dar koridorlar, zırhlı böcekler, yarasalar, kolon çiftleri ve yükselen kale kapısı |
 
-Kolonlar fizik gövdesine sahiptir; tavana kadar uzanırlar. Açıkken alttaki boşluk
-yürümeye yeter ama zıplayan karakter kolona çarpar. İnişten önce 650 ms parlak
-zemin izi görülür. Kolon hızlı iner, yerde bekler ve yavaşça yükselir. Açık süre,
-genişlik ve başlangıç fazı bölüm verisindedir. Oyun saati durunca kolonlar da durur;
+Kolonlar fizik gövdesine sahiptir ve tavana kadar uzanır; üstlerinden atlanamaz.
+Başlangıç yüksekliği her denemede bir kez rastgele seçilir (140–340 aralığı);
+oyun sırasında kare kare değişmez. Kolon altında gölge veya zemin uyarısı yoktur.
+İnişten önce yalnızca kolonun üzerindeki ışık yanıp söner. İniş 220 ms, yerde
+bekleme 750 ms ve yükselme 900 ms sürer. Fabrikanın ilk geçidinde beş kolon
+430 ms aralıklarla soldan sağa sırayla iner. Aralarında bekleme boşluğu vardır.
+Açık süre, genişlik, yükseklik aralığı ve başlangıç gecikmesi bölüm verisindedir. Oyun saati durunca kolonlar da durur;
 bölüm yeniden başlayınca zamanlama sıfırlanır. Fabrikadaki bantlar iki yönde de
 çalışır. Bu davranışlar Phaser collider/overlap ve fizik gövdeleriyle uygulanır.
 
-Eski kayıt anahtarı ve World 0 indisleri korunur. Önceden 11. bölüme ulaşmış bir
-kullanıcı World 1'i açmak için boss'u tamamlar; açılan eski bölümler kapanmaz.
+Eski kayıt anahtarı ve Dünya 0 indisleri korunur. Önceden 11. bölüme ulaşmış bir
+kullanıcı Dünya 1'i açmak için boss'u tamamlar; açılan eski bölümler kapanmaz.
 
 Her bölümde 3 görev yıldızı bulunur. Diğer nesneler sadece puan verir. Anahtar
 alınınca cami, geçit, asansör veya kale kapısı açılır ve giriş aydınlanır. Çıkışa ulaşınca çocuk
 önce 1,2 saniye yıldızlarla parlar, sonra tamamlanma mesajı ve kısa ayet aynı sonuç
 kartında görünür. Ayrı bir okuma ekranı veya görünür kaynak bağlantısı yoktur.
-Kart kendiliğinden kapanmaz; Sonraki bölüm veya Enter ile ilerlenir. World 0 / 11
-sonunda World 1’e geç düğmesi çıkar; aynı sahne yeni dünyanın verileriyle kurulur.
-World 1 / 3 sonunda Ana ekrana dön görünür; düğme veya Enter bölüm seçimine döndürür, 1. bölümü
+Kart kendiliğinden kapanmaz; Sonraki bölüm veya Enter ile ilerlenir. Dünya 0 / 11
+sonunda Dünya 1’e geç düğmesi çıkar; aynı sahne yeni dünyanın verileriyle kurulur.
+Dünya 1 / 3 sonunda Ana ekrana dön görünür; düğme veya Enter bölüm seçimine döndürür, 1. bölümü
 kendiliğinden başlatmaz. Açılan bölümler korunur. Kaynak ve sure/ayet numaraları denetlenebilmesi için
 `src/data/verses.js` içinde saklanır; Diyanet meallerinden kısa alıntılar kullanılır.
 Üç nokta ayetin yalnızca bir kısmının alındığını gösterir.
@@ -373,7 +376,7 @@ başladıktan sonra yer değiştirmez. Başlangıç, abdest alanları, kontrol n
 Sağ üstteki ☰ ayar panelini açınca oyun duraklar. Ses, tam ekran, yeniden başlatma
 ve bölüm seçimi buradadır. Devam et ile oyun sürer. Yönler saydam üçgen,
 zıplama saydam dairedir. Yönler sol alt kenara bitişik ve aralıksız, zıplama sağ
-alt kenara sabittir; telefonun güvenli ekran boşlukları korunur. İki parmakla yön
+alt kenara sabittir; yön üçgenleri daha dar, yüksek ve yuvarlaktır; telefonun güvenli ekran boşlukları korunur. İki parmakla yön
 ve zıplama bağımsız kullanılabilir.
 Zıplama basış süresine bağlıdır; erken bırakma kısa, basılı tutma yüksek zıplamadır.
 

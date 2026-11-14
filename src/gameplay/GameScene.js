@@ -73,7 +73,7 @@ export class GameScene extends Phaser.Scene {
         this.bindPageControls();
         this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.shutdownScene, this);
         this.events.once(Phaser.Scenes.Events.DESTROY, this.shutdownScene, this);
-        this.announce(`World ${worldForLevel(this.levelIndex).id} · ${chapterNumber(this.levelIndex)}. bölüm: ${this.level.name}. Üç yıldızı bul, anahtarı al ve ${this.level.exitLabel || 'camiye'} ulaş.`);
+        this.announce(`Dünya ${worldForLevel(this.levelIndex).id} · ${chapterNumber(this.levelIndex)}. bölüm: ${this.level.name}. Üç yıldızı bul, anahtarı al ve ${this.level.exitLabel || 'camiye'} ulaş.`);
         this.updateHud();
     }
 
@@ -306,9 +306,9 @@ export class GameScene extends Phaser.Scene {
         const nextWorld = final ? null : worldForLevel(this.levelIndex + 1);
         const newWorld = nextWorld && nextWorld.id !== world.id;
         document.getElementById('result-eyebrow').textContent = final ? 'OYUN TAMAMLANDI' : 'BÖLÜM TAMAMLANDI';
-        document.getElementById('result-title').textContent = final ? 'Tebrikler!' : newWorld ? `World ${world.id} tamamlandı!` : `${chapterNumber(this.levelIndex)}. bölümü bitirdiniz!`;
-        document.getElementById('result-message').textContent = final ? 'Bütün dünyaları bitirdiniz.' : newWorld ? `World ${nextWorld.id} açıldı: ${nextWorld.title}.` : `${chapterNumber(this.levelIndex) + 1}. bölüm artık açık.`;
-        document.getElementById('next-level').textContent = newWorld ? `World ${nextWorld.id}'e geç →` : 'Sonraki bölüm →';
+        document.getElementById('result-title').textContent = final ? 'Tebrikler!' : newWorld ? `Dünya ${world.id} tamamlandı!` : `${chapterNumber(this.levelIndex)}. bölümü bitirdiniz!`;
+        document.getElementById('result-message').textContent = final ? 'Bütün dünyaları bitirdiniz.' : newWorld ? `Dünya ${nextWorld.id} açıldı.` : `${chapterNumber(this.levelIndex) + 1}. bölüm artık açık.`;
+        document.getElementById('next-level').textContent = newWorld ? `Dünya ${nextWorld.id}'e geç →` : 'Sonraki bölüm →';
         document.getElementById('result-verse').textContent = verses[this.levelIndex].text;
         document.getElementById('result-score').textContent = `${this.gameState.score} puan`;
         document.getElementById('next-level').hidden = final;

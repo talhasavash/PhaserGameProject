@@ -29,21 +29,21 @@ export const lavaValley = chapter({
     ],
     gaps: [{ x: 1260, width: 110 }, { x: 2530, width: 115 }, { x: 3500, width: 110 }],
     columns: [
-        { x: 760, width: 72, openMs: 2400, offset: 0 },
-        { x: 1840, width: 80, openMs: 2100, offset: 1100 },
-        { x: 2820, width: 88, openMs: 1900, offset: 2100 }
+        { x: 760, width: 72, openMs: 2400, offset: 0, raisedRange: [150, 210] },
+        { x: 1840, width: 80, openMs: 2100, offset: 1100, raisedRange: [270, 330] },
+        { x: 2820, width: 88, openMs: 1900, offset: 2100, raisedRange: [170, 240] }
     ]
 });
 
 export const mechanicalFactory = chapter({
     name: 'Mekanik Fabrika', theme: 'factory', width: 4800, exitLabel: 'asansöre',
     checkpoint: { x: 2700, y: 480 },
-    platforms: [{ x: 1400, y: 430, width: 120 }, { x: 3580, y: 430, width: 150 }, { x: 3790, y: 430, width: 130 }],
+    platforms: [{ x: 1580, y: 430, width: 120 }, { x: 3580, y: 430, width: 150 }, { x: 3790, y: 430, width: 130 }],
     fruits: [
-        { id: 'star-1', type: 'star', x: 1190, y: 480 },
+        { id: 'star-1', type: 'star', x: 1510, y: 480 },
         { id: 'star-2', type: 'star', x: 2500, y: 480 },
         { id: 'star-3', type: 'star', x: 3850, y: 394 },
-        { id: 'fruit-1', type: 'pear', x: 1450, y: 394 },
+        { id: 'fruit-1', type: 'pear', x: 1640, y: 394 },
         { id: 'fruit-2', type: 'banana', x: 2830, y: 480 },
         { id: 'fruit-3', type: 'apple', x: 3640, y: 394 },
         { id: 'bead-1', type: 'bead', x: 1800, y: 480 },
@@ -57,8 +57,11 @@ export const mechanicalFactory = chapter({
     belts: [{ x: 520, width: 650, speed: 70 }, { x: 2050, width: 470, speed: -80 }, { x: 3020, width: 360, speed: 95 }],
     gaps: [{ x: 1870, width: 110 }, { x: 3410, width: 120 }],
     columns: [
-        { x: 760, width: 72, openMs: 2100, offset: 0 },
-        { x: 990, width: 72, openMs: 2100, offset: 1600 },
+        // Aynı çevrim, 430 ms aralıklı başlangıç: soldan sağa bir pres dalgası.
+        ...[700, 870, 1040, 1210, 1380].map((x, index) => ({
+            x, width: 72, openMs: 2100, startDelay: index * 430,
+            raisedRange: index % 2 === 0 ? [140, 220] : [270, 340]
+        })),
         { x: 2250, width: 88, openMs: 1900, offset: 700 },
         { x: 3150, width: 88, openMs: 1800, offset: 2300 }
     ]

@@ -49,7 +49,6 @@ function createLevelMenu(preferredIndex) {
     const world = worlds[selectedWorld];
     levelGrid.replaceChildren();
     levelGrid.dataset.world = world.id;
-    document.getElementById('world-title').textContent = `${world.title} · ${world.count} bölüm`;
     levels.slice(world.start, world.start + world.count).forEach((level, localIndex) => {
         const index = world.start + localIndex;
         const label = document.createElement('label');
@@ -78,8 +77,8 @@ function refreshLevelLocks() {
         const world = worlds[Number(button.dataset.world)];
         button.disabled = world.start >= unlocked;
         button.setAttribute('aria-pressed', String(world.id === selectedWorld));
-        button.textContent = `World ${world.id}${button.disabled ? ' 🔒' : ''}`;
-        button.setAttribute('aria-label', `World ${world.id}${button.disabled ? ' · World 0 tamamlanınca açılır' : ''}`);
+        button.textContent = `Dünya ${world.id}${button.disabled ? ' 🔒' : ''}`;
+        button.setAttribute('aria-label', `Dünya ${world.id}${button.disabled ? ' · Dünya 0 tamamlanınca açılır' : ''}`);
     }
     for (const input of levelGrid.querySelectorAll('input')) {
         const index = Number(input.value);

@@ -19,7 +19,7 @@ export function createHud(scene) {
     };
     scene.hud.add(bg);
     scene.hud.add(scene.add.rectangle(31, 14, 54, 20, 0xedd59c).setRounded(5).setScrollFactor(0).setDepth(101));
-    label(31, 7, `W${worldForLevel(scene.levelIndex).id}·${chapterNumber(scene.levelIndex)}`, 12).setOrigin(0.5, 0).setColor('#684b23');
+    label(31, 7, `D${worldForLevel(scene.levelIndex).id}·${chapterNumber(scene.levelIndex)}`, 12).setOrigin(0.5, 0).setColor('#684b23');
     scene.heartsText = label(70, 5, '', 16);
     scene.hud.add(scene.add.image(146, 14, 'star').setDisplaySize(15, 15).setScrollFactor(0).setDepth(101));
     scene.starText = label(162, 6, '', 14);

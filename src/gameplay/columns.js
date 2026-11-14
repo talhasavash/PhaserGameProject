@@ -1,29 +1,38 @@
 // Kolon tavana kadar uzanır. Yükseldiğinde altından yürünür; üstünden atlanamaz.
 const COLUMN_HEIGHT = 512;
-export const RAISED_BOTTOM = 410;
+export const RAISED_BOTTOM = 260;
 export const CLOSED_BOTTOM = 520;
 
 export function columnTiming(column) {
-    return { open: column.openMs ?? 2100, warning: 650, fall: 260, closed: 850, rise: 1100 };
+    return { open: column.openMs ?? 2100, warning: 500, fall: 220, closed: 750, rise: 900 };
+}
+
+// Yükseklik bölüm kurulurken bir kez seçilir; kareler arasında değişip titremez.
+export function prepareColumn(definition, random = Math.random) {
+    const [minimum, maximum] = definition.raisedRange || [150, 330];
+    const raisedBottom = definition.raisedBottom ?? Math.round(minimum + random() * (maximum - minimum));
+    return { ...definition, raisedBottom };
 }
 
 // Oyun saati durunca kolon da durur. Bölüm yeniden kurulunca fazı sıfırlanır.
 export function columnFrame(elapsed, column) {
     const timing = columnTiming(column);
+    const raised = column.raisedBottom ?? RAISED_BOTTOM;
     const period = Object.values(timing).reduce((total, duration) => total + duration, 0);
-    let phase = (elapsed + (column.offset || 0)) % period;
-    if (phase < timing.open) return { bottom: RAISED_BOTTOM, state: 'open' };
+    const clock = Math.max(0, elapsed - (column.startDelay || 0));
+    let phase = (clock + (column.offset || 0)) % period;
+    if (phase < timing.open) return { bottom: raised, state: 'open' };
     phase -= timing.open;
-    if (phase < timing.warning) return { bottom: RAISED_BOTTOM, state: 'warning' };
+    if (phase < timing.warning) return { bottom: raised, state: 'warning' };
     phase -= timing.warning;
     if (phase < timing.fall) {
         const progress = phase / timing.fall;
-        return { bottom: RAISED_BOTTOM + (CLOSED_BOTTOM - RAISED_BOTTOM) * progress ** 2, state: 'falling' };
+        return { bottom: raised + (CLOSED_BOTTOM - raised) * progress ** 2, state: 'falling' };
     }
     phase -= timing.fall;
     if (phase < timing.closed) return { bottom: CLOSED_BOTTOM, state: 'closed' };
     phase -= timing.closed;
-    return { bottom: CLOSED_BOTTOM - (CLOSED_BOTTOM - RAISED_BOTTOM) * phase / timing.rise, state: 'rising' };
+    return { bottom: CLOSED_BOTTOM - (CLOSED_BOTTOM - raised) * phase / timing.rise, state: 'rising' };
 }
 
 export function createColumns(scene) {
@@ -45,14 +54,14 @@ export function createColumns(scene) {
         for (let x = 6; x < 74; x += 16) g.fillTriangle(x, 491, x + 10, 491, x + 5, 504);
         g.generateTexture(key, 80, COLUMN_HEIGHT); g.destroy();
     }
-    for (const definition of definitions) {
+    for (const source of definitions) {
+        const definition = prepareColumn(source);
         const frame = columnFrame(0, definition);
         const column = scene.columns.create(definition.x, frame.bottom - COLUMN_HEIGHT / 2, key).setDepth(13);
         column.setScale(definition.width / 80, 1);
         column.body.setSize(80, COLUMN_HEIGHT);
-        const shadow = scene.add.ellipse(definition.x, 517, definition.width + 70, 10, 0xffe4a2, 0.9).setDepth(9);
         const lamp = scene.add.rectangle(definition.x, frame.bottom - 14, definition.width - 16, 5, 0x91dfb1).setDepth(14);
-        column.setData('column', { definition, shadow, lamp, wasClosed: frame.state === 'closed' });
+        column.setData('column', { definition, lamp, wasClosed: frame.state === 'closed' });
     }
 }
 
@@ -61,11 +70,9 @@ export function updateColumns(scene) {
         const data = column.getData('column');
         const frame = columnFrame(scene.elapsed, data.definition);
         column.body.reset(data.definition.x, frame.bottom - COLUMN_HEIGHT / 2);
-        const warning = frame.state === 'warning' || frame.state === 'falling';
-        data.shadow.setVisible(warning);
-        data.shadow.setAlpha(0.5 + Math.abs(Math.sin(scene.elapsed / 90)) * 0.45);
         data.lamp.setPosition(column.x, frame.bottom - 14);
         data.lamp.setFillStyle(frame.state === 'open' ? 0x91dfb1 : 0xffa66b);
+        data.lamp.setAlpha(frame.state === 'warning' ? 0.55 + Math.abs(Math.sin(scene.elapsed / 70)) * 0.45 : 1);
         if (frame.state === 'closed' && !data.wasClosed && Math.abs(scene.player.x - column.x) < 550) {
             scene.sound.play('boss-land', { volume: 0.12 });
         }

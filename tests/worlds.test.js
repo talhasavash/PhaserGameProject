@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { levels, worlds, worldForLevel, chapterNumber, bossGate } from '../src/world/level.js';
 import { readUnlocked, unlockNext } from '../src/data/progress.js';
-import { columnFrame, columnTiming, RAISED_BOTTOM, CLOSED_BOTTOM } from '../src/gameplay/columns.js';
+import { columnFrame, columnTiming, prepareColumn, RAISED_BOTTOM, CLOSED_BOTTOM } from '../src/gameplay/columns.js';
 
 test('World 0 keeps its old indexes and boss; World 1 restarts chapter numbering', () => {
     assert.deepEqual(worlds.map(world => [world.id, world.start, world.count]), [[0, 0, 11], [1, 11, 3]]);
@@ -45,8 +45,42 @@ test('Columns warn before slamming, remain closed, then retract continuously', (
     for (let time = 10; time < end; time += 10) {
         const bottom = columnFrame(time, column).bottom;
         assert.ok(bottom >= RAISED_BOTTOM && bottom <= CLOSED_BOTTOM);
-        assert.ok(Math.abs(bottom - previous) < 10, 'No teleporting at phase boundaries');
+        const maximumStep = 2 * (CLOSED_BOTTOM - RAISED_BOTTOM) / t.fall * 10 + 1;
+        assert.ok(Math.abs(bottom - previous) <= maximumStep, 'No teleporting at phase boundaries');
         previous = bottom;
+    }
+});
+
+test('Column heights are chosen once per attempt without changing level data', () => {
+    const source = levels[11].columns[0];
+    const before = JSON.stringify(source);
+    const high = prepareColumn(source, () => 0);
+    const low = prepareColumn(source, () => 1);
+    assert.equal(high.raisedBottom, source.raisedRange[0]);
+    assert.equal(low.raisedBottom, source.raisedRange[1]);
+    assert.ok(high.raisedBottom < low.raisedBottom && low.raisedBottom < 410);
+    assert.equal(columnFrame(0, high).bottom, high.raisedBottom);
+    assert.equal(columnFrame(100, high).bottom, high.raisedBottom);
+    assert.equal(JSON.stringify(source), before);
+    assert.ok(columnTiming(source).fall < 260);
+    assert.ok(columnTiming(source).rise < 1100);
+});
+
+test('Five factory presses fall in order on every cycle with room to wait between them', () => {
+    const presses = levels[12].columns.slice(0, 5);
+    const t = columnTiming(presses[0]);
+    const period = Object.values(t).reduce((sum, duration) => sum + duration, 0);
+    assert.equal(presses.length, 5);
+    for (let index = 0; index < presses.length; index++) {
+        const column = presses[index];
+        const impactAt = column.startDelay + t.open + t.warning;
+        assert.equal(columnFrame(impactAt + 1, column).state, 'falling');
+        assert.equal(columnFrame(impactAt + period + 1, column).state, 'falling');
+        if (index === 0) continue;
+        const previous = presses[index - 1];
+        assert.equal(column.startDelay - previous.startDelay, 430);
+        assert.ok(column.x - previous.x - (column.width + previous.width) / 2 > 54);
+        assert.ok(430 > t.fall, 'Consecutive presses do not start falling simultaneously');
     }
 });
 

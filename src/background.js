@@ -150,6 +150,16 @@ export function createMosque(scene, x, theme = 'garden') {
         boss: { wall: 0xeee5d6, roof: 0x665d94, trim: 0xe5c275, width: 250, top: 434, towers: [-154, -116, 116, 154], domes: [[-88, 421, 80, 76], [88, 421, 80, 76], [0, 380, 136, 138]] }
     };
     const design = designs[theme] || designs.garden;
+    // Her bölüme uygun açık renk vitraylar.
+    const finishes = {
+        garden: 0xb8e2d5, courtyard: 0xc0e4ee,
+        desert: 0xf4dcad, night: 0xd3c8ed,
+        forest: 0xc9e2b9, interior: 0xb5e2df,
+        snow: 0xd9f0f4, river: 0xb7e7e6,
+        canyon: 0xebcbd1, festival: 0xf3e2ad,
+        boss: 0xb3cee5
+    };
+    const glass = finishes[theme] || finishes.garden;
     const add = scene.add;
     for (const [index, offset] of design.towers.entries()) {
         const top = theme === 'desert' ? 330 : 348 - (index % 2) * 18;
@@ -179,21 +189,13 @@ export function createMosque(scene, x, theme = 'garden') {
     add.rectangle(x, design.top, design.width + 10, 9, design.trim).setDepth(6);
     // Renkli pencere kemerleri ve basamaklar.
     for (const offset of [-66, 66]) {
-        if (theme === 'interior' || theme === 'boss') {
-            // Ahşap çaprazlar yerine açık renk taş kemer ve desenli vitray.
-            add.ellipse(x + offset, 466, 30, 40, 0xf5ecd5).setDepth(7);
-            add.rectangle(x + offset, 482, 30, 34, 0xf5ecd5).setDepth(7);
-            const glass = theme === 'boss' ? 0xb3cee5 : 0x9bd3d7;
-            add.ellipse(x + offset, 468, 22, 32, glass).setDepth(8);
-            add.rectangle(x + offset, 482, 22, 26, glass).setDepth(8);
-            for (const y of [465, 478, 490]) {
-                add.circle(x + offset, y, 4, y === 478 ? 0xf2d69b : 0xe0f2e7).setDepth(9);
-            }
-        } else {
-            add.ellipse(x + offset, 477, 23, 32, design.roof).setDepth(6);
-            add.rectangle(x + offset, 489, 23, 25, design.roof).setDepth(6);
-            add.rectangle(x + offset, 483, 3, 35, design.trim).setDepth(7);
-            add.rectangle(x + offset, 485, 23, 3, design.trim).setDepth(7);
+        // Ahşap çaprazlar yerine açık renk taş kemer ve desenli vitray.
+        add.ellipse(x + offset, 466, 30, 40, 0xf5ecd5).setDepth(7);
+        add.rectangle(x + offset, 482, 30, 34, 0xf5ecd5).setDepth(7);
+        add.ellipse(x + offset, 468, 22, 32, glass).setDepth(8);
+        add.rectangle(x + offset, 482, 22, 26, glass).setDepth(8);
+        for (const y of [465, 478, 490]) {
+            add.circle(x + offset, y, 4, y === 478 ? 0xf2d69b : 0xe0f2e7).setDepth(9);
         }
     }
     if (theme === 'courtyard') {

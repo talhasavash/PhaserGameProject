@@ -48,7 +48,7 @@ test('Published modules resolve across folders, share a version, and leave sourc
     const manifest = JSON.parse(fs.readFileSync(path.join(root, 'dist/manifest.webmanifest'), 'utf8'));
     assert.equal(manifest.start_url, './index.html');
     assert.equal(manifest.scope, './');
-    assert.equal(manifest.display, 'standalone');
+    assert.equal(manifest.display, 'fullscreen');
     assert.equal(manifest.orientation, 'any');
     assert.equal(manifest.id, './');
     for (const icon of manifest.icons) {

@@ -5,7 +5,7 @@ export function setupPwa() {
     window.addEventListener('beforeinstallprompt', event => {
         event.preventDefault();
         installPrompt = event;
-        button.hidden = matchMedia('(display-mode: standalone)').matches;
+        button.hidden = matchMedia('(display-mode: standalone), (display-mode: fullscreen)').matches;
     });
     button.onclick = async () => {
         if (!installPrompt) return;

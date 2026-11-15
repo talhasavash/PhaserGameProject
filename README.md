@@ -394,7 +394,8 @@ SVG'lerine dokunulmaz.
 Oyun APK gerektirmez. Android Chrome menüsünden **Uygulamayı yükle / Ana ekrana ekle**
 seçilebilir; tarayıcı kurulum olanağı sunduğunda oyunun ayar menüsünde de kurulum düğmesi
 görünür. iPhone/iPad'de Safari paylaşım menüsünden **Ana Ekrana Ekle** kullanılır.
-Ana ekran simgesiyle açıldığında adres çubuğu olmadan çalışır. Manifestte ekran yönü
+Ana ekran simgesiyle açıldığında `display: fullscreen` sayesinde destekleyen
+tarayıcılarda menü dahil tam ekran açılır. Manifestte ekran yönü
 `any` olarak ayarlanır; açılışta zorunlu döndürme yapılmaz. Oyundaki tam ekran
 düğmesi kullanıldığında yatay yön kilidi tarayıcı destekliyorsa istenir.
 `Oyna` dokunuşunda da tam ekran ve mobilde yatay yön istenir; bu istekler uygulama

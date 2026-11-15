@@ -6,7 +6,7 @@
   "lang": "tr",
   "start_url": "./index.html",
   "scope": "./",
-  "display": "standalone",
+  "display": "fullscreen",
   "orientation": "any",
   "background_color": "#183c36",
   "theme_color": "#183c36",

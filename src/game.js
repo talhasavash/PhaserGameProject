@@ -15,6 +15,7 @@ const menuButton = document.getElementById('menu-button');
 const levelGrid = document.getElementById('level-grid');
 const worldTabs = document.getElementById('world-tabs');
 const fullscreenButton = document.getElementById('fullscreen-button');
+const fullscreenMode = matchMedia('(display-mode: fullscreen)');
 let gameStarted = false;
 let activeGame = null;
 let selectedWorld = 0;
@@ -106,7 +107,7 @@ async function toggleFullscreen() {
 
 function updateFullscreenButton() {
     fullscreenButton.textContent = document.fullscreenElement ? 'Tam ekrandan çık' : 'Tam ekran';
-    fullscreenButton.hidden = Boolean(document.fullscreenElement) || !document.documentElement.requestFullscreen;
+    fullscreenButton.hidden = fullscreenMode.matches || Boolean(document.fullscreenElement) || !document.documentElement.requestFullscreen;
     fullscreenButton.setAttribute('aria-label', document.fullscreenElement ? 'Tam ekrandan çık' : 'Tam ekran');
 }
 
@@ -238,3 +239,5 @@ document.addEventListener('keydown', event => {
 fullscreenButton.hidden = !document.documentElement.requestFullscreen;
 fullscreenButton.addEventListener('click', toggleFullscreen);
 document.addEventListener('fullscreenchange', updateFullscreenButton);
+fullscreenMode.addEventListener('change', updateFullscreenButton);
+updateFullscreenButton();

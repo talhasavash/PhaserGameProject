@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { fireFrame, chooseFireX, fireWait } from '../src/gameplay/fireRain.js';
+import { fireFrame, chooseFireX, fireWait, createFireRain, updateFireRain } from '../src/gameplay/fireRain.js';
 import { levels } from '../src/world/level.js';
 
-test('A chosen target warns for 1.5 seconds, then falls and finishes without moving its target', () => {
+test('A chosen target waits for 1.5 seconds, then falls and finishes without moving its target', () => {
     const plan = { x: 900, startAt: 2000, speed: 300 };
     assert.equal(fireFrame(1999, plan).warning, false);
     assert.equal(fireFrame(2000, plan).warning, true);
@@ -14,6 +14,27 @@ test('A chosen target warns for 1.5 seconds, then falls and finishes without mov
     assert.equal(fireFrame(5000, plan).falling, false);
     assert.equal(fireFrame(5000, plan).done, true);
     assert.equal(plan.x, 900);
+});
+
+test('Fire rain creates no ground shadows or warning graphics', () => {
+    const sprite = {
+        active: false, body: { setCircle() {} }, setDepth() { return this; },
+        disableBody() { this.active = false; }, enableBody() { this.active = true; }
+    };
+    const scene = {
+        level: { fireRain: [{ offset: 4000, period: 10000, speed: 300 }] },
+        textures: { exists: () => true },
+        physics: { add: { group: () => ({ create: () => sprite }) } },
+        add: { container() { assert.fail('No warning container'); }, ellipse() { assert.fail('No ground shadow'); } }
+    };
+    createFireRain(scene);
+    scene.rainDrops[0].plan = { x: 900, startAt: 2000, speed: 300 };
+    scene.elapsed = 2000;
+    updateFireRain(scene);
+    assert.equal(sprite.active, false);
+    scene.elapsed = 3600;
+    updateFireRain(scene);
+    assert.equal(sprite.active, true);
 });
 
 test('Random fire targets vary, stay near the player and avoid safe spots and other drops', () => {
@@ -32,9 +53,9 @@ test('Random fire targets vary, stay near the player and avoid safe spots and ot
     assert.equal(chooseFireX(levels[2], levels[2].exit.x, random), null);
     assert.equal(chooseFireX(levels[2], 100, () => 0), null, 'Do not fall back to an unsafe target');
 });
-test('Fourteen chapters have unique themes and reachable stars before their key and exit', () => {
-    assert.equal(levels.length, 14);
-    assert.equal(new Set(levels.map(level => level.theme)).size, 14);
+test('Fifteen chapters have unique themes and reachable stars before their key and exit', () => {
+    assert.equal(levels.length, 15);
+    assert.equal(new Set(levels.map(level => level.theme)).size, 15);
     const maxRise = 590 ** 2 / (2 * 1600);
     for (const level of levels) {
         const reached = [];

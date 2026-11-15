@@ -14,7 +14,8 @@ export const platformThemes = {
     boss: { body: 0x59677f, edge: 0xc7ad70, detail: 0x93a4b4 },
     lava: { body: 0x564252, edge: 0xf5ac67, detail: 0xbf6c59 },
     factory: { body: 0x52717f, edge: 0xe2c374, detail: 0xa9c4c7 },
-    castle: { body: 0x67627f, edge: 0xb5a8d0, detail: 0x3f3d59 }
+    castle: { body: 0x67627f, edge: 0xb5a8d0, detail: 0x3f3d59 },
+    abyss: { body: 0x726a60, edge: 0xe0c99d, detail: 0x4f5960 }
 };
 
 export function createPlatformArt(scene, platform, theme) {

@@ -29,7 +29,6 @@ function toggleSettings() {
     settingsButton.setAttribute('aria-label', opening ? 'Oyun menüsünü kapat' : 'Oyun menüsünü aç');
     document.getElementById('settings-title').textContent = gameStarted ? 'Bir mola' : 'Ayarlar';
     document.getElementById('pause-button').hidden = !gameStarted;
-    document.getElementById('sound-button').hidden = !gameStarted;
     document.getElementById('game-stage').inert = opening;
     document.getElementById('touch-controls').inert = opening;
     const scene = activeGame?.scene.getScene('Garden');
@@ -184,7 +183,7 @@ function returnToMenu(game) {
             document.getElementById('fall-result').hidden = true;
             document.getElementById('character-select').hidden = false;
             document.getElementById('game-stage').classList.add('choosing');
-            for (const id of ['sound-button', 'pause-button', 'restart-button']) document.getElementById(id).disabled = true;
+            for (const id of ['pause-button', 'restart-button']) document.getElementById(id).disabled = true;
             menuButton.hidden = true;
             menuButton.disabled = false;
             startButton.disabled = false;

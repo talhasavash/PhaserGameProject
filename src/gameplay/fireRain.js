@@ -39,13 +39,7 @@ export function createFireRain(scene) {
         const sprite = scene.fireballs.create(0, 80, 'fireball').setDepth(14);
         sprite.body.setCircle(10, 6, 14);
         sprite.disableBody(true, true);
-        const warning = scene.add.container(0, 0).setDepth(9).setVisible(false);
-        warning.add([
-            scene.add.ellipse(0, 514, 92, 20, 0xfff9dc, 0.2),
-            scene.add.ellipse(0, 513, 68, 12, 0xffffff, 0.8).setStrokeStyle(1, 0xb39f78),
-            scene.add.ellipse(0, 512, 40, 6, 0xffffff, 0.95)
-        ]);
-        return { rain, sprite, warning, plan: null, nextAt: 600 + rain.offset };
+        return { rain, sprite, plan: null, nextAt: 600 + rain.offset };
     });
 }
 
@@ -59,8 +53,6 @@ export function updateFireRain(scene) {
         }
         if (!drop.plan) continue;
         const frame = fireFrame(scene.elapsed, drop.plan);
-        drop.warning.setPosition(drop.plan.x, 0).setVisible(frame.warning);
-        drop.warning.setAlpha(0.8 + 0.2 * Math.abs(Math.sin(scene.elapsed / 120)));
         if (frame.falling) drop.sprite.enableBody(true, drop.plan.x, frame.y, true, true);
         else if (drop.sprite.active) drop.sprite.disableBody(true, true);
         if (frame.done) {

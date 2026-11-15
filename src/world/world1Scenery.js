@@ -1,7 +1,8 @@
 const palettes = {
     lava: { sky: '#422d43', far: 0x654055, near: 0x91505a, floor: 0x473b4d, trim: 0xf2a361 },
     factory: { sky: '#b4cbd0', far: 0x89a9b0, near: 0x577d8b, floor: 0x3e5969, trim: 0xd9bd70 },
-    castle: { sky: '#252f50', far: 0x394363, near: 0x4e5478, floor: 0x41415e, trim: 0xb0a1cb }
+    castle: { sky: '#252f50', far: 0x394363, near: 0x4e5478, floor: 0x41415e, trim: 0xb0a1cb },
+    abyss: { sky: '#a6ccd5', far: 0x83a7b5, near: 0x617f91, floor: 0x726a60, trim: 0xe0c99d }
 };
 
 function texture(scene, key, width, height, draw) {
@@ -18,7 +19,13 @@ export function createWorldOneScenery(scene, width, theme) {
     scene.cameras.main.setBackgroundColor(p.sky);
     texture(scene, `${theme}-skyline`, 512, 512, g => {
         g.fillStyle(p.far);
-        if (theme === 'lava') {
+        if (theme === 'abyss') {
+            for (const x of [-100, 180, 450]) {
+                g.fillTriangle(x - 170, 512, x, 160, x + 190, 512);
+                g.fillStyle(0xc7dae0, 0.6); g.fillTriangle(x - 30, 220, x, 160, x + 34, 220);
+                g.fillStyle(p.far);
+            }
+        } else if (theme === 'lava') {
             for (const x of [-100, 180, 450]) g.fillTriangle(x - 150, 512, x, 190, x + 180, 512);
             g.fillStyle(p.trim, 0.65); g.fillEllipse(190, 360, 390, 80);
         } else {
@@ -35,7 +42,14 @@ export function createWorldOneScenery(scene, width, theme) {
     });
     texture(scene, `${theme}-walls`, 512, 256, g => {
         g.fillStyle(p.near);
-        if (theme === 'lava') {
+        if (theme === 'abyss') {
+            for (let x = -60; x < 560; x += 140) {
+                const top = 90 + (x + 60) % 80;
+                g.fillRect(x, top, 95, 256 - top);
+                g.fillTriangle(x, top, x + 18, top - 24, x + 60, top);
+                g.fillStyle(p.trim, 0.5); g.fillRect(x + 10, top + 10, 68, 5); g.fillStyle(p.near);
+            }
+        } else if (theme === 'lava') {
             for (let x = -50; x < 600; x += 130) g.fillTriangle(x - 80, 256, x, 60, x + 120, 256);
             g.lineStyle(5, p.trim, 0.7); g.lineBetween(130, 90, 155, 180); g.lineBetween(155, 180, 138, 245);
         } else {
@@ -55,7 +69,12 @@ export function createWorldOneScenery(scene, width, theme) {
         g.fillStyle(p.floor); g.fillRect(0, 0, 256, 128);
         g.fillStyle(p.trim); g.fillRect(0, 0, 256, 8);
         g.lineStyle(2, p.near);
-        for (let x = 0; x < 256; x += 64) { g.strokeRect(x, 16, 60, 30); g.strokeRect(x + 32, 52, 60, 30); }
+        if (theme === 'abyss') {
+            for (const y of [26, 58, 94]) {
+                g.lineBetween(0, y, 80, y - 8); g.lineBetween(80, y - 8, 160, y + 6); g.lineBetween(160, y + 6, 256, y - 2);
+            }
+            g.lineBetween(110, 8, 100, 24); g.lineBetween(205, 56, 192, 90);
+        } else for (let x = 0; x < 256; x += 64) { g.strokeRect(x, 16, 60, 30); g.strokeRect(x + 32, 52, 60, 30); }
         if (theme === 'factory') {
             g.fillStyle(0xd9bd70);
             for (let x = 0; x < 256; x += 32) g.fillTriangle(x, 8, x + 16, 8, x + 8, 22);

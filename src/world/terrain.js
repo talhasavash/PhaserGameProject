@@ -1,4 +1,5 @@
 import { createPlatformArt } from './platforms.js';
+import { createPitArt } from './pits.js';
 
 // Zemini sabit Phaser gövdeleriyle kur; çukurlarda fizik gövdesi oluşturma.
 export function createTerrain(scene) {
@@ -8,14 +9,7 @@ export function createTerrain(scene) {
     for (const gap of [...(scene.level.gaps || []), { x: scene.level.width, width: 0 }]) {
         const width = gap.x - start;
         if (width > 0) scene.solids.add(scene.add.rectangle(start + width / 2, 570, width, 100).setVisible(false));
-        if (gap.width > 0) {
-            const water = scene.level.theme === 'river';
-            const lava = scene.level.theme === 'lava';
-            const color = lava ? 0xe66d48 : water ? 0x397b91 : 0x263342;
-            scene.add.rectangle(gap.x + gap.width / 2, 560, gap.width, 86, color).setDepth(3);
-            scene.add.rectangle(gap.x + gap.width / 2, 528, gap.width - 6, 5, water ? 0x82ccd1 : 0x465167).setDepth(4);
-            for (const side of [gap.x - 4, gap.x + gap.width + 4]) scene.add.rectangle(side, 560, 8, 80, 0x816e62).setDepth(4);
-        }
+        if (gap.width > 0) createPitArt(scene, gap);
         start = gap.x + gap.width;
     }
     for (const passage of scene.level.passages || []) {

@@ -126,7 +126,7 @@ export class GameScene extends Phaser.Scene {
         this.events.off(Phaser.Scenes.Events.DESTROY, this.shutdownScene, this);
         this.scale.off(Phaser.Scale.Events.RESIZE, this.centerHud, this);
         this.touchControls.destroy();
-        for (const id of ['pause-button', 'restart-button', 'play-again', 'next-level', 'retry-fall', 'sound-button']) {
+        for (const id of ['pause-button', 'restart-button', 'play-again', 'next-level', 'retry-fall']) {
             document.getElementById(id).onclick = null;
         }
     }
@@ -200,20 +200,7 @@ export class GameScene extends Phaser.Scene {
         document.getElementById('play-again').onclick = () => this.continueAfterResult();
         document.getElementById('next-level').onclick = () => this.continueAfterResult();
         document.getElementById('retry-fall').onclick = () => this.retryFall();
-        const soundButton = document.getElementById('sound-button');
-        soundButton.disabled = false;
         this.sound.setMute(this.soundMuted);
-        const updateSoundButton = () => {
-            soundButton.textContent = this.soundMuted ? 'Ses: kapalı' : 'Ses: açık';
-            soundButton.setAttribute('aria-label', this.soundMuted ? 'Sesi aç' : 'Sesi kapat');
-            soundButton.setAttribute('aria-pressed', String(this.soundMuted));
-        };
-        updateSoundButton();
-        soundButton.onclick = () => {
-            this.soundMuted = !this.soundMuted;
-            this.sound.setMute(this.soundMuted);
-            updateSoundButton();
-        };
     }
 
     updateHud() {

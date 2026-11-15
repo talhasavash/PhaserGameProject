@@ -96,4 +96,35 @@ export const darkCastle = chapter({
     ]
 });
 
-export const worldOneLevels = [lavaValley, mechanicalFactory, darkCastle];
+// Uzun atlayışlar arasında dinlenme adaları var; tüm boşluklar koşarak aşılabilir.
+export const brokenPass = chapter({
+    name: 'Uçurum Geçidi', theme: 'abyss', width: 5200, exitLabel: 'taş geçide',
+    checkpoint: { x: 2460, y: 480 },
+    fountains: [{ id: 'fountain-1', x: 420 }, { id: 'fountain-2', x: 3520 }],
+    platforms: [],
+    gaps: [
+        { x: 550, width: 90 }, { x: 850, width: 110 }, { x: 1190, width: 130 },
+        { x: 1510, width: 140 }, { x: 1840, width: 150 }, { x: 2230, width: 135 },
+        { x: 2570, width: 150 }, { x: 2920, width: 140 }, { x: 3270, width: 150 },
+        { x: 3640, width: 155 }, { x: 4000, width: 150 }, { x: 4350, width: 155 }
+    ],
+    fruits: [
+        { id: 'star-1', type: 'star', x: 1050, y: 480 },
+        { id: 'star-2', type: 'star', x: 2430, y: 480 },
+        { id: 'star-3', type: 'star', x: 3850, y: 480 },
+        { id: 'fruit-1', type: 'orange', x: 595, y: 430 },
+        { id: 'fruit-2', type: 'grapes', x: 1230, y: 420 },
+        { id: 'fruit-3', type: 'strawberry', x: 1885, y: 410 },
+        { id: 'fruit-4', type: 'banana', x: 2630, y: 410 },
+        { id: 'fruit-5', type: 'pear', x: 3700, y: 410 },
+        { id: 'fruit-6', type: 'apple', x: 4410, y: 415 },
+        { id: 'mat-1', type: 'mat', x: 2070, y: 480 },
+        { id: 'lantern-1', type: 'lantern', x: 4600, y: 480 }
+    ],
+    enemies: [
+        { type: 'bat', x: 1740, y: 384, minX: 1690, maxX: 1790, speed: 80, bob: 14 },
+        { type: 'bird', x: 3140, y: 375, minX: 3100, maxX: 3200, speed: 90, bob: 16 }
+    ]
+});
+
+export const worldOneLevels = [lavaValley, mechanicalFactory, darkCastle, brokenPass];

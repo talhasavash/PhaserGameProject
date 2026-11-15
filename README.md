@@ -29,7 +29,7 @@ Yatay telefonda 600 yerine 320 dünya birimi yükseklik gösterilir; üst/alt ş
 kaldırıldığı için karakter ve nesneler daha büyük görünür. Tablet görünümü 480 birimdir.
 Bu değerler `src/ui/view.js` içindedir. Kamera zemine göre sabittir; zıplarken dikey kaymaz.
 Bölüm numarası/can/yıldız/anahtar/puan bilgileri ince bir üst satırdadır.
-Üst satır ekran genişliğinin yaklaşık %63'ünü kaplar. Küçük nota düğmesi sesleri açıp kapatır.
+Üst satır ekran genişliğinin yaklaşık %52'sini kaplar; arka planı %20 opaktır.
 Zıplama, toplama, çarpma, can yenileme ve anahtar alma kısa ses efektleri kullanır.
 `preload()` içindeki `load.audio` WAV dosyalarını yükler; `sound.play` olay gerçekleştiğinde çalar.
 Ses dosyaları `assets/audio` içindedir; özgün tonları `node scripts/build-sounds.cjs` yeniden üretir.
@@ -87,10 +87,11 @@ PhaserGameProject/
 │   ├── world/                  Bölümler ve ortam
 │   │   ├── level.js             Bölüm tanımları ve nesne konumları
 │   │   ├── terrain.js           Zemin, çukurlar, buz ve platform gövdeleri
+│   │   ├── pits.js              Kırık kaya kenarlarıyla açık uçurum çizimleri
 │   │   ├── platforms.js         Bölüme özel basamak çizimleri
 │   │   ├── background.js        Arka plan, cami ve abdest alanı çizimleri
 │   │   ├── chapterScenery.js    Diğer ortamların arka planları
-│   │   ├── world1.js            Lav Vadisi, Mekanik Fabrika ve Kara Kale verileri
+│   │   ├── world1.js            Yeni dünyanın dört bölümünün verileri
 │   │   └── world1Scenery.js     Yeni dünya çizimleri ve farklı çıkışlar
 │   ├── ui/
 │   │   ├── hud.js               Bölüm numarası, can, görev ve puan
@@ -271,11 +272,11 @@ HTTP kullan; HTML dosyasını çift tıklayarak açma (oyun ES modülleri kullan
 
 ## Dünyalar ve bölüm akışı
 
-Dünya 0 mevcut 11 bölümü, Dünya 1 yeni üç bölümü içerir. Ana menüde önce dünya,
+Dünya 0 mevcut 11 bölümü, Dünya 1 yeni dört bölümü içerir. Ana menüde önce dünya,
 sonra o dünyadaki bölüm seçilir. Dünya 1 başlangıçta kilitlidir; Dünya 0 boss
 bölümü tamamlanınca açılır. Bölüm numaraları her dünyada yeniden 1’den başlar;
-HUD üzerinde Bölüm 1, Bölüm 2 gibi görünür; her dünyanın kendi bölüm numarası
-kullanılır. Puan çubuğunun arka planı %40 opaktır. Menüde dünya/bölüm adları yerine yalnızca numaralar gösterilir.
+Puan çubuğunda bölüm etiketi yoktur; yalnızca can, yıldız, anahtar, puan ve ilerleme
+görünür. Çubuğun arka planı %20 opaktır. Menüde dünya/bölüm adları yerine yalnızca numaralar gösterilir.
 
 Başlangıçta yalnızca Dünya 0 / 1 açıktır; her bölüm bitince sonraki açılır. Ana ekranda yalnızca
 numaralar görünür. Dünya 0'ın 11. bölümü altın renkli özel bir çemberdir. Menü `levels` dizisinden
@@ -304,6 +305,7 @@ Dünya 1'in bölümleri farklı geçişler ve yeni düşmanlar sunar:
 | 1 · Lav Vadisi | Lav boşlukları, semenderler, inip yükselen taş kolonlar ve ışıklı çıkış geçidi |
 | 2 · Mekanik Fabrika | Ters yönlü bantlar, robotlar, fazları farklı presler ve asansör çıkışı |
 | 3 · Kara Kale | Dar koridorlar, zırhlı böcekler, yarasalar, kolon çiftleri ve yükselen kale kapısı |
+| 4 · Uçurum Geçidi | Genişliği artan 12 boşluk, sağlam iniş adaları ve zıplama rotasındaki meyveler |
 
 Kolonlar fizik gövdesine sahiptir ve tavana kadar uzanır; üstlerinden atlanamaz.
 Başlangıç yüksekliği her denemede bir kez rastgele seçilir (140–340 aralığı);
@@ -323,12 +325,13 @@ alınınca cami, geçit, asansör veya kale kapısı açılır ve giriş aydınl
 önce 1,2 saniye yıldızlarla parlar, sonra tamamlanma mesajı ve kısa ayet aynı sonuç
 kartında görünür. Kartta yalnızca “Bölüm tamam!”, ayet ve Devam et düğmesi bulunur;
 son bölümde “Oyun tamam!” ve Ana ekran gösterilir. Yıldız üç kısa, yavaş parlamayla
-aydınlanır; `level-complete.wav` bir kez çalar ve genel ses kapatma ayarına uyar.
+aydınlanır; `level-complete.wav` bir kez çalar. Ses düzeyi telefonun kendi ses
+kontrolleriyle ayarlanır; oyun menüsünde ses aç/kapat düğmesi bulunmaz.
 Sesi `node scripts/build-sounds.cjs --result-only` yeniden üretir.
 Ayrı bir okuma ekranı veya görünür kaynak bağlantısı yoktur.
 Kart kendiliğinden kapanmaz; Devam et veya Enter ile ilerlenir. Dünya 0 / 11
 sonunda da aynı düğmeyle yeni dünya başlar; aynı sahne yeni dünyanın verileriyle kurulur.
-Dünya 1 / 3 sonunda Ana ekran görünür; düğme veya Enter bölüm seçimine döndürür, 1. bölümü
+Dünya 1 / 4 sonunda Ana ekran görünür; düğme veya Enter bölüm seçimine döndürür, 1. bölümü
 kendiliğinden başlatmaz. Açılan bölümler korunur. Kaynak ve sure/ayet numaraları denetlenebilmesi için
 `src/data/verses.js` içinde saklanır; Diyanet meallerinden kısa alıntılar kullanılır.
 Üç nokta ayetin yalnızca bir kısmının alındığını gösterir.
@@ -366,20 +369,25 @@ biriktirilir; hız değişirken zıplamanın ortasında konum atlaması olmaz. �
 zıplama duraklatmada ilerlemez; bölüm yeniden başlayınca sıfırlanır.
 Tam öfkede bile muhafızın altından geçiş süresi test edilir. Can bitip kontrol
 noktasına dönüldüğünde de öfke, renk ve hız sıfırlanır. Muhafızların kalkış ve
-iniş sesleri yalnızca geçiş anında çalar; uzak muhafızlar duyulmaz. Ses kapatma
-düğmesi bunları da kapatır. `build-sounds.cjs --boss-only` bu iki WAV'ı üretir.
+iniş sesleri yalnızca geçiş anında çalar; uzak muhafızlar duyulmaz.
+`build-sounds.cjs --boss-only` bu iki WAV'ı üretir.
 
 6. bölümün son yapısında ahşap pencere bölmeleri yerine taş kemerli açık renkli
 vitraylar vardır. Lafzatullah görseli `allah-plaque.svg` içinde standart Arapça
 Allah ligatürüyle (U+FDF2) oluşturulur ve arka planda aynı doku tekrar kullanılır.
 
 Ateş olan bölümlerde aynı anda en çok bir top bulunur. Her top bittikten sonra
-en az 8 saniye beklenir; konum, hız ve süre değişir. Önceden yalnızca parlak,
-beyazımsı elips gölge gösterilir. Ünlem, üçgen ve dikey ışık yoktur. Hedef uyarı
-başladıktan sonra yer değiştirmez. Başlangıç, abdest alanları, kontrol noktaları ve
+en az 8 saniye beklenir; konum, hız ve süre değişir. Zeminde gölge, ünlem, üçgen
+veya ışık uyarısı yoktur. Hedef seçildikten sonra yer değiştirmez.
+Başlangıç, abdest alanları, kontrol noktaları ve
 çukurlar hedef seçiminde korunur.
 
-Sağ üstteki Ⅱ mola düğmesini açınca oyun duraklar. Ses ve ana ekrana dönüş
+Çukurlar düz çerçeveli kuyular yerine kırık kaya kenarlı, aşağıya doğru genişleyen
+karanlık uçurumlar olarak çizilir. `pits.js` her tema/genişlik için bir küçük doku
+üretir; fizik boşlukları `terrain.js` içinde aynı ölçülerde kalır. Dünya 1'in dördüncü
+bölümünde 12 boşluk bulunur; aralarında en az 150 birim sağlam zemin vardır.
+
+Sağ üstteki Ⅱ mola düğmesini açınca oyun duraklar. Yalnızca Devam et ve Ana ekran
 buradadır. Tam ekran aç/kapat veya uygulamadan çıkış düğmesi yoktur. Devam et ile oyun sürer. Yönler saydam üçgen,
 zıplama saydam dairedir. Yönler sol alt kenara bitişik ve aralıksız, zıplama sağ
 alt kenara sabittir; yön üçgenleri daha dar, yüksek ve yuvarlaktır; telefonun güvenli ekran boşlukları korunur. İki parmakla yön

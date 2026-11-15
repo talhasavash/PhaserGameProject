@@ -5,14 +5,14 @@ import { readUnlocked, unlockNext } from '../src/data/progress.js';
 import { columnFrame, columnTiming, prepareColumn, visibleColumn, RAISED_BOTTOM, CLOSED_BOTTOM } from '../src/gameplay/columns.js';
 
 test('World 0 keeps its old indexes and boss; World 1 restarts chapter numbering', () => {
-    assert.deepEqual(worlds.map(world => [world.id, world.start, world.count]), [[0, 0, 11], [1, 11, 3]]);
+    assert.deepEqual(worlds.map(world => [world.id, world.start, world.count]), [[0, 0, 11], [1, 11, 4]]);
     assert.equal(levels[10], bossGate);
     assert.equal(worldForLevel(10).id, 0);
     assert.equal(chapterNumber(10), 11);
     assert.equal(worldForLevel(11).id, 1);
     assert.equal(chapterNumber(11), 1);
     assert.equal(chapterNumber(13), 3);
-    assert.deepEqual(levels.slice(11).map(level => level.name), ['Lav Vadisi', 'Mekanik Fabrika', 'Kara Kale']);
+    assert.deepEqual(levels.slice(11).map(level => level.name), ['Lav Vadisi', 'Mekanik Fabrika', 'Kara Kale', 'Uçurum Geçidi']);
 });
 
 test('Existing saved progress is retained; completing the old boss unlocks World 1', () => {
@@ -24,7 +24,8 @@ test('Existing saved progress is retained; completing the old boss unlocks World
     assert.equal(saved, '12');
     assert.equal(unlockNext(11, levels.length), 13);
     assert.equal(unlockNext(12, levels.length), 14);
-    assert.equal(unlockNext(13, levels.length), 14);
+    assert.equal(unlockNext(13, levels.length), 15);
+    assert.equal(unlockNext(14, levels.length), 15);
 });
 
 test('Columns warn before slamming, remain closed, then retract continuously', () => {
@@ -85,7 +86,7 @@ test('Five factory presses fall in order on every cycle with room to wait betwee
 });
 
 test('Every column has a fair walk-under window, a safe waiting area and an unjumpable top', () => {
-    for (const level of levels.slice(11)) {
+    for (const level of levels.slice(11).filter(level => level.columns?.length)) {
         assert.ok(level.columns.length >= 3);
         for (const column of level.columns) {
             assert.ok(columnTiming(column).open > (column.width + 24) / 185 * 1000 + 500);

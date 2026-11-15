@@ -3,7 +3,7 @@ import { gameView } from './ui/view.js';
 import { levels, worlds, worldForLevel } from './world/level.js';
 import { unlockedLevels } from './data/progress.js';
 import { setupPwa } from './ui/pwa.js';
-import { enterGameDisplay, releaseGameOrientation } from './ui/display.js';
+import { enterGameDisplay, releaseGameOrientation, bindDisplayRecovery } from './ui/display.js';
 import { showLoading, hideLoading } from './ui/loading.js';
 
 // Önce HTML formundan karakter seçilir; ardından Phaser başlatılır.
@@ -196,6 +196,7 @@ function returnToMenu(game) {
 }
 
 setupPwa();
+bindDisplayRecovery(() => gameStarted);
 createWorldMenu();
 createLevelMenu();
 refreshLevelLocks();

@@ -403,6 +403,9 @@ açılışında yapılmaz. İzin verilmezse oyun normal ekran boyutunda devam ed
 `src/ui/display.js` Oyna dokunuşundaki ekran isteğini yönetir. Ana menüye dönüşte
 yalnızca yön kilidi bırakılır, tam ekran korunur. Uygulamayı kapatmak
 için telefonun kendi gezinme ve son uygulamalar kontrolleri kullanılır.
+Kurulu uygulama zaten `display-mode: fullscreen` ile açılmışsa Oyna ikinci bir
+Fullscreen API oturumu başlatmaz. Arka plandan dönüldüğünde sistem tam ekranı
+bırakmışsa ilk normal dokunuşta yeniden istenir; oyun yeniden yüklenmez.
 
 `manifest.webmanifest` uygulama adını, simgeleri ve göreli yayın yolunu tanımlar.
 Başlangıç adresi doğrudan `./index.html` dosyasıdır; uygulama kimliği `./` olarak

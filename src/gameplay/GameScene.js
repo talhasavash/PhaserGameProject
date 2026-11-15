@@ -90,6 +90,8 @@ export class GameScene extends Phaser.Scene {
     }
 
     preparePage() {
+        document.getElementById('game-stage').inert = false;
+        document.getElementById('touch-controls').inert = false;
         document.getElementById('settings-panel').hidden = true;
         document.getElementById('settings-button').setAttribute('aria-expanded', 'false');
         document.getElementById('settings-button').setAttribute('aria-label', 'Oyun menüsünü aç');

@@ -1,0 +1,26 @@
+/* Küçük liste yerine oyunla uyumlu, sade mola ekranı. */
+.game-toolbar #settings-button { border: 1px solid #fff6d566; border-radius: 50%; width: 38px; height: 38px; background: #21483dcc; color: #fff2ce; }
+.game-toolbar .settings-panel {
+    position: fixed; inset: 0; width: auto; padding: 20px;
+    display: grid; place-items: center; background: #102e28e8; border: 0; border-radius: 0;
+}
+.settings-card {
+    position: relative; display: grid; gap: 10px; width: min(100%, 320px);
+    padding: 24px; background: #2d5548; border: 2px solid #8da578;
+    border-radius: 28px; box-shadow: 0 7px 0 #0c241e; color: #ffdc82;
+}
+.settings-card h2 { margin: 0 30px 10px 0; font-size: 24px; }
+.game-toolbar .settings-card button {
+    min-height: 46px; border-radius: 15px; background: #456c56;
+    color: #fff1cd; border: 1px solid #789674; font-size: 15px; font-weight: bold;
+}
+.game-toolbar .settings-card #pause-button { background: #ffda79; color: #28482f; border-color: #ffe7a2; }
+.game-toolbar .settings-card #exit-button { color: #ffc7ad; background: #3d4b40; }
+.game-toolbar .settings-card #settings-close { position: absolute; right: 12px; top: 12px; width: 32px; min-width: 32px; min-height: 32px; height: 32px; padding: 0; border: 0; border-radius: 50%; background: #183c36; font-size: 24px; }
+#exit-screen { position: fixed; z-index: 10; }
+#exit-screen .result-card::before { display: none; }
+@media (orientation: landscape) and (max-height: 500px) {
+    .settings-card { width: min(100%, 460px); grid-template-columns: 1fr 1fr; padding: 18px; }
+    .settings-card h2, .settings-card #pause-button { grid-column: 1 / -1; }
+    .settings-card h2 { font-size: 22px; margin-bottom: 0; }
+}

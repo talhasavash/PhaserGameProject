@@ -3,6 +3,7 @@ import { gameView } from './ui/view.js';
 import { levels, worlds, worldForLevel } from './world/level.js';
 import { unlockedLevels } from './data/progress.js';
 import { setupPwa } from './ui/pwa.js';
+import { enterGameDisplay, leaveGameDisplay } from './ui/display.js';
 
 // Önce HTML formundan karakter seçilir; ardından Phaser başlatılır.
 // "import", başka bir dosyanın dışarı açtığı (export) kodu kullanmamızı sağlar.
@@ -26,8 +27,14 @@ function toggleSettings() {
     settingsPanel.hidden = !opening;
     settingsButton.setAttribute('aria-expanded', String(opening));
     settingsButton.setAttribute('aria-label', opening ? 'Oyun menüsünü kapat' : 'Oyun menüsünü aç');
+    document.getElementById('settings-title').textContent = gameStarted ? 'Bir mola' : 'Ayarlar';
+    document.getElementById('pause-button').hidden = !gameStarted;
+    document.getElementById('sound-button').hidden = !gameStarted;
+    document.getElementById('game-stage').inert = opening;
+    document.getElementById('touch-controls').inert = opening;
     const scene = activeGame?.scene.getScene('Garden');
     if (scene?.player && !scene.gameState.complete && scene.paused !== opening) scene.togglePause();
+    (opening ? document.getElementById('settings-close') : settingsButton).focus();
 }
 
 // Bölüm sayısı değişince menü de aynı veriden oluşur.
@@ -93,21 +100,13 @@ function refreshLevelLocks() {
 }
 
 async function toggleFullscreen() {
-    try {
-        if (document.fullscreenElement) await document.exitFullscreen();
-        else {
-            await document.documentElement.requestFullscreen();
-            if (matchMedia('(any-pointer: coarse)').matches && screen.orientation?.lock) {
-                try { await screen.orientation.lock('landscape'); } catch { /* Elle çevirerek de oynanabilir. */ }
-            }
-        }
-    } catch {
-        document.getElementById('game-status').textContent = 'Bu tarayıcı tam ekrana geçişe izin vermedi.';
-    }
+    if (document.fullscreenElement) await leaveGameDisplay();
+    else await enterGameDisplay();
 }
 
 function updateFullscreenButton() {
-    fullscreenButton.textContent = document.fullscreenElement ? '⤢' : '⛶';
+    fullscreenButton.textContent = document.fullscreenElement ? 'Tam ekrandan çık' : 'Tam ekran';
+    fullscreenButton.hidden = Boolean(document.fullscreenElement) || !document.documentElement.requestFullscreen;
     fullscreenButton.setAttribute('aria-label', document.fullscreenElement ? 'Tam ekrandan çık' : 'Tam ekran');
 }
 
@@ -121,9 +120,12 @@ function startSelectedGame(event) {
     const selected = characterForm.querySelector('input[name="character"]:checked');
     const selectedLevel = characterForm.querySelector('input[name="level"]:checked');
     if (!selected || !selectedLevel || Number(selectedLevel.value) >= unlockedLevels(levels.length) || gameStarted) return;
+    // Await etmeden, doğrudan dokunuş sırasında başlat: tarayıcı bu etkileşimi ister.
+    void enterGameDisplay();
     gameStarted = true;
     closeSettings();
     document.body.classList.add('playing');
+    settingsButton.textContent = 'Ⅱ';
     document.getElementById('touch-controls').hidden = false;
     startButton.disabled = true;
     document.getElementById('character-select').hidden = true;
@@ -166,32 +168,53 @@ function startGame(character, levelIndex) {
     });
     observer.observe(area);
     game.events.once(Phaser.Core.Events.DESTROY, () => observer.disconnect());
-    menuButton.onclick = () => returnToMenu(game);
+    menuButton.onclick = async () => {
+        await returnToMenu(game);
+        await leaveGameDisplay();
+    };
 }
 
 function returnToMenu(game) {
-    const currentIndex = game.scene.getScene('Garden').levelIndex;
-    closeSettings();
-    menuButton.disabled = true;
-    game.events.once(Phaser.Core.Events.DESTROY, () => {
-        gameStarted = false;
-        activeGame = null;
-        selectedWorld = worldForLevel(currentIndex).id;
-        createLevelMenu(currentIndex);
-        refreshLevelLocks();
-        document.body.classList.remove('playing');
-        document.getElementById('touch-controls').hidden = true;
-        document.getElementById('game-result').hidden = true;
-        document.getElementById('fall-result').hidden = true;
-        document.getElementById('character-select').hidden = false;
-        document.getElementById('game-stage').classList.add('choosing');
-        for (const id of ['sound-button', 'pause-button', 'restart-button']) document.getElementById(id).disabled = true;
-        menuButton.hidden = true;
-        menuButton.disabled = false;
-        startButton.disabled = false;
-        document.getElementById('character-title').focus();
+    return new Promise(resolve => {
+        const currentIndex = game.scene.getScene('Garden').levelIndex;
+        closeSettings();
+        menuButton.disabled = true;
+        game.events.once(Phaser.Core.Events.DESTROY, () => {
+            gameStarted = false;
+            activeGame = null;
+            selectedWorld = worldForLevel(currentIndex).id;
+            createLevelMenu(currentIndex);
+            refreshLevelLocks();
+            document.body.classList.remove('playing');
+            settingsButton.textContent = '⚙';
+            document.getElementById('touch-controls').hidden = true;
+            document.getElementById('game-result').hidden = true;
+            document.getElementById('fall-result').hidden = true;
+            document.getElementById('character-select').hidden = false;
+            document.getElementById('game-stage').classList.add('choosing');
+            for (const id of ['sound-button', 'pause-button', 'restart-button']) document.getElementById(id).disabled = true;
+            menuButton.hidden = true;
+            menuButton.disabled = false;
+            startButton.disabled = false;
+            document.getElementById('character-title').focus();
+            resolve();
+        });
+        game.destroy(true);
     });
-    game.destroy(true);
+}
+
+async function exitGame() {
+    const button = document.getElementById('exit-button');
+    button.disabled = true;
+    closeSettings();
+    if (activeGame) await returnToMenu(activeGame);
+    await leaveGameDisplay();
+    document.getElementById('exit-screen').hidden = false;
+    document.querySelector('.game-shell').inert = true;
+    document.getElementById('exit-return').focus();
+    // PWA izin verirse pencere kapanır. İzin vermezse aşağıdaki dürüst çıkış ekranı kalır.
+    window.close();
+    button.disabled = false;
 }
 
 setupPwa();
@@ -202,6 +225,16 @@ characterForm.reset();
 characterForm.addEventListener('change', updateStartButton);
 characterForm.addEventListener('submit', startSelectedGame);
 settingsButton.onclick = toggleSettings;
+document.getElementById('settings-close').onclick = closeSettings;
+document.getElementById('exit-button').onclick = exitGame;
+document.getElementById('exit-return').onclick = () => {
+    document.getElementById('exit-screen').hidden = true;
+    document.querySelector('.game-shell').inert = false;
+    document.getElementById('character-title').focus();
+};
+document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && !settingsPanel.hidden) closeSettings();
+});
 fullscreenButton.hidden = !document.documentElement.requestFullscreen;
 fullscreenButton.addEventListener('click', toggleFullscreen);
 document.addEventListener('fullscreenchange', updateFullscreenButton);

@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/menu.css">
     <link rel="stylesheet" href="css/results.css">
+    <link rel="stylesheet" href="css/settings.css">
     <script defer src="lib/phaser.min.js"></script>
     <script type="module" src="src/game.js"></script>
 </head>
@@ -22,15 +23,20 @@
         <div class="game-toolbar"><span id="toolbar-status" class="sr-only">Karakterini seç</span><span
             class="build-version">Demo · yerel</span>
             <button id="settings-button" type="button" aria-label="Oyun menüsünü aç" aria-expanded="false"
-                    aria-controls="settings-panel">☰
+                    aria-controls="settings-panel">⚙
             </button>
-            <div id="settings-panel" class="settings-panel" hidden>
+            <div id="settings-panel" class="settings-panel" role="dialog" aria-modal="true" aria-labelledby="settings-title" hidden>
+                <div class="settings-card">
+                <button id="settings-close" type="button" aria-label="Menüyü kapat">×</button>
+                <h2 id="settings-title">Ayarlar</h2>
                 <button id="install-button" type="button" hidden>Ana ekrana ekle</button>
+                <button id="pause-button" type="button" aria-label="Devam et" hidden disabled>Devam et</button>
                 <button id="sound-button" type="button" aria-label="Sesi kapat" aria-pressed="false" disabled>♪</button>
-                <button id="menu-button" type="button" aria-label="Bölüm seçimine dön" hidden>Bölüm seç</button>
-                <button id="pause-button" type="button" aria-label="Devam et" disabled>Devam et</button>
-                <button id="restart-button" type="button" aria-label="Yeniden başla" disabled>Yeniden başla</button>
+                <button id="menu-button" type="button" aria-label="Bölüm seçimine dön" hidden>Ana ekran</button>
+                <button id="restart-button" type="button" aria-label="Yeniden başla" hidden disabled>Yeniden başla</button>
                 <button id="fullscreen-button" type="button" aria-label="Tam ekran">Tam ekran</button>
+                <button id="exit-button" type="button">Oyundan çık</button>
+                </div>
             </div>
         </div>
         <div id="game-stage" class="game-stage choosing">
@@ -98,6 +104,14 @@
                     <circle cx="50" cy="50" r="44"/>
                 </svg>
             </button>
+        </div>
+    </section>
+
+    <section id="exit-screen" class="result" role="dialog" aria-modal="true" aria-labelledby="exit-title" hidden>
+        <div class="result-card">
+            <h2 id="exit-title">Oyun durduruldu</h2>
+            <p>Bu pencere otomatik kapanmadıysa telefonun son uygulamalar ekranından kapatabilirsin.</p>
+            <button id="exit-return" type="button">Ana ekrana dön</button>
         </div>
     </section>
 

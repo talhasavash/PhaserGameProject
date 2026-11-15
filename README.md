@@ -373,8 +373,8 @@ beyazımsı elips gölge gösterilir. Ünlem, üçgen ve dikey ışık yoktur. H
 başladıktan sonra yer değiştirmez. Başlangıç, abdest alanları, kontrol noktaları ve
 çukurlar hedef seçiminde korunur.
 
-Sağ üstteki ☰ ayar panelini açınca oyun duraklar. Ses, tam ekran, yeniden başlatma
-ve bölüm seçimi buradadır. Devam et ile oyun sürer. Yönler saydam üçgen,
+Sağ üstteki Ⅱ mola düğmesini açınca oyun duraklar. Ses, ana ekran ve oyundan çıkış
+buradadır. Tam ekran düğmesi yalnızca tam ekranda değilken görünür. Devam et ile oyun sürer. Yönler saydam üçgen,
 zıplama saydam dairedir. Yönler sol alt kenara bitişik ve aralıksız, zıplama sağ
 alt kenara sabittir; yön üçgenleri daha dar, yüksek ve yuvarlaktır; telefonun güvenli ekran boşlukları korunur. İki parmakla yön
 ve zıplama bağımsız kullanılabilir.
@@ -392,11 +392,17 @@ SVG'lerine dokunulmaz.
 ### Ana ekrana kurulum (PWA)
 
 Oyun APK gerektirmez. Android Chrome menüsünden **Uygulamayı yükle / Ana ekrana ekle**
-seçilebilir; tarayıcı kurulum olanağı sunduğunda oyunun ☰ menüsünde de kurulum düğmesi
+seçilebilir; tarayıcı kurulum olanağı sunduğunda oyunun ayar menüsünde de kurulum düğmesi
 görünür. iPhone/iPad'de Safari paylaşım menüsünden **Ana Ekrana Ekle** kullanılır.
 Ana ekran simgesiyle açıldığında adres çubuğu olmadan çalışır. Manifestte ekran yönü
 `any` olarak ayarlanır; açılışta zorunlu döndürme yapılmaz. Oyundaki tam ekran
 düğmesi kullanıldığında yatay yön kilidi tarayıcı destekliyorsa istenir.
+`Oyna` dokunuşunda da tam ekran ve mobilde yatay yön istenir; bu istekler uygulama
+açılışında yapılmaz. İzin verilmezse oyun normal ekran boyutunda devam eder.
+`src/ui/display.js` giriş/çıkış isteklerini yönetir. Mola menüsündeki **Oyundan çık**
+oyun döngüsünü ve sesleri durdurup tam ekran/yön kilidini bırakır, pencereyi
+kapatmayı dener. Tarayıcı kapanmaya izin vermezse sistemin son uygulamalar
+ekranından kapatma açıklaması gösterilir; pencerenin kapandığı iddia edilmez.
 
 `manifest.webmanifest` uygulama adını, simgeleri ve göreli yayın yolunu tanımlar.
 Başlangıç adresi doğrudan `./index.html` dosyasıdır; uygulama kimliği `./` olarak

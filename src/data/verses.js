@@ -16,4 +16,4 @@ const worldZeroVerses = [
 ];
 
 // Yeni dünyada da doğrulanmış mevcut kısa alıntılar kullanılır.
-export const verses = [...worldZeroVerses, worldZeroVerses[6], worldZeroVerses[5], worldZeroVerses[10], worldZeroVerses[8]];
+export const verses = [...worldZeroVerses, worldZeroVerses[6], worldZeroVerses[5], worldZeroVerses[10], worldZeroVerses[8],worldZeroVerses[3]];

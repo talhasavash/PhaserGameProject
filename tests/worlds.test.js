@@ -1,23 +1,26 @@
 // Dünya ve bölüm sıralamasını, bölüm verilerini ve dünyalar arası kilit ilerlemesini doğrular.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { levels, worlds, worldForLevel, chapterNumber, bossGate } from '../src/world/levels/level.js';
+import { levels, worlds, worldForLevel, chapterNumber } from '../src/world/levels/level.js';
+import { bossGate } from '../src/world/levels/world0.js';
 import { readUnlocked, unlockNext } from '../src/data/progress.js';
 import { columnFrame, columnTiming, prepareColumn, visibleColumn, RAISED_BOTTOM, CLOSED_BOTTOM } from '../src/gameplay/columns.js';
 
-test('World 0 keeps its old indexes and boss; World 1 restarts chapter numbering', () => {
-    assert.deepEqual(worlds.map(world => [world.id, world.start, world.count]), [[0, 0, 11], [1, 11, 4]]);
+test('World 0 keeps its old indexes and boss; Worlds 1 and 2 restart chapter numbering', () => {
+    assert.deepEqual(worlds.map(world => [world.id, world.start, world.count]), [[0, 0, 11], [1, 11, 4],[2, 15, 1]]);
     assert.equal(levels[10], bossGate);
     assert.equal(worldForLevel(10).id, 0);
     assert.equal(chapterNumber(10), 11);
     assert.equal(worldForLevel(11).id, 1);
     assert.equal(chapterNumber(11), 1);
     assert.equal(chapterNumber(13), 3);
-    assert.deepEqual(levels.slice(11).map(level => level.name), ['Lav Vadisi', 'Mekanik Fabrika', 'Kara Kale', 'Uçurum Geçidi']);
-    assert.deepEqual(levels.slice(11).map(level => level.exitType), ['gate', 'gate', 'gate', 'mosque']);
+    assert.equal(worldForLevel(15).id, 2);
+    assert.equal(chapterNumber(15), 1);
+    assert.deepEqual(levels.slice(11, 15).map(level => level.name), ['Lav Vadisi', 'Mekanik Fabrika', 'Kara Kale', 'Uçurum Geçidi']);
+    assert.deepEqual(levels.slice(11, 15).map(level => level.exitType), ['gate', 'gate', 'gate', 'mosque']);
 });
 
-test('Existing saved progress is retained; completing the old boss unlocks World 1', () => {
+test('Existing saved progress is retained; completing each world unlocks the next', () => {
     let saved = '11';
     const storage = { getItem() { return saved; }, setItem(key, value) { saved = value; } };
     globalThis.window = { localStorage: storage };
@@ -27,7 +30,9 @@ test('Existing saved progress is retained; completing the old boss unlocks World
     assert.equal(unlockNext(11, levels.length), 13);
     assert.equal(unlockNext(12, levels.length), 14);
     assert.equal(unlockNext(13, levels.length), 15);
-    assert.equal(unlockNext(14, levels.length), 15);
+    assert.equal(unlockNext(14, levels.length), 16);
+    assert.equal(saved, '16');
+    assert.equal(unlockNext(15, levels.length), 16);
 });
 
 test('Columns warn before slamming, remain closed, then retract continuously', () => {

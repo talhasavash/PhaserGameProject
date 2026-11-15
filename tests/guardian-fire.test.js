@@ -1,14 +1,14 @@
 // Final canavarının ateş zamanlamasını, atış hareketini ve altından geçiş koşullarını doğrular.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { levels } from '../src/world/levels/level.js';
+import { brokenPass as level } from '../src/world/levels/world1.js';
 import { bossLift } from '../src/gameplay/hazards.js';
 import { breathMoment, breathWarning, guardianShotFrame, updateGuardianFire, resetGuardianFire } from '../src/gameplay/guardianFire.js';
 
-const level = levels.at(-1);
 const boss = level.enemies.find(enemy => enemy.breath);
 
-test('The final chapter has one giant fire guardian between the key and mosque on solid ground', () => {
+test('World 1 boss chapter has one giant fire guardian between the key and mosque on solid ground', () => {
+    assert.equal(level.enemies.filter(enemy => enemy.breath).length, 1);
     assert.equal(level.boss, true);
     assert.equal(level.exitLabel, 'camiye');
     assert.equal(level.exitType, 'mosque');

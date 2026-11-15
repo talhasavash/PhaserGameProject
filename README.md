@@ -87,8 +87,10 @@ PhaserGameProject/
 │   ├── world/                  Bölümler ve ortam
 │   │   ├── levelObjects.js      Toplanacak nesneler, çıkış ve can alanlarını kurma
 │   │   ├── levels/              Bölüm verileri ve dünya sıralaması
-│   │   │   ├── level.js         Tüm bölüm listesi ve Dünya 0 verileri
-│   │   │   └── world1.js        Dünya 1 bölüm verileri
+│   │   │   ├── level.js         Dünya listelerini birleştirme ve bölüm sıralaması
+│   │   │   ├── world0.js        Dünya 0 bölüm verileri
+│   │   │   ├── world1.js        Dünya 1 bölüm verileri
+│   │   │   └── world2.js        Dünya 2 bölüm verileri
 │   │   ├── scenery/             Arka plan ve dekor çizimleri
 │   │   │   ├── background.js    Tema seçimi, bahçe, cami ve abdest alanı
 │   │   │   ├── chapterScenery.js Diğer Dünya 0 ortamları
@@ -145,7 +147,7 @@ sırayı izle; çağrılan her yardımcı fonksiyonun içine hemen girmek gerekm
 | 10 | `src/world/scenery/background.js`, `chapterScenery.js`, `src/world/terrain/platforms.js`, `src/graphics/texture.js` | Ortam çizimleri ve ortak doku önbelleği |
 | 11 | `src/ui/levelMenu.js`, `src/data/progress.js`, `verses.js` | Bölüm seçimi, kilitler, localStorage ve sonuç metinleri |
 
-İlk küçük deneme: `src/world/levels/level.js` içindeki bir meyvenin `x` konumunu değiştir.
+İlk küçük deneme: `src/world/levels/world2.js` içindeki bir meyvenin `x` konumunu değiştir.
 Ardından `gameplay/player.js` içindeki `WALK_SPEED` değerini küçük miktarda değiştir.
 Son olarak bir yıldızın `collectFruit → recordFruit → updateHud` yolunu takip et.
 `lib/phaser.min.js` kütüphanenin sıkıştırılmış dosyasıdır; öğrenmek için onu okumuyoruz.
@@ -219,8 +221,9 @@ sürüm bilgisini ve kaynak dosyaların değişmediğini kontrol eder.
 ## Kodun görevleri ve Phaser kullanımı
 
 Dosyalar gameplay, world, ui ve data klasörlerinde görevlerine göre gruplanır. Yeni sınıf,
-bağımlılık veya karmaşık bir katman sistemi eklenmedi. Bölüm tanımları `level.js`
-içinde veri olarak kalır; yeni bölüm eklemek için ana oyun döngüsü değiştirilmez.
+bağımlılık veya karmaşık bir katman sistemi eklenmedi. Bölüm tanımları `world0.js`,
+`world1.js` ve `world2.js` içinde veri olarak kalır; `level.js` bu listeleri birleştirir.
+Yeni bölüm eklemek için ana oyun döngüsü değiştirilmez.
 `world/levels` bölüm verilerini, `world/scenery` dekor çizimlerini, `world/terrain`
 zemin ve basamak işlerini toplar. Ortak çizim altyapısı `graphics` içindedir.
 
@@ -293,9 +296,10 @@ HTTP kullan; HTML dosyasını çift tıklayarak açma (oyun ES modülleri kullan
 
 ## Dünyalar ve bölüm akışı
 
-Dünya 0 mevcut 11 bölümü, Dünya 1 yeni dört bölümü içerir. Ana menüde önce dünya,
-sonra o dünyadaki bölüm seçilir. Dünya 1 başlangıçta kilitlidir; Dünya 0 boss
-bölümü tamamlanınca açılır. Bölüm numaraları her dünyada yeniden 1’den başlar;
+Dünya 0 mevcut 11 bölümü, Dünya 1 dört bölümü, Dünya 2 ise öğrenme çalışması olarak
+hazırlanan bir bölümü içerir. Ana menüde önce dünya, sonra o dünyadaki bölüm seçilir.
+Dünya 1, Dünya 0 boss bölümü tamamlanınca; Dünya 2 de Dünya 1 tamamlanınca açılır.
+Bölüm numaraları her dünyada yeniden 1’den başlar;
 Puan çubuğunda bölüm etiketi yoktur; yalnızca can, yıldız, anahtar, puan ve ilerleme
 görünür. Çubuğun arka planı %20 opaktır. Menüde dünya/bölüm adları yerine yalnızca numaralar gösterilir.
 

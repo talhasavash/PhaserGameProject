@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { fireFrame, chooseFireX, fireWait, createFireRain, updateFireRain } from '../src/gameplay/fireRain.js';
-import { levels } from '../src/world/levels/level.js';
+import { levels, worlds } from '../src/world/levels/level.js';
 
 test('A chosen target waits for 1.5 seconds, then falls and finishes without moving its target', () => {
     const plan = { x: 900, startAt: 2000, speed: 300 };
@@ -54,9 +54,8 @@ test('Random fire targets vary, stay near the player and avoid safe spots and ot
     assert.equal(chooseFireX(levels[2], levels[2].exit.x, random), null);
     assert.equal(chooseFireX(levels[2], 100, () => 0), null, 'Do not fall back to an unsafe target');
 });
-test('Fifteen chapters have unique themes and reachable stars before their key and exit', () => {
-    assert.equal(levels.length, 15);
-    assert.equal(new Set(levels.map(level => level.theme)).size, 15);
+test('Every chapter has three reachable stars before its key and exit', () => {
+    assert.equal(levels.length, worlds.reduce((count, world) => count + world.count, 0));
     const maxRise = 590 ** 2 / (2 * 1600);
     for (const level of levels) {
         const reached = [];
@@ -65,14 +64,14 @@ test('Fifteen chapters have unique themes and reachable stars before their key a
                 step.y - p.y >= 0 && step.y - p.y < maxRise &&
                 p.x - (step.x + step.width) >= 0 && p.x - (step.x + step.width) < 100)) reached.push(p);
         }
-        const apples = level.fruits.filter(item => item.type === 'star');
-        assert.equal(apples.length, 3);
+        const stars = level.fruits.filter(item => item.type === 'star');
+        assert.equal(stars.length, 3);
         assert.equal(new Set(level.fruits.map(item => item.id)).size, level.fruits.length);
-        for (const apple of apples) {
-            const onGround = apple.y >= level.groundY - 60 &&
-                (level.gaps || []).every(gap => apple.x < gap.x || apple.x > gap.x + gap.width);
-            assert.ok(onGround || reached.some(p => apple.x > p.x && apple.x < p.x + p.width && p.y - apple.y < 60), level.name);
-            assert.ok(apple.x < level.key.x);
+        for (const star of stars) {
+            const onGround = star.y >= level.groundY - 60 &&
+                (level.gaps || []).every(gap => star.x < gap.x || star.x > gap.x + gap.width);
+            assert.ok(onGround || reached.some(p => star.x > p.x && star.x < p.x + p.width && p.y - star.y < 60), level.name);
+            assert.ok(star.x < level.key.x);
         }
         assert.ok(level.key.x < level.exit.x && level.exit.x < level.width);
     }

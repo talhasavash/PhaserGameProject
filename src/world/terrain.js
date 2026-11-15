@@ -1,3 +1,4 @@
+// Zemin ve platformların fizik gövdelerini kurar; çukur ve buz alanlarını hazırlar.
 import { createPlatformArt } from './platforms.js';
 import { createPitArt } from './pits.js';
 

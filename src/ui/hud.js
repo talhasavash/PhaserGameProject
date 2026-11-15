@@ -1,3 +1,4 @@
+// Ekranda sabit duran can, yıldız, anahtar, puan ve ilerleme göstergelerini oluşturup günceller.
 const textStyle = { fontFamily: 'Trebuchet MS, sans-serif', color: '#294e4c' };
 const HUD_WIDTH = 500;
 const HUD_PROGRESS_WIDTH = 76;

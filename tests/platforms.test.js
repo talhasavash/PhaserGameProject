@@ -1,3 +1,4 @@
+// Bölüme özel platform çizimlerini ve doku tekrar kullanımını doğrular.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createPlatformArt, platformThemes } from '../src/world/platforms.js';

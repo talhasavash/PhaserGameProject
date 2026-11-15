@@ -1,3 +1,4 @@
+// Yayın dosyalarını önbelleğe alır; ağ isteği başarısız olduğunda kayıtlı kopyadan oyunu sunar.
 // build-site.cjs bu iki değeri yayın sürümü ve dosya listesiyle doldurur.
 const CACHE_NAME = 'meyve-bahcesi-__VERSION__';
 const PRECACHE = __PRECACHE__;

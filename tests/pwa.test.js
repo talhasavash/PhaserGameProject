@@ -1,3 +1,4 @@
+// PWA ayarlarını ve service worker önbellek, güncelleme ve çevrimdışı davranışlarını doğrular.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

@@ -1,4 +1,4 @@
-// Muhafız önce yerde bekler, sonra yüksek bir yay çizerek zıplar.
+// Büyük canavarların zıplama zamanını ve karaktere uzaklığa göre öfke durumunu hesaplar.
 // Yükseldiği aralıkta çocuğun altından koşarak geçebileceği boşluk açılır.
 export function bossLift(elapsed, jump) {
     const phase = (elapsed + jump.offset) % jump.period;

@@ -1,4 +1,4 @@
-// Bölümün basamak görünümü. Fizik kutusunu GameScene kurar; burada yalnızca çizim var.
+// Bölüm temasına göre basamak görsellerini çizer ve tekrar kullanılacak dokular üretir.
 // Her genişlik/tema bir kez dokuya çevrilir; oyun sırasında şekiller yeniden çizilmez.
 export const platformThemes = {
     garden: { body: 0x98714d, edge: 0x72a65f, detail: 0xc8a16e },

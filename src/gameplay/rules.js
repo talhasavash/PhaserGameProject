@@ -1,4 +1,4 @@
-// Burada Phaser yok. Sadece puan, elma, anahtar ve can bilgisi var.
+// Phaser kullanmadan puan, yıldız, anahtar, can ve bölüm tamamlama kurallarını hesaplar.
 export const FRUIT_TYPES = ['apple', 'pear', 'orange', 'banana', 'grapes', 'strawberry'];
 export function createGameState(initialScore = 0) {
     return {

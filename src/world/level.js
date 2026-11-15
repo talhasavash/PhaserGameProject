@@ -1,3 +1,4 @@
+// Dünya ve bölüm listesini, nesne konumlarını ve bölüm numarasını bulma yardımcılarını içerir.
 import { worldOneLevels } from './world1.js';
 // Bu dosya sadece bölümün verisidir; hareket veya çarpışma kodu içermez.
 // x sağa, y aşağı doğru artar. Platformların y değeri üst yüzeyleridir.

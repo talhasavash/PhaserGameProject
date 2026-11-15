@@ -1,4 +1,4 @@
-// Yeni bölüm görselleri; özgün karakterleri ve mevcut SVG düzenlemelerini değiştirmez.
+// Ek bölüm nesneleri ve düşmanlar için SVG görseller üretir.
 const fs = require('node:fs');
 const path = require('node:path');
 const target = path.resolve(__dirname, '../assets/images');

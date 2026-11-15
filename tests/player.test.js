@@ -1,3 +1,4 @@
+// Karakterin yön, hareket, zıplama, yüz ifadesi ve toparlanma davranışlarını doğrular.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readDirection, movePlayer, currentExpression, showPlayerExpression, showRecovery, updatePlayerEffects } from '../src/gameplay/player.js';

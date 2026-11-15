@@ -1,3 +1,4 @@
+// Dünya ve bölüm sıralamasını, bölüm verilerini ve dünyalar arası kilit ilerlemesini doğrular.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { levels, worlds, worldForLevel, chapterNumber, bossGate } from '../src/world/level.js';
@@ -13,6 +14,7 @@ test('World 0 keeps its old indexes and boss; World 1 restarts chapter numbering
     assert.equal(chapterNumber(11), 1);
     assert.equal(chapterNumber(13), 3);
     assert.deepEqual(levels.slice(11).map(level => level.name), ['Lav Vadisi', 'Mekanik Fabrika', 'Kara Kale', 'Uçurum Geçidi']);
+    assert.deepEqual(levels.slice(11).map(level => level.exitType), ['gate', 'gate', 'gate', 'mosque']);
 });
 
 test('Existing saved progress is retained; completing the old boss unlocks World 1', () => {

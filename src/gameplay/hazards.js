@@ -1,3 +1,4 @@
+// Düşmanları oluşturur; devriye hareketlerini ve boss davranışlarının güncellenmesini yönetir.
 import { bossStep, bossMood } from './boss.js';
 
 const ENEMY_SCALE = 0.8;

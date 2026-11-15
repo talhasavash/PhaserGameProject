@@ -1,4 +1,4 @@
-// Kısa, özgün oyun seslerini üretir. Oyunda dosyaları Phaser çalar.
+// Zıplama, toplama, çarpma ve kazanma gibi olaylarda çalınacak kısa oyun seslerini üretir.
 const fs = require('node:fs');
 const path = require('node:path');
 const folder = path.resolve(__dirname, '../assets/audio');

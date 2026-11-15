@@ -1,3 +1,4 @@
+// Karakteri oluşturur; yürüme, hızlanma, zıplama, animasyon ve yüz ifadelerini yönetir.
 // Hızlar piksel/saniye, süreler milisaniye cinsindedir.
 const WALK_SPEED = 265;
 const JUMP_SPEED = 590;

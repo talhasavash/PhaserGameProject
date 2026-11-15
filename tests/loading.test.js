@@ -1,3 +1,4 @@
+// Yükleme göstergesini ve sahne hazır olduğunda yükleme ekranının kapanmasını doğrular.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { EventEmitter } from 'node:events';

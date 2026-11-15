@@ -1,4 +1,4 @@
-// Kurulum Chrome/Safari menüsünden yapılır; oyun menüsü yalnızca oyun içindir.
+// Yayınlanan oyunda service worker kaydını yaparak PWA önbelleğinin kullanılmasını sağlar.
 export function setupPwa() {
     // Geliştirme sunucusunda önbellek oluşturmayız; yalnızca yayın kopyası kaydeder.
     if (!document.querySelector('meta[name="game-release"]') || !('serviceWorker' in navigator)) return;

@@ -1,3 +1,4 @@
+// Final canavarının ateş zamanlamasını, atış hareketini ve altından geçiş koşullarını doğrular.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { levels } from '../src/world/level.js';
@@ -10,7 +11,7 @@ const boss = level.enemies.find(enemy => enemy.breath);
 test('The final chapter has one giant fire guardian between the key and mosque on solid ground', () => {
     assert.equal(level.boss, true);
     assert.equal(level.exitLabel, 'camiye');
-    assert.equal(level.columns, undefined, 'This chapter uses a mosque exit');
+    assert.equal(level.exitType, 'mosque');
     assert.ok(boss.scale >= 2.4);
     const halfBody = 29 * boss.scale;
     assert.ok(level.key.x < boss.x - halfBody);

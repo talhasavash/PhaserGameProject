@@ -1,4 +1,4 @@
-// Yalnızca yayın için bir kopya üretir; src dosyalarımızı değiştirmez.
+// GitHub Pages için yayın dosyalarını dist klasörüne kopyalar; sürüm ve önbellek bilgilerini hazırlar.
 const fs = require('node:fs');
 const path = require('node:path');
 const root = path.resolve(__dirname, '..');

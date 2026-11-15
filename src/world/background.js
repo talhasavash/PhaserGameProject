@@ -1,3 +1,4 @@
+// Bölüme uygun arka planı kurar; cami ve abdest alanı gibi ortam görsellerini çizer.
 import { createChapterScenery } from './chapterScenery.js';
 import { createWorldOneScenery } from './world1Scenery.js';
 // Bu dosya yalnızca görünümü çizer; oyun kurallarını değiştirmez.

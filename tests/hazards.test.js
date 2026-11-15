@@ -1,3 +1,4 @@
+// Düşman hareketlerinin ve boss güncellemelerinin beklenen şekilde çalıştığını doğrular.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { updateHazards } from '../src/gameplay/hazards.js';

@@ -1,3 +1,4 @@
+// Boss zıplamasını, öfkesini ve yeniden başlama durumunda sıfırlanmasını doğrular.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { bossLift, bossMood, bossStep, resetBossRage } from '../src/gameplay/boss.js';

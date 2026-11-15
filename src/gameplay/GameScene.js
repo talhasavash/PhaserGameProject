@@ -1,22 +1,23 @@
+// Phaser sahnesidir; bölümü kurar, oyun döngüsünü ve toplama, çarpışma, kazanma akışını yönetir.
 import { levels, worldForLevel, chapterNumber } from '../world/level.js';
 import { createGameState, isKeyReady, recordFruit, takeKey, finishLevel, healAtFountain } from './rules.js';
 import { createPlayer, movePlayer, resetPlayerMovement, showPlayerExpression, showRecovery, updatePlayerEffects } from './player.js';
-import { createScenery, createMosque, createFountain } from '../world/background.js';
+import { createScenery } from '../world/background.js';
 import { bindTouchControls } from './controls.js';
 import { createFireRain, updateFireRain } from './fireRain.js';
 import { unlockNext } from '../data/progress.js';
-import { verses } from '../data/verses.js';
 import { resetBossRage } from './boss.js';
 import { createTerrain } from '../world/terrain.js';
 import { createHazards, updateHazards } from './hazards.js';
 import { createHud, centerHud, updateHud, updateProgress } from '../ui/hud.js';
 import { loadGameAssets } from '../data/assets.js';
 import { createColumns, updateColumns } from './columns.js';
-import { createWorldGate } from '../world/world1Scenery.js';
+import { createCollectibles, createLandmarks, createHealingSpots } from '../world/levelObjects.js';
+import { prepareScenePage, bindSceneButtons, clearSceneButtons, showCompletion } from '../ui/scenePage.js';
 import { showLoading, updateLoading, hideLoading, finishLoading } from '../ui/loading.js';
 import { createGuardianFire, updateGuardianFire, resetGuardianFire } from './guardianFire.js';
 
-const COLLECTIBLE_SCALE = 0.75;
+export const GAME_SCENE_KEY = 'Garden';
 const ITEM_MESSAGES = {
     bead: 'Tesbih taneleri buldun! +10 puan.',
     mat: 'Bir seccade buldun! +20 puan.',
@@ -28,7 +29,7 @@ export class GameScene extends Phaser.Scene {
     // Tek sınıfımız bu: Phaser bir oyun ekranını "Scene" olarak yönetir.
     // "this", bu oyun ekranını temsil eder. Fizik ve kamera ona aittir.
     constructor(character = 'boy', levelIndex = 0) {
-        super('Garden');
+        super(GAME_SCENE_KEY);
         this.character = character;
         this.soundMuted = false;
         this.levelIndex = levelIndex;
@@ -53,29 +54,32 @@ export class GameScene extends Phaser.Scene {
     // Görseller yüklenince Phaser create'i bir kez çağırır: bölümü kur.
     create() {
         this.resetLevelState();
-        this.preparePage();
+        prepareScenePage();
+        // Önce dünya ve temas bölgeleri kurulur.
         this.physics.world.setBounds(0, 0, this.level.width, 600);
         createScenery(this, this.level.width, this.level.theme);
         createTerrain(this);
-        this.createCollectibles();
+        createCollectibles(this);
         createHazards(this);
         createGuardianFire(this);
         createFireRain(this);
         createColumns(this);
-        this.createLandmarks();
-        this.createHealingSpots();
+        createLandmarks(this);
+        createHealingSpots(this);
+        // Ardından karakter, kontroller ve çarpışma bağlantıları hazırlanır.
         this.player = createPlayer(this, this.level.spawn.x, this.level.spawn.y, this.character);
         this.player.onJump = () => this.sound.play('jump', { volume: 0.20 });
         this.touchControls = bindTouchControls();
         this.player.touchKeys = this.touchControls.keys;
         this.bindCollisions();
+        // Son olarak kamera, puan çubuğu ve sayfa düğmeleri bağlanır.
         this.cameras.main.setBounds(0, 0, this.level.width, 600);
         this.cameras.main.startFollow(this.player, true, 0.09, 0, -190, 0);
         createHud(this);
         this.centerHud();
         this.scale.on(Phaser.Scale.Events.RESIZE, this.centerHud, this);
         this.pauseKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
-        this.bindPageControls();
+        bindSceneButtons(this);
         this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.shutdownScene, this);
         this.events.once(Phaser.Scenes.Events.DESTROY, this.shutdownScene, this);
         this.announce(`Dünya ${worldForLevel(this.levelIndex).id} · ${chapterNumber(this.levelIndex)}. bölüm: ${this.level.name}. Üç yıldızı bul, anahtarı al ve ${this.level.exitLabel || 'camiye'} ulaş.`);
@@ -93,16 +97,6 @@ export class GameScene extends Phaser.Scene {
         this.lost = false;
         this.falling = false;
         this.lastGateHint = -Infinity;
-    }
-
-    preparePage() {
-        document.getElementById('game-stage').inert = false;
-        document.getElementById('touch-controls').inert = false;
-        document.getElementById('settings-panel').hidden = true;
-        document.getElementById('settings-button').setAttribute('aria-expanded', 'false');
-        document.getElementById('settings-button').setAttribute('aria-label', 'Oyun menüsünü aç');
-        document.getElementById('fall-result').hidden = true;
-        document.getElementById('touch-controls').hidden = false;
     }
 
     bindCollisions() {
@@ -129,49 +123,7 @@ export class GameScene extends Phaser.Scene {
         this.events.off(Phaser.Scenes.Events.DESTROY, this.shutdownScene, this);
         this.scale.off(Phaser.Scale.Events.RESIZE, this.centerHud, this);
         this.touchControls.destroy();
-        for (const id of ['pause-button', 'restart-button', 'play-again', 'next-level', 'retry-fall']) {
-            document.getElementById(id).onclick = null;
-        }
-    }
-
-    // Meyveleri kur; anahtar üç yıldız toplanıncaya kadar gizli kalır.
-    createCollectibles() {
-        this.fruits = this.physics.add.staticGroup();
-        for (const fruit of this.level.fruits) {
-            const sprite = this.fruits.create(fruit.x, fruit.y, fruit.type).setDepth(10);
-            sprite.setScale(COLLECTIBLE_SCALE).refreshBody();
-            sprite.setData('item', fruit);
-            // Görsel hafifçe süzülür; toplama kutusu yerinde kalır.
-            this.tweens.add({ targets: sprite, y: fruit.y - 5, duration: 950, yoyo: true, repeat: -1, delay: fruit.x % 400, ease: 'Sine.easeInOut' });
-        }
-        this.keySprite = this.physics.add.staticImage(this.level.key.x, this.level.key.y, 'key').setDepth(10);
-        this.keySprite.setScale(COLLECTIBLE_SCALE).refreshBody();
-        this.keySprite.disableBody(true, true);
-        this.add.ellipse(this.level.key.x, 514, 100, 12, 0x528b56).setDepth(2);
-        this.add.rectangle(this.level.key.x, 506, 64, 18, 0xc8b78c).setDepth(3);
-    }
-
-    createLandmarks() {
-        const { x } = this.level.checkpoint;
-        this.add.rectangle(x, 476, 6, 88, 0x6b6e52).setDepth(6);
-        this.checkpointFlag = this.add.triangle(x + 4, 433, 0, 0, 48, 12, 0, 27, 0xe3c37d).setOrigin(0, 0).setDepth(7);
-        const exit = this.level.exit;
-        this.door = this.level.columns
-            ? createWorldGate(this, exit.x, this.level.theme)
-            : createMosque(this, exit.x, this.level.theme);
-        this.exitZone = this.add.zone(exit.x, 480, 68, 80);
-        this.physics.add.existing(this.exitZone, true);
-    }
-
-    createHealingSpots() {
-        this.fountains = this.physics.add.staticGroup();
-        for (const fountain of this.level.fountains) {
-            const water = createFountain(this, fountain.x);
-            const zone = this.add.zone(fountain.x, 480, 85, 80);
-            zone.setData('id', fountain.id);
-            zone.setData('water', water);
-            this.fountains.add(zone);
-        }
+        clearSceneButtons();
     }
 
     useFountain(player, zone) {
@@ -185,25 +137,6 @@ export class GameScene extends Phaser.Scene {
 
     centerHud() {
         centerHud(this);
-    }
-
-    bindPageControls() {
-        const result = document.getElementById('game-result');
-        result.hidden = true;
-        document.getElementById('pause-button').textContent = 'Devam et';
-        document.getElementById('pause-button').setAttribute('aria-label', 'Devam et');
-        document.getElementById('pause-button').disabled = false;
-        document.getElementById('restart-button').disabled = false;
-        document.getElementById('toolbar-status').textContent = `${this.level.name} seni bekliyor`;
-        document.getElementById('pause-button').onclick = () => document.getElementById('settings-button').click();
-        document.getElementById('restart-button').onclick = () => {
-            document.getElementById('settings-button').click();
-            this.restart();
-        };
-        document.getElementById('play-again').onclick = () => this.continueAfterResult();
-        document.getElementById('next-level').onclick = () => this.continueAfterResult();
-        document.getElementById('retry-fall').onclick = () => this.retryFall();
-        this.sound.setMute(this.soundMuted);
     }
 
     updateHud() {
@@ -301,15 +234,9 @@ export class GameScene extends Phaser.Scene {
         if (this.resultShown) return;
         this.resultShown = true;
         this.tweens.pauseAll();
-        const final = this.levelIndex === levels.length - 1;
-        document.getElementById('result-title').textContent = final ? 'Oyun tamam!' : 'Bölüm tamam!';
-        document.getElementById('result-verse').textContent = verses[this.levelIndex].text;
-        document.getElementById('next-level').hidden = final;
-        document.getElementById('play-again').hidden = !final;
-        document.getElementById('game-result').hidden = false;
+        const title = showCompletion(this.levelIndex);
         this.sound.play('level-complete', { volume: 0.22 });
-        document.getElementById(final ? 'play-again' : 'next-level').focus({ preventScroll: true });
-        this.announce(document.getElementById('result-title').textContent);
+        this.announce(title);
     }
 
     continueAfterResult() {

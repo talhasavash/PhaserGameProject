@@ -1,3 +1,4 @@
+// Puan, yıldız, anahtar, can kazanma ve bölüm tamamlama kurallarını doğrular.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createGameState, isKeyReady, recordFruit, takeKey, finishLevel, healAtFountain, FRUIT_TYPES } from '../src/gameplay/rules.js';

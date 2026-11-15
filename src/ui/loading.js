@@ -1,4 +1,4 @@
-// İlk bölümde dosya indirmeyi, sonraki bölümlerde sahnenin hazırlanmasını örter.
+// Bölüm yüklenirken gösterilen yükleme ekranını ve ilerleme bilgisini yönetir.
 export function showLoading() {
     document.getElementById('game-loading').hidden = false;
     updateLoading(0);

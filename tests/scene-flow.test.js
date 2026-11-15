@@ -1,3 +1,4 @@
+// Bölüm kurulumunu, sahne geçişlerini ve oyun akışındaki bağlantıları doğrular.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createGameState, recordFruit, takeKey } from '../src/gameplay/rules.js';

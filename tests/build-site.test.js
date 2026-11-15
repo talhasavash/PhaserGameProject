@@ -1,3 +1,4 @@
+// Yayın kopyasının dosyalarını, import yollarını ve sürüm bilgilerini doğrular.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

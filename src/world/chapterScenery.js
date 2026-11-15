@@ -1,4 +1,4 @@
-// Yeni ortamlar küçük dokulara bir kez çizilir; kamera kayarken bu dokular tekrarlanır.
+// Orman, cami içi ve diğer bölüm temalarının katmanlı arka plan dokularını oluşturur.
 const palettes = {
     forest: { sky: 0xd4e7cb, far: 0x8fb393, near: 0x547d63, earth: 0x95744f, edge: 0x79a15b },
     interior: { sky: 0xeae1cb, far: 0xd4c6a6, near: 0xb89c76, earth: 0x934d51, edge: 0xc6a268 },

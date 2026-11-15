@@ -1,3 +1,4 @@
+// Bölüm tamamlanma kartlarında gösterilen ayet metinlerini ve kaynak bilgilerini içerir.
 // Diyanet meallerinden kısa alıntılar. Üç nokta, ayetin yalnızca bir bölümünün alındığını gösterir.
 // Metinler oyun puanıyla ilişkilendirilmez; bölüm sonunda okuyabilmek için süre sınırı yoktur.
 const worldZeroVerses = [

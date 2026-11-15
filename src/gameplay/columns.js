@@ -1,4 +1,4 @@
-// Kolon tavana kadar uzanır. Yükseldiğinde altından yürünür; üstünden atlanamaz.
+// İnip yükselen kolonların çizimini, fizik gövdelerini ve geçiş zamanlamasını yönetir.
 const COLUMN_HEIGHT = 512;
 export const RAISED_BOTTOM = 260;
 export const CLOSED_BOTTOM = 520;

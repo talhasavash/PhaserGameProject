@@ -1,3 +1,4 @@
+// Dünya 1 ortamlarının katmanlı arka planlarını ve bölüme özel çıkış geçitlerini çizer.
 const palettes = {
     lava: { sky: '#422d43', far: 0x654055, near: 0x91505a, floor: 0x473b4d, trim: 0xf2a361 },
     factory: { sky: '#b4cbd0', far: 0x89a9b0, near: 0x577d8b, floor: 0x3e5969, trim: 0xd9bd70 },

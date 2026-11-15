@@ -1,3 +1,4 @@
+// Ateş yağmurunun konum, bekleme süresi ve düşüş hareketini doğrular.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { fireFrame, chooseFireX, fireWait, createFireRain, updateFireRain } from '../src/gameplay/fireRain.js';

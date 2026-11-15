@@ -1,3 +1,4 @@
+// Mobil yön ve zıplama düğmelerini çoklu dokunmayla karakterin kontrol bilgisine dönüştürür.
 // Her parmağın kimliği ayrı tutulur. İkinci parmak yön tuşunu bırakmış sayılmaz.
 export function bindTouchControls(root = document, page = window) {
     const keys = {};

@@ -1,3 +1,4 @@
+// Projedeki JavaScript dosyalarının sözdizimini kontrol ederek yazım hatalarını bulur.
 const fs = require('node:fs');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');

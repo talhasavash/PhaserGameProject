@@ -1,4 +1,4 @@
-// Mobilde daha az dünya yüksekliği göstererek her şeyi orantılı büyütürüz.
+// Ekran boyutuna göre görünür oyun alanını hesaplayarak mobilde nesnelerin daha büyük görünmesini sağlar.
 // Platformların, karakterin ve fizik kurallarının gerçek boyutları değişmez.
 export function gameView(width, height, touchLayout) {
     if (touchLayout && width > height) {

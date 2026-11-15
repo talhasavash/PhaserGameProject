@@ -87,6 +87,7 @@ PhaserGameProject/
 │   │   └── columns.js           İnip yükselen katı kolonlar ve zamanlama
 │   ├── world/                  Bölümler ve ortam
 │   │   ├── level.js             Bölüm tanımları ve nesne konumları
+│   │   ├── levelObjects.js      Toplanacak nesneler, çıkış ve can alanlarını kurma
 │   │   ├── terrain.js           Zemin, çukurlar, buz ve platform gövdeleri
 │   │   ├── pits.js              Kırık kaya kenarlarıyla açık uçurum çizimleri
 │   │   ├── platforms.js         Bölüme özel basamak çizimleri
@@ -95,7 +96,9 @@ PhaserGameProject/
 │   │   ├── world1.js            Yeni dünyanın dört bölümünün verileri
 │   │   └── world1Scenery.js     Yeni dünya çizimleri ve farklı çıkışlar
 │   ├── ui/
-│   │   ├── hud.js               Bölüm numarası, can, görev ve puan
+│   │   ├── levelMenu.js         Dünya/bölüm seçenekleri ve kilitlerin görünümü
+│   │   ├── scenePage.js         Sahnenin HTML düğmeleri ve sonuç kartı
+│   │   ├── hud.js               Can, görev ve puan
 │   │   └── view.js              Telefon/tablet için dünya boyutu
 │   └── data/
 │       ├── assets.js            Phaser Loader görsel ve ses listeleri
@@ -130,13 +133,13 @@ sırayı izle; çağrılan her yardımcı fonksiyonun içine hemen girmek gerekm
 | 2 | `src/game.js` | `startSelectedGame` ve `startGame`; seçimin Phaser'a aktarılması |
 | 3 | `src/gameplay/GameScene.js` | Yalnızca `init`, `preload`, `create`, `update`; ana akış |
 | 4 | `src/data/assets.js` | Görsel/ses anahtarları ve Phaser Loader |
-| 5 | `src/world/level.js`, `terrain.js` | Bölüm verilerinin fizik zeminine dönüşmesi |
+| 5 | `src/world/level.js`, `terrain.js`, `levelObjects.js` | Bölüm verilerinin zemine, nesnelere ve temas bölgelerine dönüşmesi |
 | 6 | `src/gameplay/player.js`, `controls.js` | Girdi, hızlanma, zıplama ve animasyon; ardından mobil parmak takibi |
 | 7 | `src/gameplay/rules.js` | Puan, yıldız, anahtar ve can; sonra GameScene'deki temas metotlarına dön |
-| 8 | `src/ui/hud.js`, `view.js` | Durumun ekranda gösterilmesi ve mobil ekran ölçüsü |
-| 9 | `src/gameplay/hazards.js`, `boss.js`, `fireRain.js` | Devriye, boss öfkesi/zıplaması ve ateş zamanlaması |
+| 8 | `src/ui/hud.js`, `view.js`, `scenePage.js` | Oyun göstergeleri, mobil ölçüler, HTML düğmeleri ve sonuç kartı |
+| 9 | `src/gameplay/hazards.js`, `boss.js`, `fireRain.js`, `guardianFire.js` | Devriye, boss öfkesi/zıplaması ve ateş zamanlaması |
 | 10 | `src/world/background.js`, `chapterScenery.js`, `platforms.js` | Ortam çizimleri ve doku önbelleği |
-| 11 | `src/data/progress.js`, `verses.js` | Bölüm kilitleri, localStorage ve sonuç metinleri |
+| 11 | `src/ui/levelMenu.js`, `src/data/progress.js`, `verses.js` | Bölüm seçimi, kilitler, localStorage ve sonuç metinleri |
 
 İlk küçük deneme: `world/level.js` içindeki bir meyvenin `x` konumunu değiştir.
 Ardından `gameplay/player.js` içindeki `WALK_SPEED` değerini küçük miktarda değiştir.
@@ -218,6 +221,9 @@ içinde veri olarak kalır; yeni bölüm eklemek için ana oyun döngüsü deği
 - `GameScene.preload` → `assets.js`: görselleri ve sesleri Phaser Loader'a verir.
 - `GameScene.create` → dünyayı kurar, karakteri oluşturur ve Phaser collider/overlap bağlantılarını yapar.
 - `GameScene.update` → karakter, kamera, düşmanlar, bant, kontrol noktası ve ilerlemeyi günceller.
+- `levelObjects.js` → bölüm verilerinden Phaser görsellerini ve fizik temas bölgelerini oluşturur; toplama ve kazanma kararları `GameScene` içinde kalır.
+- `levelMenu.js` → HTML dünya/bölüm seçeneklerini kurar; seçili dünya ve oyunu başlatma akışı `game.js` içinde kalır.
+- `scenePage.js` → sahnenin HTML düğmelerini bağlar, sahne kapanınca bağlantıları temizler ve sonuç kartını gösterir.
 - `hazards.js` → devriye, zıplama, öfke ve ses görevleri ayrı kısa fonksiyonlardır.
 - `hud.js` → Phaser Container, Text ve Graphics kullanır. `terrain.js` sabit fizik gruplarını kurar.
 
@@ -225,6 +231,9 @@ Phaser'ın Arcade Physics, animasyon, kamera, tween, ses ve zamanlayıcı sistem
 kullanıyoruz. Hız sınırını `Phaser.Math.Clamp`, yumuşak geçişleri `Phaser.Math.Linear`,
 bant oklarının dolaşımını `Phaser.Math.Wrap` sağlar. Phaser'ın SHUTDOWN ve DESTROY
 olayları hem bölüm değişiminde hem menüye dönüşte giriş/ekran dinleyicilerini temizler.
+
+Yeni bölümün çıkışı `exitType: 'gate'` ile geçit olarak seçilir; diğer bölümler cami
+kullanır. Böylece çıkış türü, bölümde kolon olup olmamasından bağımsızdır.
 
 Zıplama toleransı, kısa/uzun zıplama, buzda fren ve son basılan yönün önceliği
 oyuna özel küçük JavaScript fonksiyonlarıdır. Bunları fizik motoruna bırakmak aynı

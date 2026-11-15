@@ -1,4 +1,4 @@
-// Hesap veya sunucu gerekmez: bu tarayıcıdaki en son açılan bölüm saklanır.
+// Açılmış bölümleri localStorage içinde saklar ve sonraki bölümün kilidini açar.
 const STORAGE_KEY = 'meyve-oyunu-unlocked-levels';
 let unlocked = 1;
 

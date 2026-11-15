@@ -1,7 +1,7 @@
-// World 1: zıplamanın yanında bekleme, zamanlama ve bantlara karşı hareket etme.
+// Dünya 1 bölümlerinin ortam, engel, düşman ve toplanacak nesne verilerini tanımlar.
 function chapter(data) {
     return {
-        groundY: 520, spawn: { x: 100, y: 480 },
+        groundY: 520, spawn: { x: 100, y: 480 }, exitType: 'gate',
         key: { x: data.width - 520, y: 477 }, exit: { x: data.width - 220, y: 468 },
         checkpoint: { x: data.width / 2, y: 480 },
         belt: { x: 0, width: 1, speed: 0 },
@@ -98,7 +98,7 @@ export const darkCastle = chapter({
 
 // Uzun atlayışlar arasında dinlenme adaları var; tüm boşluklar koşarak aşılabilir.
 export const brokenPass = chapter({
-    name: 'Uçurum Geçidi', theme: 'abyss', width: 5600, exitLabel: 'camiye', boss: true,
+    name: 'Uçurum Geçidi', theme: 'abyss', width: 5600, exitType: 'mosque', exitLabel: 'camiye', boss: true,
     checkpoint: { x: 2460, y: 480 },
     fountains: [{ id: 'fountain-1', x: 420 }, { id: 'fountain-2', x: 3520 }, { id: 'fountain-3', x: 4680 }],
     platforms: [],

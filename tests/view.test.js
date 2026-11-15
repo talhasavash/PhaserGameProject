@@ -1,3 +1,4 @@
+// Telefon, tablet ve masaüstü ekranlarında görünür oyun alanı ölçülerini doğrular.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { gameView } from '../src/ui/view.js';

@@ -1,3 +1,4 @@
+// Karakter animasyon kareleri ve oyun nesneleri için SVG görseller üretir.
 const fs = require('node:fs');
 const path = require('node:path');
 const target = path.resolve(__dirname, '../assets/images');

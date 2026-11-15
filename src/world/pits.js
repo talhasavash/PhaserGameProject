@@ -1,4 +1,4 @@
-// Yalnızca görsel: fizik boşluğu terrain.js içinde aynı x / width ile korunur.
+// Çukurların kırık kaya kenarlarını ve derinlik görünümünü çizer; fizik boşluğunu terrain.js kurar.
 export function createPitArt(scene, gap) {
     const theme = scene.level.theme;
     const height = 600 - scene.level.groundY + 8;

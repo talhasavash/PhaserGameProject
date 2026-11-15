@@ -1,4 +1,4 @@
-// Oyundaki mevcut SVG yüzlerini kullanır; karakter tasarımlarıyla aynı kalır.
+// Erkek ve kız karakterlerin mevcut SVG yüzlerini birleştirerek oyunun simge görselini üretir.
 const fs = require('node:fs');
 const path = require('node:path');
 const root = path.resolve(__dirname, '..');

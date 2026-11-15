@@ -1,7 +1,9 @@
-import { GameScene } from './gameplay/GameScene.js';
+// Oyunun giriş noktasıdır; menü seçimini, Phaser oyununu başlatmayı ve ana ekrana dönüşü yönetir.
+import { GameScene, GAME_SCENE_KEY } from './gameplay/GameScene.js';
 import { gameView } from './ui/view.js';
-import { levels, worlds, worldForLevel } from './world/level.js';
+import { levels, worldForLevel } from './world/level.js';
 import { unlockedLevels } from './data/progress.js';
+import { createWorldMenu, createLevelMenu, refreshLevelLocks } from './ui/levelMenu.js';
 import { setupPwa } from './ui/pwa.js';
 import { enterGameDisplay, releaseGameOrientation, bindDisplayRecovery } from './ui/display.js';
 import { showLoading, hideLoading } from './ui/loading.js';
@@ -31,71 +33,17 @@ function toggleSettings() {
     document.getElementById('pause-button').hidden = !gameStarted;
     document.getElementById('game-stage').inert = opening;
     document.getElementById('touch-controls').inert = opening;
-    const scene = activeGame?.scene.getScene('Garden');
+    const scene = activeGame?.scene.getScene(GAME_SCENE_KEY);
     if (scene?.player && !scene.gameState.complete && scene.paused !== opening) scene.togglePause();
     (opening ? document.getElementById('settings-close') : settingsButton).focus();
 }
 
-// Bölüm sayısı değişince menü de aynı veriden oluşur.
-function createWorldMenu() {
-    for (const world of worlds) {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.dataset.world = world.id;
-        button.onclick = () => {
-            selectedWorld = world.id;
-            createLevelMenu();
-            refreshLevelLocks();
-            updateStartButton();
-        };
-        worldTabs.append(button);
-    }
-}
-
-function createLevelMenu(preferredIndex) {
-    const world = worlds[selectedWorld];
-    levelGrid.replaceChildren();
-    levelGrid.dataset.world = world.id;
-    levels.slice(world.start, world.start + world.count).forEach((level, localIndex) => {
-        const index = world.start + localIndex;
-        const label = document.createElement('label');
-        label.className = 'level-option';
-        const input = document.createElement('input');
-        input.type = 'radio';
-        input.name = 'level';
-        input.value = index;
-        input.required = true;
-        input.defaultChecked = index === (preferredIndex ?? world.start);
-        const card = document.createElement('span');
-        card.className = 'level-card';
-        const number = document.createElement('strong');
-        number.textContent = localIndex + 1;
-        label.dataset.theme = level.theme;
-        if (level.boss) label.classList.add('boss-level');
-        card.append(number);
-        label.append(input, card);
-        levelGrid.append(label);
-    });
-}
-
-function refreshLevelLocks() {
-    const unlocked = unlockedLevels(levels.length);
-    for (const button of worldTabs.querySelectorAll('button')) {
-        const world = worlds[Number(button.dataset.world)];
-        button.disabled = world.start >= unlocked;
-        button.setAttribute('aria-pressed', String(world.id === selectedWorld));
-        button.textContent = `Dünya ${world.id}${button.disabled ? ' 🔒' : ''}`;
-        button.setAttribute('aria-label', `Dünya ${world.id}${button.disabled ? ' · Dünya 0 tamamlanınca açılır' : ''}`);
-    }
-    for (const input of levelGrid.querySelectorAll('input')) {
-        const index = Number(input.value);
-        input.disabled = index >= unlocked;
-        input.parentElement.classList.toggle('locked', input.disabled);
-        const bossLabel = levels[index].boss ? ' · Boss' : '';
-        const lockLabel = input.disabled ? ' · Kilitli' : '';
-        const localNumber = index - worlds[selectedWorld].start + 1;
-        input.setAttribute('aria-label', `${localNumber}. bölüm${bossLabel}${lockLabel}`);
-    }
+// Kullanıcı dünya seçince bölüm listesi ve kilitleri birlikte yenilenir.
+function selectWorld(worldId) {
+    selectedWorld = worldId;
+    createLevelMenu(levelGrid, selectedWorld);
+    refreshLevelLocks(worldTabs, levelGrid, selectedWorld);
+    updateStartButton();
 }
 
 function updateStartButton() {
@@ -166,7 +114,7 @@ function startGame(character, levelIndex) {
 
 function returnToMenu(game) {
     return new Promise(resolve => {
-        const currentIndex = game.scene.getScene('Garden').levelIndex;
+        const currentIndex = game.scene.getScene(GAME_SCENE_KEY).levelIndex;
         closeSettings();
         menuButton.disabled = true;
         game.events.once(Phaser.Core.Events.DESTROY, () => {
@@ -174,8 +122,8 @@ function returnToMenu(game) {
             activeGame = null;
             hideLoading();
             selectedWorld = worldForLevel(currentIndex).id;
-            createLevelMenu(currentIndex);
-            refreshLevelLocks();
+            createLevelMenu(levelGrid, selectedWorld, currentIndex);
+            refreshLevelLocks(worldTabs, levelGrid, selectedWorld);
             document.body.classList.remove('playing');
             settingsButton.hidden = true;
             document.getElementById('touch-controls').hidden = true;
@@ -183,7 +131,7 @@ function returnToMenu(game) {
             document.getElementById('fall-result').hidden = true;
             document.getElementById('character-select').hidden = false;
             document.getElementById('game-stage').classList.add('choosing');
-            for (const id of ['pause-button', 'restart-button']) document.getElementById(id).disabled = true;
+            document.getElementById('pause-button').disabled = true;
             menuButton.hidden = true;
             menuButton.disabled = false;
             startButton.disabled = false;
@@ -196,9 +144,9 @@ function returnToMenu(game) {
 
 setupPwa();
 bindDisplayRecovery(() => gameStarted);
-createWorldMenu();
-createLevelMenu();
-refreshLevelLocks();
+createWorldMenu(worldTabs, selectWorld);
+createLevelMenu(levelGrid, selectedWorld);
+refreshLevelLocks(worldTabs, levelGrid, selectedWorld);
 characterForm.reset();
 characterForm.addEventListener('change', updateStartButton);
 characterForm.addEventListener('submit', startSelectedGame);

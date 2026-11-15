@@ -1,3 +1,4 @@
+// Gökyüzünden düşen ateş toplarının rastgele konumlarını, zamanlamasını ve hareketini yönetir.
 const WARNING_MS = 1500;
 
 export function fireWait(rain, random = Math.random) {

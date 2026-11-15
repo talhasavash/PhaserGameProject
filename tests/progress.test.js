@@ -1,3 +1,4 @@
+// Bölüm kilitlerinin açılmasını, saklanmasını ve geçersiz kayıtların ele alınmasını doğrular.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readUnlocked, unlockedLevels, unlockNext } from '../src/data/progress.js';

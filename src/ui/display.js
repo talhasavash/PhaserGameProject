@@ -1,3 +1,4 @@
+// Mobilde tam ekran ve yatay görünüm isteklerini, oyuna geri dönüldüğünde ekranın toparlanmasını yönetir.
 // Bu istek yalnızca Oyna düğmesindeki kullanıcı dokunuşundan yapılır.
 export async function enterGameDisplay(
     doc = document,

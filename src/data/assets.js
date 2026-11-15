@@ -1,3 +1,4 @@
+// Oyunun görsel ve ses dosyalarını listeler; bunları Phaser Loader ile yükler.
 import { FRUIT_TYPES } from '../gameplay/rules.js';
 
 // Aynı boyutta yüklenen SVG'ler birlikte listelenir. Boyutlar fizik kutusu değildir.

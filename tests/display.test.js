@@ -1,3 +1,4 @@
+// Tam ekran, yatay görünüm ve oyuna geri dönüldüğünde ekranı toparlama akışını doğrular.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { enterGameDisplay, releaseGameOrientation, bindDisplayRecovery } from '../src/ui/display.js';

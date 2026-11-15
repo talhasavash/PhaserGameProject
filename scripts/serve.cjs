@@ -1,3 +1,4 @@
+// Oyunu yerelde çalıştırmak için HTML, JavaScript ve oyun dosyalarını sunan HTTP sunucusunu başlatır.
 const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');

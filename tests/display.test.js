@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { enterGameDisplay, leaveGameDisplay } from '../src/ui/display.js';
+import { enterGameDisplay, releaseGameOrientation } from '../src/ui/display.js';
 
 test('Play requests fullscreen before locking landscape, without a launch-time orientation requirement', async () => {
     const calls = [];
@@ -18,12 +18,12 @@ test('Unsupported fullscreen or orientation cannot prevent the game from startin
     await assert.doesNotReject(enterGameDisplay({ documentElement: {} }, {}, true));
 });
 
-test('Desktop play does not lock orientation and leaving releases mobile orientation', async () => {
+test('Returning to the menu releases orientation while keeping fullscreen', async () => {
     const calls = [];
     const screen = { orientation: { lock() { calls.push('lock'); }, unlock() { calls.push('unlock'); } } };
     const doc = { fullscreenElement: {}, documentElement: {}, async exitFullscreen() { calls.push('exit'); } };
     await enterGameDisplay(doc, screen, false);
     assert.deepEqual(calls, []);
-    await leaveGameDisplay(doc, screen);
-    assert.deepEqual(calls, ['unlock', 'exit']);
+    releaseGameOrientation(screen);
+    assert.deepEqual(calls, ['unlock']);
 });

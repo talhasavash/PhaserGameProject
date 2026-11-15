@@ -3,7 +3,8 @@ import { gameView } from './ui/view.js';
 import { levels, worlds, worldForLevel } from './world/level.js';
 import { unlockedLevels } from './data/progress.js';
 import { setupPwa } from './ui/pwa.js';
-import { enterGameDisplay, leaveGameDisplay } from './ui/display.js';
+import { enterGameDisplay, releaseGameOrientation } from './ui/display.js';
+import { showLoading, hideLoading } from './ui/loading.js';
 
 // Önce HTML formundan karakter seçilir; ardından Phaser başlatılır.
 // "import", başka bir dosyanın dışarı açtığı (export) kodu kullanmamızı sağlar.
@@ -14,8 +15,6 @@ const settingsPanel = document.getElementById('settings-panel');
 const menuButton = document.getElementById('menu-button');
 const levelGrid = document.getElementById('level-grid');
 const worldTabs = document.getElementById('world-tabs');
-const fullscreenButton = document.getElementById('fullscreen-button');
-const fullscreenMode = matchMedia('(display-mode: fullscreen)');
 let gameStarted = false;
 let activeGame = null;
 let selectedWorld = 0;
@@ -100,17 +99,6 @@ function refreshLevelLocks() {
     }
 }
 
-async function toggleFullscreen() {
-    if (document.fullscreenElement) await leaveGameDisplay();
-    else await enterGameDisplay();
-}
-
-function updateFullscreenButton() {
-    fullscreenButton.textContent = document.fullscreenElement ? 'Tam ekrandan çık' : 'Tam ekran';
-    fullscreenButton.hidden = fullscreenMode.matches || Boolean(document.fullscreenElement) || !document.documentElement.requestFullscreen;
-    fullscreenButton.setAttribute('aria-label', document.fullscreenElement ? 'Tam ekrandan çık' : 'Tam ekran');
-}
-
 function updateStartButton() {
     startButton.disabled = !characterForm.querySelector('input[name="character"]:checked') ||
         !characterForm.querySelector('input[name="level"]:checked');
@@ -124,9 +112,11 @@ function startSelectedGame(event) {
     // Await etmeden, doğrudan dokunuş sırasında başlat: tarayıcı bu etkileşimi ister.
     void enterGameDisplay();
     gameStarted = true;
+    showLoading();
     closeSettings();
     document.body.classList.add('playing');
     settingsButton.textContent = 'Ⅱ';
+    settingsButton.hidden = false;
     document.getElementById('touch-controls').hidden = false;
     startButton.disabled = true;
     document.getElementById('character-select').hidden = true;
@@ -147,7 +137,7 @@ function startGame(character, levelIndex) {
         width: initialView.width,
         height: initialView.height,
         parent: 'game',
-        backgroundColor: '#bce9ed',
+        backgroundColor: '#183c36',
         scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
         physics: {
             default: 'arcade', // Phaser'ın 2D platform oyunlarına uygun fizik sistemi.
@@ -171,7 +161,7 @@ function startGame(character, levelIndex) {
     game.events.once(Phaser.Core.Events.DESTROY, () => observer.disconnect());
     menuButton.onclick = async () => {
         await returnToMenu(game);
-        await leaveGameDisplay();
+        releaseGameOrientation();
     };
 }
 
@@ -183,11 +173,12 @@ function returnToMenu(game) {
         game.events.once(Phaser.Core.Events.DESTROY, () => {
             gameStarted = false;
             activeGame = null;
+            hideLoading();
             selectedWorld = worldForLevel(currentIndex).id;
             createLevelMenu(currentIndex);
             refreshLevelLocks();
             document.body.classList.remove('playing');
-            settingsButton.textContent = '⚙';
+            settingsButton.hidden = true;
             document.getElementById('touch-controls').hidden = true;
             document.getElementById('game-result').hidden = true;
             document.getElementById('fall-result').hidden = true;
@@ -204,20 +195,6 @@ function returnToMenu(game) {
     });
 }
 
-async function exitGame() {
-    const button = document.getElementById('exit-button');
-    button.disabled = true;
-    closeSettings();
-    if (activeGame) await returnToMenu(activeGame);
-    await leaveGameDisplay();
-    document.getElementById('exit-screen').hidden = false;
-    document.querySelector('.game-shell').inert = true;
-    document.getElementById('exit-return').focus();
-    // PWA izin verirse pencere kapanır. İzin vermezse aşağıdaki dürüst çıkış ekranı kalır.
-    window.close();
-    button.disabled = false;
-}
-
 setupPwa();
 createWorldMenu();
 createLevelMenu();
@@ -227,17 +204,6 @@ characterForm.addEventListener('change', updateStartButton);
 characterForm.addEventListener('submit', startSelectedGame);
 settingsButton.onclick = toggleSettings;
 document.getElementById('settings-close').onclick = closeSettings;
-document.getElementById('exit-button').onclick = exitGame;
-document.getElementById('exit-return').onclick = () => {
-    document.getElementById('exit-screen').hidden = true;
-    document.querySelector('.game-shell').inert = false;
-    document.getElementById('character-title').focus();
-};
 document.addEventListener('keydown', event => {
     if (event.key === 'Escape' && !settingsPanel.hidden) closeSettings();
 });
-fullscreenButton.hidden = !document.documentElement.requestFullscreen;
-fullscreenButton.addEventListener('click', toggleFullscreen);
-document.addEventListener('fullscreenchange', updateFullscreenButton);
-fullscreenMode.addEventListener('change', updateFullscreenButton);
-updateFullscreenButton();

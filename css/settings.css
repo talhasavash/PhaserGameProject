@@ -15,10 +15,7 @@
     color: #fff1cd; border: 1px solid #789674; font-size: 15px; font-weight: bold;
 }
 .game-toolbar .settings-card #pause-button { background: #ffda79; color: #28482f; border-color: #ffe7a2; }
-.game-toolbar .settings-card #exit-button { color: #ffc7ad; background: #3d4b40; }
 .game-toolbar .settings-card #settings-close { position: absolute; right: 12px; top: 12px; width: 32px; min-width: 32px; min-height: 32px; height: 32px; padding: 0; border: 0; border-radius: 50%; background: #183c36; font-size: 24px; }
-#exit-screen { position: fixed; z-index: 10; }
-#exit-screen .result-card::before { display: none; }
 @media (orientation: landscape) and (max-height: 500px) {
     .settings-card { width: min(100%, 460px); grid-template-columns: 1fr 1fr; padding: 18px; }
     .settings-card h2, .settings-card #pause-button { grid-column: 1 / -1; }

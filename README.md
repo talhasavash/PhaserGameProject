@@ -19,7 +19,8 @@ Yayın kopyasında JS, CSS ve görsel adreslerine commit bilgisi eklenir; kaynak
 eski tarayıcı önbelleğiyle yeni dosyaların karışması önlenir. `dist` Git'e eklenmez.
 
 Oyun sayfası ekranı kaplar; dışarıda başlık, açıklama veya site alt bilgisi yoktur.
-Destekleyen tarayıcılarda **Tam ekran** düğmesi tarayıcı çubuklarını da gizler.
+Ana ekrandan kurulu PWA destekleyen tarayıcılarda tam ekran açılır; oyun menüsünde
+tam ekran aç/kapat düğmesi bulunmaz.
 Telefon/tablette dokunmatik sol, sağ ve zıplama düğmeleri görünür. İki parmakla
 aynı anda yürüyüp zıplanabilir. Yatay kullanım daha büyük bir oyun görüntüsü sağlar;
 oyun oranı korunur, görüntü esnetilmez. Yatay mobilde oyun bütün ekranı kaplar;
@@ -373,8 +374,8 @@ beyazımsı elips gölge gösterilir. Ünlem, üçgen ve dikey ışık yoktur. H
 başladıktan sonra yer değiştirmez. Başlangıç, abdest alanları, kontrol noktaları ve
 çukurlar hedef seçiminde korunur.
 
-Sağ üstteki Ⅱ mola düğmesini açınca oyun duraklar. Ses, ana ekran ve oyundan çıkış
-buradadır. Tam ekran düğmesi yalnızca tam ekranda değilken görünür. Devam et ile oyun sürer. Yönler saydam üçgen,
+Sağ üstteki Ⅱ mola düğmesini açınca oyun duraklar. Ses ve ana ekrana dönüş
+buradadır. Tam ekran aç/kapat veya uygulamadan çıkış düğmesi yoktur. Devam et ile oyun sürer. Yönler saydam üçgen,
 zıplama saydam dairedir. Yönler sol alt kenara bitişik ve aralıksız, zıplama sağ
 alt kenara sabittir; yön üçgenleri daha dar, yüksek ve yuvarlaktır; telefonun güvenli ekran boşlukları korunur. İki parmakla yön
 ve zıplama bağımsız kullanılabilir.
@@ -392,25 +393,27 @@ SVG'lerine dokunulmaz.
 ### Ana ekrana kurulum (PWA)
 
 Oyun APK gerektirmez. Android Chrome menüsünden **Uygulamayı yükle / Ana ekrana ekle**
-seçilebilir; tarayıcı kurulum olanağı sunduğunda oyunun ayar menüsünde de kurulum düğmesi
-görünür. iPhone/iPad'de Safari paylaşım menüsünden **Ana Ekrana Ekle** kullanılır.
+seçilebilir. Oyun menüsünde kurulum düğmesi bulunmaz. iPhone/iPad'de Safari paylaşım
+menüsünden **Ana Ekrana Ekle** kullanılır.
 Ana ekran simgesiyle açıldığında `display: fullscreen` sayesinde destekleyen
 tarayıcılarda menü dahil tam ekran açılır. Manifestte ekran yönü
-`any` olarak ayarlanır; açılışta zorunlu döndürme yapılmaz. Oyundaki tam ekran
-düğmesi kullanıldığında yatay yön kilidi tarayıcı destekliyorsa istenir.
+`any` olarak ayarlanır; açılışta zorunlu döndürme yapılmaz.
 `Oyna` dokunuşunda da tam ekran ve mobilde yatay yön istenir; bu istekler uygulama
 açılışında yapılmaz. İzin verilmezse oyun normal ekran boyutunda devam eder.
-`src/ui/display.js` giriş/çıkış isteklerini yönetir. Mola menüsündeki **Oyundan çık**
-oyun döngüsünü ve sesleri durdurup tam ekran/yön kilidini bırakır, pencereyi
-kapatmayı dener. Tarayıcı kapanmaya izin vermezse sistemin son uygulamalar
-ekranından kapatma açıklaması gösterilir; pencerenin kapandığı iddia edilmez.
+`src/ui/display.js` Oyna dokunuşundaki ekran isteğini yönetir. Ana menüye dönüşte
+yalnızca yön kilidi bırakılır, tam ekran korunur. Uygulamayı kapatmak
+için telefonun kendi gezinme ve son uygulamalar kontrolleri kullanılır.
 
 `manifest.webmanifest` uygulama adını, simgeleri ve göreli yayın yolunu tanımlar.
 Başlangıç adresi doğrudan `./index.html` dosyasıdır; uygulama kimliği `./` olarak
 korunur. Sayfa isteği dört saniyede sonuçlanmazsa kayıtlı açılış sayfası kullanılır.
 Önbelleğe yazılamaması, başarılı bir çevrimiçi açılışı engellemez.
-`src/ui/pwa.js` kurulumu ve service worker kaydını yönetir. `scripts/service-worker.js`
-yayın sırasında `dist/sw.js` olur; bütün oyun kaynakları ilk çevrimiçi açılışta
+`src/ui/pwa.js` service worker kaydını yönetir.
+`src/ui/loading.js` bölüm yükleme ekranını yönetir: Phaser Loader ilerlemesini
+çubuğa aktarır ve ilk `postrender` olayından sonra ekranı kaldırır. Böylece dosyalar
+yüklense bile bölüm çizilmeden açık renkli boş canvas gösterilmez.
+
+`scripts/service-worker.js` yayın sırasında `dist/sw.js` olur; bütün oyun kaynakları ilk çevrimiçi açılışta
 önbelleğe alınır. İndirme tamamlandıktan sonra internet olmadan da oynanabilir.
 Çevrimiçi açılışta güncel dosyalar istenir; açık oyun zorla yenilenmez. Yeni worker
 açık eski sekmeler kapanınca etkinleşir. Tarayıcı verilerini temizlemek çevrimdışı

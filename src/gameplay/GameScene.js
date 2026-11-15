@@ -13,6 +13,7 @@ import { createHud, centerHud, updateHud, updateProgress } from '../ui/hud.js';
 import { loadGameAssets } from '../data/assets.js';
 import { createColumns, updateColumns } from './columns.js';
 import { createWorldGate } from '../world/world1Scenery.js';
+import { showLoading, updateLoading, hideLoading, finishLoading } from '../ui/loading.js';
 
 const COLLECTIBLE_SCALE = 0.75;
 const ITEM_MESSAGES = {
@@ -43,6 +44,8 @@ export class GameScene extends Phaser.Scene {
 
     // Phaser önce preload'u çağırır: görselleri hazırla.
     preload() {
+        showLoading();
+        this.load.on('progress', updateLoading);
         loadGameAssets(this, this.character);
     }
 
@@ -75,6 +78,7 @@ export class GameScene extends Phaser.Scene {
         this.events.once(Phaser.Scenes.Events.DESTROY, this.shutdownScene, this);
         this.announce(`Dünya ${worldForLevel(this.levelIndex).id} · ${chapterNumber(this.levelIndex)}. bölüm: ${this.level.name}. Üç yıldızı bul, anahtarı al ve ${this.level.exitLabel || 'camiye'} ulaş.`);
         this.updateHud();
+        finishLoading(this);
     }
 
     resetLevelState() {
@@ -115,6 +119,8 @@ export class GameScene extends Phaser.Scene {
     }
 
     shutdownScene() {
+        this.load.off('progress', updateLoading);
+        this.game.events.off('postrender', hideLoading);
         // Bölüm değişimi ve ana menüye dönüş aynı temizliği kullanır.
         this.events.off(Phaser.Scenes.Events.SHUTDOWN, this.shutdownScene, this);
         this.events.off(Phaser.Scenes.Events.DESTROY, this.shutdownScene, this);

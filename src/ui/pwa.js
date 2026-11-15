@@ -1,22 +1,5 @@
-// Kurulum tarayıcının kendi penceresiyle yapılır; oyun için APK gerekmez.
+// Kurulum Chrome/Safari menüsünden yapılır; oyun menüsü yalnızca oyun içindir.
 export function setupPwa() {
-    const button = document.getElementById('install-button');
-    let installPrompt = null;
-    window.addEventListener('beforeinstallprompt', event => {
-        event.preventDefault();
-        installPrompt = event;
-        button.hidden = matchMedia('(display-mode: standalone), (display-mode: fullscreen)').matches;
-    });
-    button.onclick = async () => {
-        if (!installPrompt) return;
-        await installPrompt.prompt();
-        installPrompt = null;
-        button.hidden = true;
-    };
-    window.addEventListener('appinstalled', () => {
-        installPrompt = null;
-        button.hidden = true;
-    });
     // Geliştirme sunucusunda önbellek oluşturmayız; yalnızca yayın kopyası kaydeder.
     if (!document.querySelector('meta[name="game-release"]') || !('serviceWorker' in navigator)) return;
     async function registerWorker() {

@@ -1,4 +1,5 @@
 // Bölüme uygun arka planı kurar; cami ve abdest alanı gibi ortam görsellerini çizer.
+import { cacheTexture } from '../../graphics/texture.js';
 import { createChapterScenery } from './chapterScenery.js';
 import { createWorldOneScenery } from './world1Scenery.js';
 // Bu dosya yalnızca görünümü çizer; oyun kurallarını değiştirmez.
@@ -54,13 +55,6 @@ export function createScenery(scene, width, theme = 'garden') {
     tile('garden-flowers', 488, 32, 1, 1);
 }
 
-function cacheTexture(scene, key, width, height, draw) {
-    if (scene.textures.exists(key)) return;
-    const graphics = scene.make.graphics({ x: 0, y: 0, add: false });
-    draw(graphics);
-    graphics.generateTexture(key, width, height);
-    graphics.destroy();
-}
 
 function createThemedScenery(scene, width, theme) {
     const night = theme === 'night';

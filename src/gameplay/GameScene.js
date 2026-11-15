@@ -1,13 +1,13 @@
 // Phaser sahnesidir; bölümü kurar, oyun döngüsünü ve toplama, çarpışma, kazanma akışını yönetir.
-import { levels, worldForLevel, chapterNumber } from '../world/level.js';
+import { levels, worldForLevel, chapterNumber } from '../world/levels/level.js';
 import { createGameState, isKeyReady, recordFruit, takeKey, finishLevel, healAtFountain } from './rules.js';
 import { createPlayer, movePlayer, resetPlayerMovement, showPlayerExpression, showRecovery, updatePlayerEffects } from './player.js';
-import { createScenery } from '../world/background.js';
+import { createScenery } from '../world/scenery/background.js';
 import { bindTouchControls } from './controls.js';
 import { createFireRain, updateFireRain } from './fireRain.js';
 import { unlockNext } from '../data/progress.js';
 import { resetBossRage } from './boss.js';
-import { createTerrain } from '../world/terrain.js';
+import { createTerrain } from '../world/terrain/terrain.js';
 import { createHazards, updateHazards } from './hazards.js';
 import { createHud, centerHud, updateHud, updateProgress } from '../ui/hud.js';
 import { loadGameAssets } from '../data/assets.js';

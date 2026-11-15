@@ -1,4 +1,5 @@
 // İnip yükselen kolonların çizimini, fizik gövdelerini ve geçiş zamanlamasını yönetir.
+import { cacheTexture } from '../graphics/texture.js';
 const COLUMN_HEIGHT = 512;
 export const RAISED_BOTTOM = 260;
 export const CLOSED_BOTTOM = 520;
@@ -48,8 +49,7 @@ export function createColumns(scene) {
     const definitions = scene.level.columns || [];
     if (definitions.length === 0) return;
     const key = `column-${scene.level.theme}`;
-    if (!scene.textures.exists(key)) {
-        const g = scene.make.graphics({ x: 0, y: 0, add: false });
+    cacheTexture(scene, key, 80, COLUMN_HEIGHT, g => {
         const metal = scene.level.theme === 'factory';
         g.fillStyle(metal ? 0x718e9c : 0x6f627c); g.fillRect(8, 0, 64, COLUMN_HEIGHT);
         g.fillStyle(metal ? 0xa9c4c7 : 0xa093ae); g.fillRect(13, 0, 8, COLUMN_HEIGHT - 18);
@@ -60,8 +60,7 @@ export function createColumns(scene) {
         g.fillStyle(0xd4b77b); g.fillRoundedRect(0, COLUMN_HEIGHT - 24, 80, 24, 4);
         g.fillStyle(0x443b51);
         for (let x = 6; x < 74; x += 16) g.fillTriangle(x, 491, x + 10, 491, x + 5, 504);
-        g.generateTexture(key, 80, COLUMN_HEIGHT); g.destroy();
-    }
+    });
     for (const source of definitions) {
         const definition = prepareColumn(source);
         const frame = columnFrame(0, visibleColumn(definition, scene.scale.height, scene.level.groundY));

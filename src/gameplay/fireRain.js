@@ -1,4 +1,5 @@
 // Gökyüzünden düşen ateş toplarının rastgele konumlarını, zamanlamasını ve hareketini yönetir.
+import { cacheTexture } from '../graphics/texture.js';
 const WARNING_MS = 1500;
 
 export function fireWait(rain, random = Math.random) {
@@ -29,12 +30,10 @@ export function createFireRain(scene) {
     scene.fireballs = scene.physics.add.group({ allowGravity: false, immovable: true });
     scene.rainDrops = [];
     if (!scene.level.fireRain?.length) return;
-    if (!scene.textures.exists('fireball')) {
-        const g = scene.make.graphics({ x: 0, y: 0, add: false });
+    cacheTexture(scene, 'fireball', 32, 40, g => {
         g.fillStyle(0xef7d44); g.fillTriangle(6, 24, 16, 0, 27, 24); g.fillCircle(16, 22, 12);
         g.fillStyle(0xffdf88); g.fillCircle(16, 24, 6);
-        g.generateTexture('fireball', 32, 40); g.destroy();
-    }
+    });
     // Aynı anda yalnızca bir ateş: yeni atış, önceki bittikten uzun süre sonra gelir.
     scene.rainDrops = scene.level.fireRain.slice(0, 1).map(rain => {
         const sprite = scene.fireballs.create(0, 80, 'fireball').setDepth(14);

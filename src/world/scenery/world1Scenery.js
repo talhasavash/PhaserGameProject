@@ -1,4 +1,5 @@
 // Dünya 1 ortamlarının katmanlı arka planlarını ve bölüme özel çıkış geçitlerini çizer.
+import { cacheTexture } from '../../graphics/texture.js';
 const palettes = {
     lava: { sky: '#422d43', far: 0x654055, near: 0x91505a, floor: 0x473b4d, trim: 0xf2a361 },
     factory: { sky: '#b4cbd0', far: 0x89a9b0, near: 0x577d8b, floor: 0x3e5969, trim: 0xd9bd70 },
@@ -6,19 +7,12 @@ const palettes = {
     abyss: { sky: '#a6ccd5', far: 0x83a7b5, near: 0x617f91, floor: 0x726a60, trim: 0xe0c99d }
 };
 
-function texture(scene, key, width, height, draw) {
-    if (scene.textures.exists(key)) return;
-    const graphics = scene.make.graphics({ x: 0, y: 0, add: false });
-    draw(graphics);
-    graphics.generateTexture(key, width, height);
-    graphics.destroy();
-}
 
 export function createWorldOneScenery(scene, width, theme) {
     const p = palettes[theme];
     if (!p) return false;
     scene.cameras.main.setBackgroundColor(p.sky);
-    texture(scene, `${theme}-skyline`, 512, 512, g => {
+    cacheTexture(scene, `${theme}-skyline`, 512, 512, g => {
         g.fillStyle(p.far);
         if (theme === 'abyss') {
             for (const x of [-100, 180, 450]) {
@@ -41,7 +35,7 @@ export function createWorldOneScenery(scene, width, theme) {
             }
         }
     });
-    texture(scene, `${theme}-walls`, 512, 256, g => {
+    cacheTexture(scene, `${theme}-walls`, 512, 256, g => {
         g.fillStyle(p.near);
         if (theme === 'abyss') {
             for (let x = -60; x < 560; x += 140) {
@@ -66,7 +60,7 @@ export function createWorldOneScenery(scene, width, theme) {
             if (theme === 'factory') { g.lineBetween(70, 10, 70, 210); g.lineBetween(70, 210, 380, 210); }
         }
     });
-    texture(scene, `${theme}-floor`, 256, 128, g => {
+    cacheTexture(scene, `${theme}-floor`, 256, 128, g => {
         g.fillStyle(p.floor); g.fillRect(0, 0, 256, 128);
         g.fillStyle(p.trim); g.fillRect(0, 0, 256, 8);
         g.lineStyle(2, p.near);
@@ -90,7 +84,7 @@ export function createWorldOneScenery(scene, width, theme) {
         scene.add.circle(670, 137, 44, 0x252f50).setScrollFactor(0.08).setDepth(-69);
     }
     if (theme === 'lava') {
-        texture(scene, 'lava-glow', 256, 32, g => {
+        cacheTexture(scene, 'lava-glow', 256, 32, g => {
             g.fillStyle(0xf28550); g.fillRect(0, 0, 256, 32);
             g.fillStyle(0xffd17c);
             for (let x = 0; x < 256; x += 32) g.fillEllipse(x, 12 + x % 3, 24, 6);
@@ -102,7 +96,7 @@ export function createWorldOneScenery(scene, width, theme) {
 }
 
 function createGears(scene, width) {
-    texture(scene, 'factory-gear', 128, 128, g => {
+    cacheTexture(scene, 'factory-gear', 128, 128, g => {
         g.fillStyle(0x3b6071); g.fillCircle(64, 64, 42);
         for (let i = 0; i < 12; i++) {
             const angle = i * Math.PI / 6;

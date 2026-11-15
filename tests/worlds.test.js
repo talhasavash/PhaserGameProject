@@ -1,7 +1,7 @@
 // Dünya ve bölüm sıralamasını, bölüm verilerini ve dünyalar arası kilit ilerlemesini doğrular.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { levels, worlds, worldForLevel, chapterNumber, bossGate } from '../src/world/level.js';
+import { levels, worlds, worldForLevel, chapterNumber, bossGate } from '../src/world/levels/level.js';
 import { readUnlocked, unlockNext } from '../src/data/progress.js';
 import { columnFrame, columnTiming, prepareColumn, visibleColumn, RAISED_BOTTOM, CLOSED_BOTTOM } from '../src/gameplay/columns.js';
 

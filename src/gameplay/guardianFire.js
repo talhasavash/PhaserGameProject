@@ -1,4 +1,5 @@
 // Final canavarının ağız uyarısını, ateş atışlarını ve yeniden kullanılan ateş nesnelerini yönetir.
+import { cacheTexture } from '../graphics/texture.js';
 const FLAME_POOL_SIZE = 3;
 const ATTACK_DISTANCE = 500;
 const BREATH_WARNING_MS = 350;
@@ -33,17 +34,15 @@ function mouthOf(guard) {
 }
 
 function createFlameTexture(scene) {
-    if (scene.textures.exists('guardian-flame')) return;
-    const g = scene.make.graphics({ x: 0, y: 0, add: false });
-    g.fillStyle(0xef7c42);
-    g.fillTriangle(44, 2, 8, 14, 44, 26);
-    g.fillCircle(13, 14, 12);
-    g.fillStyle(0xffd268);
-    g.fillEllipse(17, 14, 26, 15);
-    g.fillStyle(0xfff0bd);
-    g.fillEllipse(11, 14, 12, 8);
-    g.generateTexture('guardian-flame', 44, 28);
-    g.destroy();
+    cacheTexture(scene, 'guardian-flame', 44, 28, g => {
+        g.fillStyle(0xef7c42);
+        g.fillTriangle(44, 2, 8, 14, 44, 26);
+        g.fillCircle(13, 14, 12);
+        g.fillStyle(0xffd268);
+        g.fillEllipse(17, 14, 26, 15);
+        g.fillStyle(0xfff0bd);
+        g.fillEllipse(11, 14, 12, 8);
+    });
 }
 
 export function createGuardianFire(scene) {

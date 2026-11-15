@@ -1,7 +1,7 @@
 // Oyunun giriş noktasıdır; menü seçimini, Phaser oyununu başlatmayı ve ana ekrana dönüşü yönetir.
 import { GameScene, GAME_SCENE_KEY } from './gameplay/GameScene.js';
 import { gameView } from './ui/view.js';
-import { levels, worldForLevel } from './world/level.js';
+import { levels, worldForLevel } from './world/levels/level.js';
 import { unlockedLevels } from './data/progress.js';
 import { createWorldMenu, createLevelMenu, refreshLevelLocks } from './ui/levelMenu.js';
 import { setupPwa } from './ui/pwa.js';

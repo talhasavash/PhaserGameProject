@@ -1,5 +1,5 @@
 // Sahnenin HTML düğmelerini bağlar ve temizler; bölüm tamamlanınca sonuç kartını gösterir.
-import { levels } from '../world/level.js';
+import { levels } from '../world/levels/level.js';
 import { verses } from '../data/verses.js';
 
 const SCENE_BUTTON_IDS = ['pause-button', 'play-again', 'next-level', 'retry-fall'];

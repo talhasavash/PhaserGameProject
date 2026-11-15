@@ -1,11 +1,11 @@
 // Çukurların kırık kaya kenarlarını ve derinlik görünümünü çizer; fizik boşluğunu terrain.js kurar.
+import { cacheTexture } from '../../graphics/texture.js';
 export function createPitArt(scene, gap) {
     const theme = scene.level.theme;
     const height = 600 - scene.level.groundY + 8;
     const key = `pit-${theme}-${gap.width}`;
-    if (!scene.textures.exists(key)) {
-        const g = scene.make.graphics({ x: 0, y: 0, add: false });
-        const width = gap.width + 24;
+    const width = gap.width + 24;
+    cacheTexture(scene, key, width, height, g => {
         const shades = theme === 'river'
             ? [0x315b70, 0x29485e, 0x20384f, 0x162b42, 0x0e2038]
             : [0x354858, 0x293b4e, 0x1d2e42, 0x142337, 0x0b192d];
@@ -32,7 +32,6 @@ export function createPitArt(scene, gap) {
             g.fillStyle(0xe86f42); g.fillRect(12, height - 14, gap.width, 14);
             g.fillStyle(0xffcf7a); g.fillEllipse(width / 2, height - 10, gap.width * 0.6, 4);
         }
-        g.generateTexture(key, width, height); g.destroy();
-    }
+    });
     scene.add.image(gap.x - 12, scene.level.groundY - 8, key).setOrigin(0).setDepth(3);
 }

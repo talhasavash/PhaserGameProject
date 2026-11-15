@@ -1,10 +1,10 @@
 // Çukurlarda fizik zemini oluşmadığını ve çukur görsellerinin doğru kurulduğunu doğrular.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createTerrain } from '../src/world/terrain.js';
-import { createPitArt } from '../src/world/pits.js';
-import { brokenPass } from '../src/world/world1.js';
-import { levels } from '../src/world/level.js';
+import { createTerrain } from '../src/world/terrain/terrain.js';
+import { createPitArt } from '../src/world/terrain/pits.js';
+import { brokenPass } from '../src/world/levels/world1.js';
+import { levels } from '../src/world/levels/level.js';
 
 test('The new jump chapter has twelve real holes with solid landing islands between them', () => {
     const floors = [];

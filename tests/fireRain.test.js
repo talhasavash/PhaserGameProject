@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { fireFrame, chooseFireX, fireWait, createFireRain, updateFireRain } from '../src/gameplay/fireRain.js';
-import { levels } from '../src/world/level.js';
+import { levels } from '../src/world/levels/level.js';
 
 test('A chosen target waits for 1.5 seconds, then falls and finishes without moving its target', () => {
     const plan = { x: 900, startAt: 2000, speed: 300 };

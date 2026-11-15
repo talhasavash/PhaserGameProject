@@ -1,7 +1,7 @@
 // Arka plan kurulumunun ve çizim dokularının tekrar kullanımının doğru çalıştığını doğrular.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createScenery } from '../src/world/background.js';
+import { createScenery } from '../src/world/scenery/background.js';
 
 test('Garden scenery stays within a small render-object budget and reuses cached textures', () => {
     const cached = new Set();

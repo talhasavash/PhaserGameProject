@@ -1,5 +1,5 @@
 // Dünya ve bölüm seçim düğmelerini oluşturur; açılan ve kilitli bölümlerin görünümünü günceller.
-import { levels, worlds } from '../world/level.js';
+import { levels, worlds } from '../world/levels/level.js';
 import { unlockedLevels } from '../data/progress.js';
 
 // Bu dosya yalnızca HTML seçimlerini kurar; seçilen dünya game.js içinde tutulur.

@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { bossLift, bossMood, bossStep, resetBossRage } from '../src/gameplay/boss.js';
-import { levels } from '../src/world/level.js';
+import { levels } from '../src/world/levels/level.js';
 import { verses } from '../src/data/verses.js';
 
 test('The eleventh chapter has giant jumping guards with enough time to run underneath', () => {

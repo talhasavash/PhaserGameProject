@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createGameState, isKeyReady, recordFruit, takeKey, finishLevel, healAtFountain, FRUIT_TYPES } from '../src/gameplay/rules.js';
-import { levels } from '../src/world/level.js';
+import { levels } from '../src/world/levels/level.js';
 
 test('Apples and bonuses score points, but only three distinct stars unlock the key', () => {
     const run = createGameState();

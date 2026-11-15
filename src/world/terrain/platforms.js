@@ -1,4 +1,5 @@
 // Bölüm temasına göre basamak görsellerini çizer ve tekrar kullanılacak dokular üretir.
+import { cacheTexture } from '../../graphics/texture.js';
 // Her genişlik/tema bir kez dokuya çevrilir; oyun sırasında şekiller yeniden çizilmez.
 export const platformThemes = {
     garden: { body: 0x98714d, edge: 0x72a65f, detail: 0xc8a16e },
@@ -21,14 +22,9 @@ export const platformThemes = {
 export function createPlatformArt(scene, platform, theme) {
     const { x, y, width } = platform;
     const key = `step-${theme}-${width}-${platform.single ? 'single' : 'wide'}`;
-    if (!scene.textures.exists(key)) {
-        let textureWidth = 64;
-        while (textureWidth < width + 12) textureWidth *= 2;
-        const g = scene.make.graphics({ x: 0, y: 0, add: false });
-        drawStep(g, width, theme);
-        g.generateTexture(key, textureWidth, 64);
-        g.destroy();
-    }
+    let textureWidth = 64;
+    while (textureWidth < width + 12) textureWidth *= 2;
+    cacheTexture(scene, key, textureWidth, 64, g => drawStep(g, width, theme));
     return scene.add.image(x - 6, y, key).setOrigin(0).setDepth(6);
 }
 

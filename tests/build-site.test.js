@@ -59,6 +59,10 @@ test('Published modules resolve across folders, share a version, and leave sourc
     const worker = fs.readFileSync(path.join(root, 'dist/sw.js'), 'utf8');
     const precache = JSON.parse(worker.match(/const PRECACHE = (\[.*\]);/)[1]);
     assert.ok(precache.includes('./src/game.js?v=1234567'));
+    for (const module of ['world/levels/level.js', 'world/scenery/background.js', 'world/terrain/terrain.js', 'graphics/texture.js']) {
+        assert.ok(precache.includes(`./src/${module}?v=1234567`), module);
+    }
+    assert.equal(fs.existsSync(path.join(output, 'world/background.js')), false);
     assert.ok(precache.includes('./lib/phaser.min.js?v=1234567'));
     assert.ok(precache.includes('./assets/images/child-0.svg?v=1234567'));
     assert.ok(precache.includes('./assets/audio/jump.wav?v=1234567'));

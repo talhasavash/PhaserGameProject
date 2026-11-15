@@ -1,4 +1,5 @@
 // Orman, cami içi ve diğer bölüm temalarının katmanlı arka plan dokularını oluşturur.
+import { cacheTexture } from '../../graphics/texture.js';
 const palettes = {
     forest: { sky: 0xd4e7cb, far: 0x8fb393, near: 0x547d63, earth: 0x95744f, edge: 0x79a15b },
     interior: { sky: 0xeae1cb, far: 0xd4c6a6, near: 0xb89c76, earth: 0x934d51, edge: 0xc6a268 },
@@ -8,16 +9,11 @@ const palettes = {
     festival: { sky: 0xe8d9df, far: 0xbcaac6, near: 0x789997, earth: 0x9c7e84, edge: 0xa9bd86 },
     boss: { sky: 0xbcb1d0, far: 0x817d9e, near: 0x645d80, earth: 0x71637b, edge: 0xc8ae73 }
 };
-function texture(scene, key, width, height, draw) {
-    if (scene.textures.exists(key)) return;
-    const g = scene.make.graphics({ x: 0, y: 0, add: false });
-    draw(g); g.generateTexture(key, width, height); g.destroy();
-}
 export function createChapterScenery(scene, width, theme) {
     const p = palettes[theme];
     if (!p) return false;
     scene.cameras.main.setBackgroundColor(p.sky);
-    texture(scene, `${theme}-far`, 1024, 512, g => {
+    cacheTexture(scene, `${theme}-far`, 1024, 512, g => {
         g.fillStyle(p.far);
         if (theme === 'interior') {
             g.fillRect(0, 0, 1024, 512);
@@ -47,7 +43,7 @@ export function createChapterScenery(scene, width, theme) {
         }
     });
     scene.add.tileSprite(0, 0, width + 1024, 512, `${theme}-far`).setOrigin(0).setScrollFactor(theme === 'interior' ? 0.55 : 0.3).setDepth(-60);
-    texture(scene, `${theme}-near`, 512, 512, g => {
+    cacheTexture(scene, `${theme}-near`, 512, 512, g => {
         if (theme === 'interior') {
             g.fillStyle(0xc7af88); g.fillRect(18, 120, 24, 392); g.fillRect(8, 115, 44, 15); g.fillRect(8, 495, 44, 17);
             // Lafzatullah tabloları aşağıda aynı SVG dokusundan eklenir.
@@ -85,7 +81,7 @@ export function createChapterScenery(scene, width, theme) {
     scene.add.rectangle(width / 2, 560, width, 80, p.earth).setDepth(-5);
     scene.add.rectangle(width / 2, 524, width, 12, p.edge).setDepth(-4);
     if (theme === 'interior') {
-        texture(scene, 'interior-carpet', 128, 128, g => {
+        cacheTexture(scene, 'interior-carpet', 128, 128, g => {
             g.fillStyle(0xc6a268); g.fillRect(0, 0, 128, 5); g.fillRect(0, 68, 128, 4);
             g.lineStyle(2, 0xdfbd8f, 0.7); g.strokeRect(14, 15, 98, 42); g.strokeCircle(64, 36, 13); g.strokeCircle(64, 36, 6);
         });

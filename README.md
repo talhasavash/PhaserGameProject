@@ -86,15 +86,20 @@ PhaserGameProject/
 │   │   ├── guardianFire.js      Final muhafızının ağızdan ateş atışı
 │   │   └── columns.js           İnip yükselen katı kolonlar ve zamanlama
 │   ├── world/                  Bölümler ve ortam
-│   │   ├── level.js             Bölüm tanımları ve nesne konumları
 │   │   ├── levelObjects.js      Toplanacak nesneler, çıkış ve can alanlarını kurma
-│   │   ├── terrain.js           Zemin, çukurlar, buz ve platform gövdeleri
-│   │   ├── pits.js              Kırık kaya kenarlarıyla açık uçurum çizimleri
-│   │   ├── platforms.js         Bölüme özel basamak çizimleri
-│   │   ├── background.js        Arka plan, cami ve abdest alanı çizimleri
-│   │   ├── chapterScenery.js    Diğer ortamların arka planları
-│   │   ├── world1.js            Yeni dünyanın dört bölümünün verileri
-│   │   └── world1Scenery.js     Yeni dünya çizimleri ve farklı çıkışlar
+│   │   ├── levels/              Bölüm verileri ve dünya sıralaması
+│   │   │   ├── level.js         Tüm bölüm listesi ve Dünya 0 verileri
+│   │   │   └── world1.js        Dünya 1 bölüm verileri
+│   │   ├── scenery/             Arka plan ve dekor çizimleri
+│   │   │   ├── background.js    Tema seçimi, bahçe, cami ve abdest alanı
+│   │   │   ├── chapterScenery.js Diğer Dünya 0 ortamları
+│   │   │   └── world1Scenery.js Dünya 1 ortamları ve çıkış geçitleri
+│   │   └── terrain/             Zemin ve basamaklar
+│   │       ├── terrain.js       Zemin, çukur, buz ve platform gövdeleri
+│   │       ├── pits.js          Açık uçurum çizimleri
+│   │       └── platforms.js     Bölüme özel basamak çizimleri
+│   ├── graphics/
+│   │   └── texture.js           Ortak parametrik doku üretimi ve önbelleği
 │   ├── ui/
 │   │   ├── levelMenu.js         Dünya/bölüm seçenekleri ve kilitlerin görünümü
 │   │   ├── scenePage.js         Sahnenin HTML düğmeleri ve sonuç kartı
@@ -133,15 +138,15 @@ sırayı izle; çağrılan her yardımcı fonksiyonun içine hemen girmek gerekm
 | 2 | `src/game.js` | `startSelectedGame` ve `startGame`; seçimin Phaser'a aktarılması |
 | 3 | `src/gameplay/GameScene.js` | Yalnızca `init`, `preload`, `create`, `update`; ana akış |
 | 4 | `src/data/assets.js` | Görsel/ses anahtarları ve Phaser Loader |
-| 5 | `src/world/level.js`, `terrain.js`, `levelObjects.js` | Bölüm verilerinin zemine, nesnelere ve temas bölgelerine dönüşmesi |
+| 5 | `src/world/levels/level.js`, `src/world/terrain/terrain.js`, `src/world/levelObjects.js` | Bölüm verilerinin zemine, nesnelere ve temas bölgelerine dönüşmesi |
 | 6 | `src/gameplay/player.js`, `controls.js` | Girdi, hızlanma, zıplama ve animasyon; ardından mobil parmak takibi |
 | 7 | `src/gameplay/rules.js` | Puan, yıldız, anahtar ve can; sonra GameScene'deki temas metotlarına dön |
 | 8 | `src/ui/hud.js`, `view.js`, `scenePage.js` | Oyun göstergeleri, mobil ölçüler, HTML düğmeleri ve sonuç kartı |
 | 9 | `src/gameplay/hazards.js`, `boss.js`, `fireRain.js`, `guardianFire.js` | Devriye, boss öfkesi/zıplaması ve ateş zamanlaması |
-| 10 | `src/world/background.js`, `chapterScenery.js`, `platforms.js` | Ortam çizimleri ve doku önbelleği |
+| 10 | `src/world/scenery/background.js`, `chapterScenery.js`, `src/world/terrain/platforms.js`, `src/graphics/texture.js` | Ortam çizimleri ve ortak doku önbelleği |
 | 11 | `src/ui/levelMenu.js`, `src/data/progress.js`, `verses.js` | Bölüm seçimi, kilitler, localStorage ve sonuç metinleri |
 
-İlk küçük deneme: `world/level.js` içindeki bir meyvenin `x` konumunu değiştir.
+İlk küçük deneme: `src/world/levels/level.js` içindeki bir meyvenin `x` konumunu değiştir.
 Ardından `gameplay/player.js` içindeki `WALK_SPEED` değerini küçük miktarda değiştir.
 Son olarak bir yıldızın `collectFruit → recordFruit → updateHud` yolunu takip et.
 `lib/phaser.min.js` kütüphanenin sıkıştırılmış dosyasıdır; öğrenmek için onu okumuyoruz.
@@ -155,7 +160,7 @@ tarayıcıda çalışır; her hareket için sunucuya istek gönderilmez.
 flowchart TD
     A["Node.js sunucusu / GitHub Pages"] --> B["index.html: Phaser ve src/game.js yüklenir"]
     B --> C["game.js: karakter ve bölüm seçimi"]
-    D["world/level.js + data/progress.js: bölümler ve kilitler"] --> C
+    D["world/levels/level.js + data/progress.js: bölümler ve kilitler"] --> C
     C --> E["new Phaser.Game + ui/view.js: ekran ve fizik"]
     E --> F["gameplay/GameScene.js: init → preload"]
     F --> G["data/assets.js: görsel ve ses yükle"]
@@ -217,6 +222,13 @@ sürüm bilgisini ve kaynak dosyaların değişmediğini kontrol eder.
 Dosyalar gameplay, world, ui ve data klasörlerinde görevlerine göre gruplanır. Yeni sınıf,
 bağımlılık veya karmaşık bir katman sistemi eklenmedi. Bölüm tanımları `level.js`
 içinde veri olarak kalır; yeni bölüm eklemek için ana oyun döngüsü değiştirilmez.
+`world/levels` bölüm verilerini, `world/scenery` dekor çizimlerini, `world/terrain`
+zemin ve basamak işlerini toplar. Ortak çizim altyapısı `graphics` içindedir.
+
+`cacheTexture(scene, key, width, height, draw)` arka plan, basamak, çukur, kolon ve
+ateş çizimleri tarafından kullanılır. Anahtar zaten varsa yeniden çizmez; yoksa
+verilen boyutta dokuyu `draw(graphics)` fonksiyonuyla üretir ve geçici Graphics
+nesnesini temizler. Her nesnenin kendi çizim tarifi ilgili dosyada kalır.
 
 - `GameScene.preload` → `assets.js`: görselleri ve sesleri Phaser Loader'a verir.
 - `GameScene.create` → dünyayı kurar, karakteri oluşturur ve Phaser collider/overlap bağlantılarını yapar.

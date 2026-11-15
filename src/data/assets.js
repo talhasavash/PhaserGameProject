@@ -14,7 +14,7 @@ const IMAGE_GROUPS = [
     { width: 40, height: 52, keys: ['lantern'] },
     { width: 44, height: 46, keys: ['crescent'] }
 ];
-const SOUND_KEYS = ['jump', 'collect', 'hurt', 'heal', 'key', 'boss-jump', 'boss-land'];
+const SOUND_KEYS = ['jump', 'collect', 'hurt', 'heal', 'key', 'boss-jump', 'boss-land', 'level-complete'];
 
 // Phaser Loader yüklemeyi yönetir; GameScene.preload yalnızca bu fonksiyonu çağırır.
 export function loadGameAssets(scene, character) {

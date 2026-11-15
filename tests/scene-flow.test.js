@@ -52,7 +52,7 @@ test('Touching the exit early leaves the game running and explains the mission',
 
 test('Every mosque celebrates before showing a result; only Continue starts the next level', () => {
     for (let index = 0; index < levels.length; index++) {
-        const ids = ['result-score', 'game-result', 'play-again', 'next-level', 'result-eyebrow', 'result-title', 'result-message', 'touch-controls', 'result-verse'];
+        const ids = ['game-result', 'play-again', 'next-level', 'result-title', 'touch-controls', 'result-verse'];
         const elements = new Map(ids.map(id => [id, { hidden: true, textContent: '', style: {}, focus() { this.focused = true; } }]));
         globalThis.document = { getElementById: id => elements.get(id) };
         const run = createGameState();
@@ -62,12 +62,13 @@ test('Every mosque celebrates before showing a result; only Continue starts the 
         let delayed;
         let scheduled = 0;
         const calls = [];
+        const sounds = [];
         elements.set('menu-button', { click() { calls.push('menu'); } });
         const scene = {
             gameState: run, elapsed: 10000, levelIndex: index,
             physics: { pause() { pauseCount++; }, resume() {} },
             player: { anims: { stop() {} }, setTexture() {}, setVelocity() {}, setAlpha() {} },
-            touchControls: { reset() {} }, sound: { play() {} },
+            touchControls: { reset() {} }, sound: { play(key) { sounds.push(key); } },
             time: { delayedCall(ms, callback) { assert.equal(ms, 1200); scheduled++; delayed = callback; } },
             tweens: { pauseAll() {}, resumeAll() {} }, announce() {}, updateHud() {},
             showLevelResult() { GameScene.prototype.showLevelResult.call(this); },
@@ -86,16 +87,13 @@ test('Every mosque celebrates before showing a result; only Continue starts the 
         delayed();
         assert.ok(elements.get('result-verse').textContent.length > 10);
         assert.equal(elements.get('game-result').hidden, false);
-        assert.match(elements.get('result-score').textContent, /120 puan/);
+        scene.showLevelResult();
+        assert.equal(sounds.filter(key => key === 'level-complete').length, 1, 'A repeated result callback cannot replay the reward sound');
         const final = index === levels.length - 1;
         assert.equal(elements.get('next-level').hidden, final);
         assert.equal(elements.get('play-again').hidden, !final);
         assert.equal(elements.get(final ? 'play-again' : 'next-level').focused, true);
-        if (index === 10) {
-            assert.equal(elements.get('result-title').textContent, 'Dünya 0 tamamlandı!');
-            assert.equal(elements.get('next-level').textContent, "Dünya 1'e geç →");
-            assert.match(elements.get('result-message').textContent, /Dünya 1 açıldı/);
-        }
+        assert.equal(elements.get('result-title').textContent, final ? 'Oyun tamam!' : 'Bölüm tamam!');
         GameScene.prototype.continueAfterResult.call(scene);
         GameScene.prototype.continueAfterResult.call(scene);
         assert.deepEqual(calls, final ? ['menu'] : [{ levelIndex: index + 1, score: 120 }]);

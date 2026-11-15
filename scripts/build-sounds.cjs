@@ -6,6 +6,7 @@ fs.mkdirSync(folder, { recursive: true });
 const sampleRate = 22050;
 
 function saveSound(name, notes) {
+    if (process.argv.includes('--result-only') && name !== 'level-complete') return;
     if (process.argv.includes('--boss-only') && !['boss-jump', 'boss-land'].includes(name)) return;
     const samples = [];
     for (const [start, end, seconds] of notes) {
@@ -37,6 +38,7 @@ saveSound('collect', [[660, 740, 0.06], [880, 880, 0.09]]);
 saveSound('hurt', [[180, 85, 0.18]]);
 saveSound('heal', [[523, 523, 0.07], [659, 659, 0.07], [784, 784, 0.10]]);
 saveSound('key', [[784, 784, 0.08], [1047, 1047, 0.13]]);
+saveSound('level-complete', [[523, 523, 0.10], [659, 659, 0.10], [784, 784, 0.10], [1047, 1047, 0.28]]);
 saveSound('boss-jump', [[110, 240, 0.16]]);
 saveSound('boss-land', [[180, 55, 0.23]]);
-console.log(process.argv.includes('--boss-only') ? '2 muhafız sesi üretildi.' : '7 kısa oyun sesi üretildi.');
+console.log(process.argv.includes('--result-only') ? 'Bölüm bitiş sesi üretildi.' : process.argv.includes('--boss-only') ? '2 muhafız sesi üretildi.' : '8 kısa oyun sesi üretildi.');

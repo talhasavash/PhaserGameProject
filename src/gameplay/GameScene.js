@@ -307,21 +307,16 @@ export class GameScene extends Phaser.Scene {
     }
 
     showLevelResult() {
+        if (this.resultShown) return;
         this.resultShown = true;
         this.tweens.pauseAll();
         const final = this.levelIndex === levels.length - 1;
-        const world = worldForLevel(this.levelIndex);
-        const nextWorld = final ? null : worldForLevel(this.levelIndex + 1);
-        const newWorld = nextWorld && nextWorld.id !== world.id;
-        document.getElementById('result-eyebrow').textContent = final ? 'OYUN TAMAMLANDI' : 'BÖLÜM TAMAMLANDI';
-        document.getElementById('result-title').textContent = final ? 'Tebrikler!' : newWorld ? `Dünya ${world.id} tamamlandı!` : `${chapterNumber(this.levelIndex)}. bölümü bitirdiniz!`;
-        document.getElementById('result-message').textContent = final ? 'Bütün dünyaları bitirdiniz.' : newWorld ? `Dünya ${nextWorld.id} açıldı.` : `${chapterNumber(this.levelIndex) + 1}. bölüm artık açık.`;
-        document.getElementById('next-level').textContent = newWorld ? `Dünya ${nextWorld.id}'e geç →` : 'Sonraki bölüm →';
+        document.getElementById('result-title').textContent = final ? 'Oyun tamam!' : 'Bölüm tamam!';
         document.getElementById('result-verse').textContent = verses[this.levelIndex].text;
-        document.getElementById('result-score').textContent = `${this.gameState.score} puan`;
         document.getElementById('next-level').hidden = final;
         document.getElementById('play-again').hidden = !final;
         document.getElementById('game-result').hidden = false;
+        this.sound.play('level-complete', { volume: 0.22 });
         document.getElementById(final ? 'play-again' : 'next-level').focus({ preventScroll: true });
         this.announce(document.getElementById('result-title').textContent);
     }

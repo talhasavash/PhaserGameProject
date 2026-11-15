@@ -274,7 +274,8 @@ HTTP kullan; HTML dosyasını çift tıklayarak açma (oyun ES modülleri kullan
 Dünya 0 mevcut 11 bölümü, Dünya 1 yeni üç bölümü içerir. Ana menüde önce dünya,
 sonra o dünyadaki bölüm seçilir. Dünya 1 başlangıçta kilitlidir; Dünya 0 boss
 bölümü tamamlanınca açılır. Bölüm numaraları her dünyada yeniden 1’den başlar;
-HUD üzerinde D0·11, D1·1 gibi görünür. Menüde dünya/bölüm adları yerine yalnızca numaralar gösterilir.
+HUD üzerinde Bölüm 1, Bölüm 2 gibi görünür; her dünyanın kendi bölüm numarası
+kullanılır. Puan çubuğunun arka planı %40 opaktır. Menüde dünya/bölüm adları yerine yalnızca numaralar gösterilir.
 
 Başlangıçta yalnızca Dünya 0 / 1 açıktır; her bölüm bitince sonraki açılır. Ana ekranda yalnızca
 numaralar görünür. Dünya 0'ın 11. bölümü altın renkli özel bir çemberdir. Menü `levels` dizisinden
@@ -320,10 +321,14 @@ kullanıcı Dünya 1'i açmak için boss'u tamamlar; açılan eski bölümler ka
 Her bölümde 3 görev yıldızı bulunur. Diğer nesneler sadece puan verir. Anahtar
 alınınca cami, geçit, asansör veya kale kapısı açılır ve giriş aydınlanır. Çıkışa ulaşınca çocuk
 önce 1,2 saniye yıldızlarla parlar, sonra tamamlanma mesajı ve kısa ayet aynı sonuç
-kartında görünür. Ayrı bir okuma ekranı veya görünür kaynak bağlantısı yoktur.
-Kart kendiliğinden kapanmaz; Sonraki bölüm veya Enter ile ilerlenir. Dünya 0 / 11
-sonunda Dünya 1’e geç düğmesi çıkar; aynı sahne yeni dünyanın verileriyle kurulur.
-Dünya 1 / 3 sonunda Ana ekrana dön görünür; düğme veya Enter bölüm seçimine döndürür, 1. bölümü
+kartında görünür. Kartta yalnızca “Bölüm tamam!”, ayet ve Devam et düğmesi bulunur;
+son bölümde “Oyun tamam!” ve Ana ekran gösterilir. Yıldız üç kısa, yavaş parlamayla
+aydınlanır; `level-complete.wav` bir kez çalar ve genel ses kapatma ayarına uyar.
+Sesi `node scripts/build-sounds.cjs --result-only` yeniden üretir.
+Ayrı bir okuma ekranı veya görünür kaynak bağlantısı yoktur.
+Kart kendiliğinden kapanmaz; Devam et veya Enter ile ilerlenir. Dünya 0 / 11
+sonunda da aynı düğmeyle yeni dünya başlar; aynı sahne yeni dünyanın verileriyle kurulur.
+Dünya 1 / 3 sonunda Ana ekran görünür; düğme veya Enter bölüm seçimine döndürür, 1. bölümü
 kendiliğinden başlatmaz. Açılan bölümler korunur. Kaynak ve sure/ayet numaraları denetlenebilmesi için
 `src/data/verses.js` içinde saklanır; Diyanet meallerinden kısa alıntılar kullanılır.
 Üç nokta ayetin yalnızca bir kısmının alındığını gösterir.

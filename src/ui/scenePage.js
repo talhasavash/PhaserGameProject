@@ -1,4 +1,4 @@
-// Sahnenin HTML düğmelerini bağlar ve temizler; bölüm tamamlanınca sonuç kartını gösterir.
+// Sahnenin HTML düğmelerini, sonuç kartını ve bölüm yükleme ekranını yönetir.
 import { levels } from '../world/levels/level.js';
 import { verses } from '../data/verses.js';
 
@@ -43,4 +43,24 @@ export function showCompletion(levelIndex) {
     document.getElementById('game-result').hidden = false;
     document.getElementById(final ? 'play-again' : 'next-level').focus({ preventScroll: true });
     return title;
+}
+
+export function showLoading() {
+    document.getElementById('game-loading').hidden = false;
+    updateLoading(0);
+}
+
+export function updateLoading(progress) {
+    document.getElementById('loading-progress').value = Math.max(0, Math.min(1, progress));
+}
+
+export function hideLoading() {
+    document.getElementById('game-loading').hidden = true;
+}
+
+export function finishLoading(scene) {
+    scene.load.off('progress', updateLoading);
+    updateLoading(1);
+    // create bitse de canvas henüz çizilmemiş olabilir; ilk gerçek kareyi bekle.
+    scene.game.events.once('postrender', hideLoading);
 }

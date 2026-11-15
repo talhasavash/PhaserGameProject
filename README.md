@@ -27,7 +27,7 @@ oyun oranı korunur, görüntü esnetilmez. Yatay mobilde oyun bütün ekranı k
 düğmeler karakterin altında kalan toprak alanındadır. Dikey telefonda görüntü oranı korunur.
 Yatay telefonda 600 yerine 320 dünya birimi yükseklik gösterilir; üst/alt şeritler de
 kaldırıldığı için karakter ve nesneler daha büyük görünür. Tablet görünümü 480 birimdir.
-Bu değerler `src/ui/view.js` içindedir. Kamera zemine göre sabittir; zıplarken dikey kaymaz.
+Bu değerler `src/ui/browser.js` içindedir. Kamera zemine göre sabittir; zıplarken dikey kaymaz.
 Bölüm numarası/can/yıldız/anahtar/puan bilgileri ince bir üst satırdadır.
 Üst satır ekran genişliğinin yaklaşık %52'sini kaplar; arka planı %20 opaktır.
 Zıplama, toplama, çarpma, can yenileme ve anahtar alma kısa ses efektleri kullanır.
@@ -80,8 +80,7 @@ PhaserGameProject/
 │   │   ├── player.js            Karakter, hızlanma, zıplama ve animasyon
 │   │   ├── controls.js          Mobil çoklu dokunma
 │   │   ├── rules.js             Puan, can ve görev kuralları
-│   │   ├── hazards.js           Düşman oluşturma ve hareketleri
-│   │   ├── boss.js              Muhafız zıplaması ve öfkesi
+│   │   ├── hazards.js           Düşman hareketleri, boss zıplaması ve öfkesi
 │   │   ├── fireRain.js          Gökyüzünden düşen seyrek ateş topları
 │   │   ├── guardianFire.js      Final muhafızının ağızdan ateş atışı
 │   │   └── columns.js           İnip yükselen katı kolonlar ve zamanlama
@@ -102,9 +101,9 @@ PhaserGameProject/
 │   │   └── texture.js           Ortak parametrik doku üretimi ve önbelleği
 │   ├── ui/
 │   │   ├── levelMenu.js         Dünya/bölüm seçenekleri ve kilitlerin görünümü
-│   │   ├── scenePage.js         Sahnenin HTML düğmeleri ve sonuç kartı
+│   │   ├── scenePage.js         HTML düğmeleri, sonuç ve yükleme ekranı
 │   │   ├── hud.js               Can, görev ve puan
-│   │   └── view.js              Telefon/tablet için dünya boyutu
+│   │   └── browser.js           Ekran ölçüleri, tam ekran, yön ve PWA
 │   └── data/
 │       ├── assets.js            Phaser Loader görsel ve ses listeleri
 │       ├── progress.js          Tarayıcıda bölüm ilerlemesini saklama
@@ -141,8 +140,8 @@ sırayı izle; çağrılan her yardımcı fonksiyonun içine hemen girmek gerekm
 | 5 | `src/world/levels/level.js`, `src/world/terrain/terrain.js`, `src/world/levelObjects.js` | Bölüm verilerinin zemine, nesnelere ve temas bölgelerine dönüşmesi |
 | 6 | `src/gameplay/player.js`, `controls.js` | Girdi, hızlanma, zıplama ve animasyon; ardından mobil parmak takibi |
 | 7 | `src/gameplay/rules.js` | Puan, yıldız, anahtar ve can; sonra GameScene'deki temas metotlarına dön |
-| 8 | `src/ui/hud.js`, `view.js`, `scenePage.js` | Oyun göstergeleri, mobil ölçüler, HTML düğmeleri ve sonuç kartı |
-| 9 | `src/gameplay/hazards.js`, `boss.js`, `fireRain.js`, `guardianFire.js` | Devriye, boss öfkesi/zıplaması ve ateş zamanlaması |
+| 8 | `src/ui/hud.js`, `browser.js`, `scenePage.js` | Oyun göstergeleri, mobil ölçüler, HTML düğmeleri ve sonuç kartı |
+| 9 | `src/gameplay/hazards.js`, `fireRain.js`, `guardianFire.js` | Devriye, boss öfkesi/zıplaması ve ateş zamanlaması |
 | 10 | `src/world/scenery/background.js`, `chapterScenery.js`, `src/world/terrain/platforms.js`, `src/graphics/texture.js` | Ortam çizimleri ve ortak doku önbelleği |
 | 11 | `src/ui/levelMenu.js`, `src/data/progress.js`, `verses.js` | Bölüm seçimi, kilitler, localStorage ve sonuç metinleri |
 
@@ -161,7 +160,7 @@ flowchart TD
     A["Node.js sunucusu / GitHub Pages"] --> B["index.html: Phaser ve src/game.js yüklenir"]
     B --> C["game.js: karakter ve bölüm seçimi"]
     D["world/levels/level.js + data/progress.js: bölümler ve kilitler"] --> C
-    C --> E["new Phaser.Game + ui/view.js: ekran ve fizik"]
+    C --> E["new Phaser.Game + ui/browser.js: ekran ve fizik"]
     E --> F["gameplay/GameScene.js: init → preload"]
     F --> G["data/assets.js: görsel ve ses yükle"]
     G --> H["GameScene.create: bölümü kur"]
@@ -442,7 +441,7 @@ tarayıcılarda menü dahil tam ekran açılır. Manifestte ekran yönü
 `any` olarak ayarlanır; açılışta zorunlu döndürme yapılmaz.
 `Oyna` dokunuşunda da tam ekran ve mobilde yatay yön istenir; bu istekler uygulama
 açılışında yapılmaz. İzin verilmezse oyun normal ekran boyutunda devam eder.
-`src/ui/display.js` Oyna dokunuşundaki ekran isteğini yönetir. Ana menüye dönüşte
+`src/ui/browser.js` Oyna dokunuşundaki ekran isteğini yönetir. Ana menüye dönüşte
 yalnızca yön kilidi bırakılır, tam ekran korunur. Uygulamayı kapatmak
 için telefonun kendi gezinme ve son uygulamalar kontrolleri kullanılır.
 Kurulu uygulama zaten `display-mode: fullscreen` ile açılmışsa Oyna ikinci bir
@@ -453,8 +452,8 @@ bırakmışsa ilk normal dokunuşta yeniden istenir; oyun yeniden yüklenmez.
 Başlangıç adresi doğrudan `./index.html` dosyasıdır; uygulama kimliği `./` olarak
 korunur. Sayfa isteği dört saniyede sonuçlanmazsa kayıtlı açılış sayfası kullanılır.
 Önbelleğe yazılamaması, başarılı bir çevrimiçi açılışı engellemez.
-`src/ui/pwa.js` service worker kaydını yönetir.
-`src/ui/loading.js` bölüm yükleme ekranını yönetir: Phaser Loader ilerlemesini
+`src/ui/browser.js` service worker kaydını yönetir.
+`src/ui/scenePage.js` bölüm yükleme ekranını yönetir: Phaser Loader ilerlemesini
 çubuğa aktarır ve ilk `postrender` olayından sonra ekranı kaldırır. Böylece dosyalar
 yüklense bile bölüm çizilmeden açık renkli boş canvas gösterilmez.
 

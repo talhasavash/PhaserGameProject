@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { levels } from '../src/world/levels/level.js';
-import { bossLift } from '../src/gameplay/boss.js';
+import { bossLift } from '../src/gameplay/hazards.js';
 import { breathMoment, breathWarning, guardianShotFrame, updateGuardianFire, resetGuardianFire } from '../src/gameplay/guardianFire.js';
 
 const level = levels.at(-1);

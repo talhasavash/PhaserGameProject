@@ -6,15 +6,13 @@ import { createScenery } from '../world/scenery/background.js';
 import { bindTouchControls } from './controls.js';
 import { createFireRain, updateFireRain } from './fireRain.js';
 import { unlockNext } from '../data/progress.js';
-import { resetBossRage } from './boss.js';
+import { resetBossRage, createHazards, updateHazards } from './hazards.js';
 import { createTerrain } from '../world/terrain/terrain.js';
-import { createHazards, updateHazards } from './hazards.js';
 import { createHud, centerHud, updateHud, updateProgress } from '../ui/hud.js';
 import { loadGameAssets } from '../data/assets.js';
 import { createColumns, updateColumns } from './columns.js';
 import { createCollectibles, createLandmarks, createHealingSpots } from '../world/levelObjects.js';
-import { prepareScenePage, bindSceneButtons, clearSceneButtons, showCompletion } from '../ui/scenePage.js';
-import { showLoading, updateLoading, hideLoading, finishLoading } from '../ui/loading.js';
+import { prepareScenePage, bindSceneButtons, clearSceneButtons, showCompletion, showLoading, updateLoading, hideLoading, finishLoading } from '../ui/scenePage.js';
 import { createGuardianFire, updateGuardianFire, resetGuardianFire } from './guardianFire.js';
 
 export const GAME_SCENE_KEY = 'Garden';

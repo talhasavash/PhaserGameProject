@@ -117,6 +117,10 @@ export function resetPlayerMovement(player) {
     player.recoveryUntil = 0;
 }
 
+function lastPressedTime(...keys) {
+    return Math.max(0, ...keys.filter(key => key?.isDown).map(key => key.timeDown));
+}
+
 export function readDirection(player) {
     const touch = player.touchKeys;
     const leftHeld = player.cursors.left.isDown || player.keys.A.isDown || touch?.left.isDown;
@@ -126,14 +130,8 @@ export function readDirection(player) {
     if (leftHeld && rightHeld) {
         // İki yön aynı anda basılıysa son basılan yön kazanır.
         // timeDown, Phaser'ın tuşa basıldığı anda kaydettiği zamandır.
-        let leftTime = 0;
-        let rightTime = 0;
-        if (player.cursors.left.isDown) leftTime = player.cursors.left.timeDown;
-        if (player.keys.A.isDown) leftTime = Math.max(leftTime, player.keys.A.timeDown);
-        if (player.cursors.right.isDown) rightTime = player.cursors.right.timeDown;
-        if (player.keys.D.isDown) rightTime = Math.max(rightTime, player.keys.D.timeDown);
-        if (touch?.left.isDown) leftTime = Math.max(leftTime, touch.left.timeDown);
-        if (touch?.right.isDown) rightTime = Math.max(rightTime, touch.right.timeDown);
+        const leftTime = lastPressedTime(player.cursors.left, player.keys.A, touch?.left);
+        const rightTime = lastPressedTime(player.cursors.right, player.keys.D, touch?.right);
         direction = player.movement.lastDirection;
         if (rightTime > leftTime) direction = 1;
         if (leftTime > rightTime) direction = -1;

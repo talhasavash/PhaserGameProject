@@ -1,4 +1,18 @@
-// Mobilde tam ekran ve yatay görünüm isteklerini, oyuna geri dönüldüğünde ekranın toparlanmasını yönetir.
+// Tarayıcıya ait PWA kaydını, oyun ekranı ölçülerini ve mobil tam ekran/yön davranışını yönetir.
+export function setupPwa() {
+    // Geliştirme sunucusunda önbellek oluşturmayız; yalnızca yayın kopyası kaydeder.
+    if (!document.querySelector('meta[name="game-release"]') || !('serviceWorker' in navigator)) return;
+    async function registerWorker() {
+        try {
+            await navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' });
+        } catch (error) {
+            console.warn('Çevrimdışı oyun desteği başlatılamadı.', error);
+        }
+    }
+    if (document.readyState === 'complete') registerWorker();
+    else window.addEventListener('load', registerWorker, { once: true });
+}
+
 // Bu istek yalnızca Oyna düğmesindeki kullanıcı dokunuşundan yapılır.
 export async function enterGameDisplay(
     doc = document,
@@ -34,4 +48,13 @@ export function bindDisplayRecovery(isPlaying, doc = document, restore = () => e
 // Bölüm seçimine dönünce yön serbest kalır; tam ekrandan çıkılmaz.
 export function releaseGameOrientation(deviceScreen = screen) {
     try { deviceScreen.orientation?.unlock?.(); } catch { /* Desteklenmeyebilir. */ }
+}
+
+// Platformların, karakterin ve fizik kurallarının gerçek boyutları değişmez.
+export function gameView(width, height, touchLayout) {
+    if (touchLayout && width > height) {
+        const worldHeight = height < 500 ? 320 : 480;
+        return { width: Math.round(worldHeight * width / Math.max(1, height)), height: worldHeight };
+    }
+    return { width: Math.max(960, Math.round(600 * width / Math.max(1, height))), height: 600 };
 }

@@ -140,6 +140,7 @@ export function createMosque(scene, x, theme = 'garden') {
     // Her bölümün cephesi, kubbe düzeni ve minare sayısı farklıdır.
     const designs = {
         garden: { wall: 0xf0e6c5, roof: 0x4b897b, trim: 0xc5a86a, width: 168, top: 455, towers: [-106, 106], domes: [[0, 444, 144, 106]] },
+        abyss: { wall: 0xebe3ce, roof: 0x488c87, trim: 0xe2c783, width: 190, top: 445, towers: [118], domes: [[0, 412, 150, 106]] },
         courtyard: { wall: 0xe5e8eb, roof: 0x427fa4, trim: 0x77bfc2, width: 218, top: 446, towers: [-132], domes: [[-72, 437, 70, 58], [72, 437, 70, 58], [0, 410, 116, 100]] },
         desert: { wall: 0xe8bc8c, roof: 0xcb8256, trim: 0xf5dd9c, width: 194, top: 428, towers: [126], domes: [[0, 410, 94, 70]] },
         night: { wall: 0xe8dff0, roof: 0x7763a7, trim: 0xe8c77a, width: 230, top: 450, towers: [-140, -104, 104, 140], domes: [[-78, 435, 68, 68], [78, 435, 68, 68], [0, 399, 122, 116]] },
@@ -154,7 +155,7 @@ export function createMosque(scene, x, theme = 'garden') {
     const design = designs[theme] || designs.garden;
     // Her bölüme uygun açık renk vitraylar.
     const finishes = {
-        garden: 0xb8e2d5, courtyard: 0xc0e4ee,
+        garden: 0xb8e2d5, abyss: 0xb9e6df, courtyard: 0xc0e4ee,
         desert: 0xf4dcad, night: 0xd3c8ed,
         forest: 0xc9e2b9, interior: 0xb5e2df,
         snow: 0xd9f0f4, river: 0xb7e7e6,

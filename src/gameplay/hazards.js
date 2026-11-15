@@ -29,6 +29,7 @@ function createHazard(scene, data) {
         bob: data.bob || 0,
         grounded: data.y === undefined,
         jump: data.jump,
+        breath: data.breath,
         jumpClock: 0,
         rage: data.rage || false,
         engagedAt: null,

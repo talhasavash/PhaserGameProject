@@ -98,9 +98,9 @@ export const darkCastle = chapter({
 
 // Uzun atlayışlar arasında dinlenme adaları var; tüm boşluklar koşarak aşılabilir.
 export const brokenPass = chapter({
-    name: 'Uçurum Geçidi', theme: 'abyss', width: 5200, exitLabel: 'taş geçide',
+    name: 'Uçurum Geçidi', theme: 'abyss', width: 5600, exitLabel: 'camiye', boss: true,
     checkpoint: { x: 2460, y: 480 },
-    fountains: [{ id: 'fountain-1', x: 420 }, { id: 'fountain-2', x: 3520 }],
+    fountains: [{ id: 'fountain-1', x: 420 }, { id: 'fountain-2', x: 3520 }, { id: 'fountain-3', x: 4680 }],
     platforms: [],
     gaps: [
         { x: 550, width: 90 }, { x: 850, width: 110 }, { x: 1190, width: 130 },
@@ -123,7 +123,12 @@ export const brokenPass = chapter({
     ],
     enemies: [
         { type: 'bat', x: 1740, y: 384, minX: 1690, maxX: 1790, speed: 80, bob: 14 },
-        { type: 'bird', x: 3140, y: 375, minX: 3100, maxX: 3200, speed: 90, bob: 16 }
+        { type: 'bird', x: 3140, y: 375, minX: 3100, maxX: 3200, speed: 90, bob: 16 },
+        {
+            type: 'ogre', texture: 'ogre-flame', x: 5200, minX: 5200, maxX: 5200, speed: 0, scale: 2.4,
+            jump: { height: 195, duration: 2100, period: 6000, offset: 2100 },
+            breath: { shots: [600, 1800], speed: 290, range: 400 }
+        }
     ]
 });
 

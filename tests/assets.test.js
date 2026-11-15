@@ -31,6 +31,6 @@ test('Both characters load existing assets and every chapter item and enemy has 
             for (let frame = 0; frame < 6; frame++) assert.ok(images.has(`${base}-${expression}${frame}`));
         }
         assert.ok(images.has('ogre-ember-angry'));
-        for (const key of ['jump', 'collect', 'hurt', 'heal', 'key', 'boss-jump', 'boss-land', 'level-complete']) assert.ok(sounds.has(key));
+        for (const key of ['jump', 'collect', 'hurt', 'heal', 'key', 'boss-jump', 'boss-land', 'level-complete', 'boss-fire']) assert.ok(sounds.has(key));
     }
 });

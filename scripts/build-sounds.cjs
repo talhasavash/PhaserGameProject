@@ -6,6 +6,7 @@ fs.mkdirSync(folder, { recursive: true });
 const sampleRate = 22050;
 
 function saveSound(name, notes) {
+    if (process.argv.includes('--guardian-only') && name !== 'boss-fire') return;
     if (process.argv.includes('--result-only') && name !== 'level-complete') return;
     if (process.argv.includes('--boss-only') && !['boss-jump', 'boss-land'].includes(name)) return;
     const samples = [];
@@ -41,4 +42,5 @@ saveSound('key', [[784, 784, 0.08], [1047, 1047, 0.13]]);
 saveSound('level-complete', [[523, 523, 0.10], [659, 659, 0.10], [784, 784, 0.10], [1047, 1047, 0.28]]);
 saveSound('boss-jump', [[110, 240, 0.16]]);
 saveSound('boss-land', [[180, 55, 0.23]]);
-console.log(process.argv.includes('--result-only') ? 'Bölüm bitiş sesi üretildi.' : process.argv.includes('--boss-only') ? '2 muhafız sesi üretildi.' : '8 kısa oyun sesi üretildi.');
+saveSound('boss-fire', [[320, 130, 0.24]]);
+console.log(process.argv.includes('--guardian-only') ? 'Canavarın ateş sesi üretildi.' : process.argv.includes('--result-only') ? 'Bölüm bitiş sesi üretildi.' : process.argv.includes('--boss-only') ? '2 muhafız sesi üretildi.' : '9 kısa oyun sesi üretildi.');

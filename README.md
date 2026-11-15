@@ -82,7 +82,8 @@ PhaserGameProject/
 │   │   ├── rules.js             Puan, can ve görev kuralları
 │   │   ├── hazards.js           Düşman oluşturma ve hareketleri
 │   │   ├── boss.js              Muhafız zıplaması ve öfkesi
-│   │   ├── fireRain.js          Ateş topları ve gölge uyarısı
+│   │   ├── fireRain.js          Gökyüzünden düşen seyrek ateş topları
+│   │   ├── guardianFire.js      Final muhafızının ağızdan ateş atışı
 │   │   └── columns.js           İnip yükselen katı kolonlar ve zamanlama
 │   ├── world/                  Bölümler ve ortam
 │   │   ├── level.js             Bölüm tanımları ve nesne konumları
@@ -305,7 +306,7 @@ Dünya 1'in bölümleri farklı geçişler ve yeni düşmanlar sunar:
 | 1 · Lav Vadisi | Lav boşlukları, semenderler, inip yükselen taş kolonlar ve ışıklı çıkış geçidi |
 | 2 · Mekanik Fabrika | Ters yönlü bantlar, robotlar, fazları farklı presler ve asansör çıkışı |
 | 3 · Kara Kale | Dar koridorlar, zırhlı böcekler, yarasalar, kolon çiftleri ve yükselen kale kapısı |
-| 4 · Uçurum Geçidi | Genişliği artan 12 boşluk, sağlam iniş adaları ve zıplama rotasındaki meyveler |
+| 4 · Uçurum Geçidi · Boss | 12 boşluk, iniş adaları ve camiden önce ateş püskürten dev muhafız |
 
 Kolonlar fizik gövdesine sahiptir ve tavana kadar uzanır; üstlerinden atlanamaz.
 Başlangıç yüksekliği her denemede bir kez rastgele seçilir (140–340 aralığı);
@@ -386,6 +387,13 @@ Başlangıç, abdest alanları, kontrol noktaları ve
 karanlık uçurumlar olarak çizilir. `pits.js` her tema/genişlik için bir küçük doku
 üretir; fizik boşlukları `terrain.js` içinde aynı ölçülerde kalır. Dünya 1'in dördüncü
 bölümünde 12 boşluk bulunur; aralarında en az 150 birim sağlam zemin vardır.
+
+Finalde iki gözlü dev muhafız, yerdeyken iki aralıklı ateş atar; sonra yüksekten
+zıplayarak altından koşulabilecek bir aralık bırakır. Son ateş geçmeden zıplamaz.
+`guardianFire.js` üç yeniden kullanılan ateş gövdesini, ağız parlamasını ve atış
+saatini yönetir; yeni bir gölge veya zemin uyarısı çizmez. Can bitip geri dönülünce
+ateşler ve muhafızın saati sıfırlanır. `ogre-flame.svg` yeni muhafızın çizimidir;
+`node scripts/build-sounds.cjs --guardian-only` ateş sesini yeniden üretir.
 
 Sağ üstteki Ⅱ mola düğmesini açınca oyun duraklar. Yalnızca Devam et ve Ana ekran
 buradadır. Tam ekran aç/kapat veya uygulamadan çıkış düğmesi yoktur. Devam et ile oyun sürer. Yönler saydam üçgen,

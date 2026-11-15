@@ -14,6 +14,7 @@ import { loadGameAssets } from '../data/assets.js';
 import { createColumns, updateColumns } from './columns.js';
 import { createWorldGate } from '../world/world1Scenery.js';
 import { showLoading, updateLoading, hideLoading, finishLoading } from '../ui/loading.js';
+import { createGuardianFire, updateGuardianFire, resetGuardianFire } from './guardianFire.js';
 
 const COLLECTIBLE_SCALE = 0.75;
 const ITEM_MESSAGES = {
@@ -58,6 +59,7 @@ export class GameScene extends Phaser.Scene {
         createTerrain(this);
         this.createCollectibles();
         createHazards(this);
+        createGuardianFire(this);
         createFireRain(this);
         createColumns(this);
         this.createLandmarks();
@@ -110,6 +112,7 @@ export class GameScene extends Phaser.Scene {
         this.physics.add.overlap(this.player, this.fruits, this.collectFruit, null, this);
         this.physics.add.overlap(this.player, this.hazards, this.hitHazard, null, this);
         this.physics.add.overlap(this.player, this.fireballs, this.hitHazard, null, this);
+        this.physics.add.overlap(this.player, this.guardianFlames, this.hitHazard, null, this);
         this.physics.add.overlap(this.player, this.keySprite, this.collectKey, null, this);
         this.physics.add.overlap(this.player, this.exitZone, this.reachExit, null, this);
         this.physics.add.overlap(this.player, this.fountains, this.useFountain, null, this);
@@ -261,6 +264,7 @@ export class GameScene extends Phaser.Scene {
 
     respawn(point = null) {
         resetBossRage(this.hazards.getChildren());
+        resetGuardianFire(this);
         if (!point) point = this.gameState.checkpointActive ? this.level.checkpoint : this.level.spawn;
         this.gameState.hearts = 3;
         this.player.setPosition(point.x, point.y);
@@ -363,6 +367,7 @@ export class GameScene extends Phaser.Scene {
         this.updatePlayer(delta);
         this.updateCamera(delta);
         updateHazards(this, delta);
+        updateGuardianFire(this);
         this.updateConveyor(delta);
         this.updateCheckpoint();
         updateProgress(this);

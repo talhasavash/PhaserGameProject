@@ -7,14 +7,14 @@ const IMAGE_GROUPS = [
     { width: 32, height: 36, keys: ['berry'] },
     { width: 76, height: 52, keys: ['hedgehog', 'snail', 'bee', 'fox', 'penguin', 'frog', 'turtle', 'bat', 'bird', 'spider', 'salamander', 'robot', 'scarab'] },
     { width: 52, height: 52, keys: ['ball', 'wheel'] },
-    { width: 96, height: 100, keys: ['ogre', 'ogre-moss', 'ogre-stone', 'ogre-ember', 'ogre-ember-angry'] },
+    { width: 96, height: 100, keys: ['ogre', 'ogre-moss', 'ogre-stone', 'ogre-ember', 'ogre-ember-angry', 'ogre-flame'] },
     { width: 96, height: 76, keys: ['allah-plaque'] },
     { width: 64, height: 40, keys: ['key'] },
     { width: 36, height: 52, keys: ['mat'] },
     { width: 40, height: 52, keys: ['lantern'] },
     { width: 44, height: 46, keys: ['crescent'] }
 ];
-const SOUND_KEYS = ['jump', 'collect', 'hurt', 'heal', 'key', 'boss-jump', 'boss-land', 'level-complete'];
+const SOUND_KEYS = ['jump', 'collect', 'hurt', 'heal', 'key', 'boss-jump', 'boss-land', 'level-complete', 'boss-fire'];
 
 // Phaser Loader yüklemeyi yönetir; GameScene.preload yalnızca bu fonksiyonu çağırır.
 export function loadGameAssets(scene, character) {

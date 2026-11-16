@@ -1,3 +1,5 @@
+/* Başlık fontu yereldedir; PWA çevrimdışıyken de Türkçe harfleriyle yüklenir. */
+@font-face { font-family: 'Garden Bubble'; src: url('../assets/fonts/Baloo2.ttf') format('truetype'); font-style: normal; font-weight: 400 800; font-display: swap; }
 /* Dünya sayfaları: tam ekran manzara, büyük bölüm düğmeleri ve kompakt karakter seçimi. */
 body:not(.playing) .game-stage { inset: 0; }
 body:not(.playing) .build-version { display: none; }
@@ -9,10 +11,11 @@ body:not(.playing) .build-version { display: none; }
 }
 .character-select[data-world="2"] { background-color: #18294c; background-image: url('../assets/images/menu-world2.svg'); }
 .character-select[data-world="3"] { background-color: #cbe8f6; background-image: url('../assets/images/menu-world3.svg'); }
+.character-select[data-world="3"] .world-heading span { color: #2a6281; -webkit-text-stroke: 2px #f4fdff; text-shadow: 0 3px 0 #2e678633; }
 .character-form { width: 100%; height: 100%; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; gap: 12px; }
 .world-heading { min-height: 88px; padding-top: 12px; align-self: start; }
-.character-form h2 { display: block; max-width: 760px; margin: 0 auto; font: 900 clamp(30px, 4.8vw, 52px)/1.12 'Trebuchet MS', sans-serif; }
-.character-form h2 span { color: #fff8de; text-shadow: 0 2px 4px #21493ecc; }
+.character-form h2 { display: block; max-width: 760px; margin: 0 auto; text-transform: uppercase; font: 800 clamp(30px, 4.8vw, 52px)/1.12 'Garden Bubble', 'Trebuchet MS', sans-serif; }
+.character-form h2 span { color: #fff8de; -webkit-text-stroke: 1.5px #21493e; paint-order: stroke fill; text-shadow: 0 3px 0 #21493e66; }
 .world-map { width: 100%; height: 100%; margin: 0 auto; align-self: stretch; display: grid; grid-template-columns: 60px minmax(0, 1fr) 60px; align-items: center; gap: 12px; min-height: 0; }
 .level-options { display: grid; place-items: center; min-width: 0; min-height: 0; width: 100%; height: 100%; }
 .level-options legend.sr-only { width: 1px; margin: -1px; }
@@ -66,11 +69,12 @@ body:not(.playing) .build-version { display: none; }
 /* İlk açılış: oyun adı, iki karakter ve tek büyük oynat düğmesi. */
 .welcome-screen { position: absolute; inset: 0; overflow: hidden; isolation: isolate; background: #a6dcf0 url('../assets/images/menu-world1.svg') center / cover no-repeat; }
 .welcome-screen::before { content: ''; position: absolute; inset: 0; z-index: -1; background: radial-gradient(ellipse at 50% 30%, #fff7cf55, transparent 65%); }
-.welcome-screen h1 { position: absolute; top: 9%; left: 12%; right: 12%; margin: 0; text-align: center; color: #fff8de; font: 900 clamp(40px, 7.5vw, 96px)/1.05 'Trebuchet MS', sans-serif; text-shadow: 0 4px 0 #346c56, 0 7px 18px #254d4640; }
-.welcome-screen h1 span { display: block; margin-top: 12px; color: #fce3a0; font-size: .42em; letter-spacing: .16em; text-shadow: 0 2px 0 #346c56; }
+.welcome-screen h1 { position: absolute; top: 9%; left: 5%; right: 5%; margin: 0; text-align: center; font: 800 clamp(46px, 9.5vw, 128px)/1.08 'Garden Bubble', 'Trebuchet MS', sans-serif; animation: welcome-title-in 750ms cubic-bezier(.2,.8,.3,1.1) 80ms both; }
+.welcome-word { display: inline-block; color: #ffd36f; -webkit-text-stroke: 5px #fff8df; paint-order: stroke fill; filter: drop-shadow(0 5px 0 #356b4f) drop-shadow(0 8px 10px #254d4626); }
+.welcome-word:last-child { color: #9ce68a; }
 .welcome-child { position: absolute; bottom: -6%; width: auto; height: min(72dvh, 600px); filter: drop-shadow(0 10px 8px #315c4b30); pointer-events: none; }
-.welcome-boy { left: 2%; transform: rotate(-8deg); }
-.welcome-girl { right: 2%; transform: rotate(8deg); }
+.welcome-boy { left: 2%; transform: rotate(-8deg); animation: welcome-boy-in 850ms cubic-bezier(.2,.8,.3,1) 120ms both; }
+.welcome-girl { right: 2%; transform: rotate(8deg); animation: welcome-girl-in 850ms cubic-bezier(.2,.8,.3,1) 230ms both; }
 #welcome-play { position: absolute; left: 50%; top: 59%; transform: translate(-50%, -50%); display: grid; place-items: center; width: clamp(100px, 17dvh, 154px); height: clamp(100px, 17dvh, 154px); padding: 24px; border: 5px solid #fff8dc; border-radius: 50%; color: #fff8df; background: radial-gradient(circle at 30% 20%, #88cfac, #438d70 55%, #245d4e); box-shadow: 0 7px 0 #24533f, inset 0 4px 0 #ffffff66, 0 14px 30px #264d4530; }
 #welcome-play svg { width: 100%; height: 100%; }
 #welcome-play:active { transform: translate(-50%, calc(-50% + 4px)); box-shadow: 0 3px 0 #24533f; }
@@ -90,12 +94,30 @@ body:not(.playing) .build-version { display: none; }
     .world-arrow { width: 48px; height: 72px; }
 }
 
-/* Son iki dünya da aynı 15 yerli düzeni kullanır. */
-.character-select[data-world="4"] { background-color: #49657c; background-image: linear-gradient(#5d477c44, #23375533), url('../assets/images/menu-world3.svg'); }
-.character-select[data-world="5"] { background-color: #18294c; background-image: linear-gradient(#493e7344, #16223e33), url('../assets/images/menu-world2.svg'); }
+/* Beş menü dünyası, bölüm verilerinden bağımsız kendi manzarasını kullanır. */
+.character-select[data-world="4"] { background-color: #49657c; background-image: url('../assets/images/menu-world4.svg'); }
+.character-select[data-world="5"] { background-color: #18294c; background-image: url('../assets/images/menu-world5.svg'); }
 @media (orientation: landscape) and (max-height: 340px) {
     .world-heading { min-height: 48px; padding-top: 4px; }
     .character-form h2 { font-size: 28px; }
     .menu-footer { min-height: 48px; }
     .character-form { gap: 4px; }
+}
+@keyframes welcome-title-in {
+    from { opacity: 0; transform: translateY(-35px) scale(.88); }
+    70% { opacity: 1; transform: translateY(4px) scale(1.025); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes welcome-boy-in {
+    from { opacity: 0; transform: translateX(-115%) rotate(-18deg); }
+    to { opacity: 1; transform: translateX(0) rotate(-8deg); }
+}
+@keyframes welcome-girl-in {
+    from { opacity: 0; transform: translateX(115%) rotate(18deg); }
+    to { opacity: 1; transform: translateX(0) rotate(8deg); }
+}
+#welcome-play { animation: welcome-play-in 500ms ease-out 650ms both; }
+@keyframes welcome-play-in { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+    .welcome-screen h1, .welcome-boy, .welcome-girl, #welcome-play { animation: none; }
 }

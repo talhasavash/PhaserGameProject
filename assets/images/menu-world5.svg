@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+<defs>
+ <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#3e607a"/><stop offset=".65" stop-color="#bdcbbf"/><stop offset="1" stop-color="#f4dfad"/></linearGradient>
+ <radialGradient id="moonlight"><stop stop-color="#fff2be" stop-opacity=".23"/><stop offset="1" stop-color="#fff2be" stop-opacity="0"/></radialGradient>
+ <mask id="crescent" maskUnits="userSpaceOnUse" x="1110" y="100" width="270" height="240"><circle cx="1230" cy="220" r="100" fill="white"/><circle cx="1272" cy="190" r="94" fill="black"/></mask>
+ <g id="sky-star"><path d="M0-6L1.6-1.6L6 0L1.6 1.6L0 6L-1.6 1.6L-6 0L-1.6-1.6Z" fill="#fff5cf"/></g>
+ <linearGradient id="stone" x2="0" y2="1"><stop stop-color="#fff4d7"/><stop offset="1" stop-color="#c9b68f"/></linearGradient>
+ <g id="arch"><path d="M0 0H110V135H0Z" fill="#d6c49e"/><path d="M18 135V55Q55-12 92 55V135Z" fill="#8b9e9e"/><path d="M10 135V51Q55-27 100 51V135" fill="none" stroke="#f1e3c0" stroke-width="9"/></g>
+ <g id="minaret"><path d="M-19 0V-282H19V0" fill="url(#stone)"/><path d="M-29-213H29V-193H-29ZM-25-286H25V-269H-25Z" fill="#e5d7ad"/><path d="M-15-286V-327Q0-362 15-327V-286" fill="#e9dcb8"/><path d="M0-351V-374" stroke="#c5a361" stroke-width="5"/><path d="M5-384A9 9 0 1 0 8-370A7 7 0 0 1 5-384" fill="#efd69a"/></g>
+</defs>
+<path fill="url(#sky)" d="M0 0H1600V900H0Z"/>
+<circle cx="1230" cy="220" r="190" fill="url(#moonlight)"/>
+<circle cx="1230" cy="220" r="100" fill="#fff2c9" mask="url(#crescent)"/>
+<g opacity=".85"><use href="#sky-star" x="205" y="170"/><use href="#sky-star" x="432" y="271"/><use href="#sky-star" x="675" y="163"/><use href="#sky-star" x="948" y="247"/><use href="#sky-star" x="1408" y="177"/><use href="#sky-star" x="1085" y="357"/><use href="#sky-star" x="294" y="389"/><use href="#sky-star" x="1465" y="371"/></g>
+<g fill="#fff5cf" opacity=".7"><circle cx="330" cy="124" r="2.5"/><circle cx="539" cy="348" r="2"/><circle cx="796" cy="303" r="2.5"/><circle cx="1004" cy="134" r="2"/><circle cx="1364" cy="281" r="2.5"/><circle cx="1524" cy="226" r="2"/><circle cx="109" cy="306" r="2.5"/></g>
+<path d="M0 584L180 447L365 553L525 461L730 573L1044 448L1240 554L1430 462L1600 563V900H0Z" fill="#a7b8b0" opacity=".7"/>
+<path d="M0 647Q800 558 1600 647V900H0Z" fill="#d8c9a8"/>
+<g transform="translate(-25 525)"><use href="#arch"/><use href="#arch" x="110"/><use href="#arch" x="220"/><use href="#arch" x="330"/><use href="#arch" x="440"/><use href="#arch" x="550"/><use href="#arch" x="660"/><use href="#arch" x="770"/><use href="#arch" x="880"/><use href="#arch" x="990"/><use href="#arch" x="1100"/><use href="#arch" x="1210"/><use href="#arch" x="1320"/><use href="#arch" x="1430"/></g>
+<path d="M0 514Q800 467 1600 514V537Q800 490 0 537Z" fill="#f3e5c5"/>
+<use href="#minaret" transform="translate(120 541)"/><use href="#minaret" transform="translate(1480 541)"/>
+<path d="M0 684Q800 617 1600 684V900H0Z" fill="url(#stone)"/>
+<g stroke="#acaa983f" stroke-width="3"><path d="M800 646L260 900M800 646L550 900M800 646L1050 900M800 646L1340 900M0 759H1600M0 841H1600"/></g>
+<!-- Sade ve saygılı bir Kabe temsili; üzerindeki kuşak yazı taklidi içermez. -->
+<g transform="translate(800 575)">
+ <path d="M-120-20L34-62L155-18L0 26Z" fill="#3b4142"/>
+ <path d="M-120-20L0 26V198L-120 143Z" fill="#272f32"/><path d="M0 26L155-18V144L0 198Z" fill="#1d272b"/>
+ <path d="M-120 17L0 61L155 18V41L0 84L-120 41Z" fill="#d6b774"/>
+ <path d="M-111 26L0 67L147 27" fill="none" stroke="#f2d999" stroke-width="4"/>
+ <path d="M93 76L128 66V137L93 148Z" fill="#d8b56e"/><path d="M99 84L122 77V131L99 138Z" fill="none" stroke="#f4d897" stroke-width="3"/>
+ <path d="M-120 123L0 174L155 122V144L0 198L-120 143Z" fill="#405052" opacity=".6"/>
+</g>
+<path d="M0 875Q310 816 532 876M1110 876Q1350 814 1600 868" fill="none" stroke="#b7b797" stroke-width="28" opacity=".45"/>
+</svg>

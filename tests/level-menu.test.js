@@ -37,7 +37,7 @@ test('World pages show names, preserve locks, and navigate using arrows and dots
         createWorldMenu(tabs, selectWorld);
         assert.equal(tabs.querySelectorAll('button').length, 5);
         selectWorld(1);
-        assert.equal(nodes.get('world-name').textContent, 'Bahçeler ve Geçitler');
+        assert.equal(nodes.get('world-name').textContent.trim(), 'Meyve Rüyası');
         assert.equal(nodes.get('world-number').textContent, '1.');
         assert.equal(nodes.get('previous-world').disabled, true);
         assert.equal(grid.querySelectorAll('button').filter(button => !button.disabled).length, 1);
@@ -46,7 +46,7 @@ test('World pages show names, preserve locks, and navigate using arrows and dots
         nodes.get('next-world').onclick();
         assert.equal(selected, 2);
         assert.equal(grid.children[0].children[0].children[0].textContent, 16);
-        assert.equal(nodes.get('world-name').textContent, 'Gölge Diyarları');
+        assert.equal(nodes.get('world-name').textContent.trim(), 'Gece Karanlığı');
         assert.equal(nodes.get('world-number').textContent, '2.');
         assert.ok(grid.querySelectorAll('button').every(button => button.disabled && button.attributes['aria-current'] === 'false'));
         grid.querySelectorAll('button')[0].onclick();

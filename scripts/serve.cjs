@@ -14,6 +14,7 @@ const contentTypes = {
     '.svg': 'image/svg+xml',
     '.mp3': 'audio/mpeg',
     '.wav': 'audio/wav',
+    '.ttf': 'font/ttf',
     '.webmanifest': 'application/manifest+json'
 };
 

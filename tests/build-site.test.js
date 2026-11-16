@@ -67,6 +67,11 @@ test('Published modules resolve across folders, share a version, and leave sourc
     assert.ok(precache.includes('./lib/phaser.min.js?v=1234567'));
     assert.ok(precache.includes('./assets/images/child-0.svg?v=1234567'));
     assert.ok(precache.includes('./assets/audio/jump.wav?v=1234567'));
+    assert.ok(precache.includes('./assets/fonts/Baloo2.ttf?v=1234567'));
+    assert.ok(fs.existsSync(path.join(root, 'dist/assets/fonts/OFL-Baloo2.txt')));
+    for (let world = 1; world <= 5; world++) {
+        assert.ok(precache.includes(`./assets/images/menu-world${world}.svg?v=1234567`));
+    }
     for (const file of precache) assert.ok(fs.existsSync(path.join(root, 'dist', file.split('?')[0])), file);
     assert.ok(html.includes('name="game-release"'));
 });

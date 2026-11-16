@@ -13,7 +13,7 @@ if (path.dirname(output) !== root || path.dirname(sourceOutput) !== output) {
 }
 fs.rmSync(sourceOutput, { recursive: true, force: true });
 
-for (const directory of ['css', 'src', 'lib', 'assets/images', 'assets/audio', 'assets/icons']) {
+for (const directory of ['css', 'src', 'lib', 'assets/images', 'assets/audio', 'assets/icons', 'assets/fonts']) {
     fs.cpSync(path.join(root, directory), path.join(output, directory), { recursive: true });
 }
 
@@ -46,7 +46,7 @@ function publicFiles(directory) {
     return fs.readdirSync(directory, { withFileTypes: true }).flatMap(entry => {
         const target = path.join(directory, entry.name);
         if (entry.isDirectory()) return publicFiles(target);
-        if (!/\.(js|css|svg|wav|png|html|webmanifest)$/.test(entry.name) || entry.name === 'sw.js') return [];
+        if (!/\.(js|css|svg|wav|png|ttf|html|webmanifest)$/.test(entry.name) || entry.name === 'sw.js') return [];
         return ['./' + path.relative(output, target).replaceAll(path.sep, '/')];
     });
 }

@@ -9,6 +9,7 @@ import { columnFrame, columnTiming, prepareColumn, visibleColumn, RAISED_BOTTOM,
 test('Five worlds reserve 15 sequential slots each without changing playable level indexes', () => {
     assert.deepEqual(worlds.map(world => [world.id, world.start, world.count]), [[1, 0, 15], [2, 15, 15], [3, 30, 15], [4, 45, 15], [5, 60, 15]]);
     assert.equal(LEVEL_SLOT_COUNT, 75);
+    assert.deepEqual(worlds.map(world => world.title), ['Meyve Rüyası', 'Gece Karanlığı', 'Buz Dağları', 'Ateş ve Çukur', "Kabe'nin Yolları"]);
     assert.equal(levels[10], bossGate);
     assert.equal(worldForLevel(10).id, 1);
     assert.equal(chapterNumber(10), 11);

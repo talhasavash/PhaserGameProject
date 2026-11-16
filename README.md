@@ -305,6 +305,13 @@ Kaynak verileri `world1.js`, `world2.js`, `world3.js` dosyalarında kalır;
 İlk açılışta oyun adı, iki çocuk ve tek oynat düğmesi
 görünür. Oynat düğmesi bölüm menüsünü açar; oyundan dönüş doğrudan bu menüyedir.
 Ana menüde önce dünya, sonra o dünyadaki bölüm seçilir.
+Menü dünyaları sırasıyla Meyve Rüyası, Gece Karanlığı, Buz Dağları, Ateş ve Çukur,
+Kabe'nin Yolları adlarını taşır. Beş ayrı SVG manzarası `assets/images/menu-world1.svg`
+ile `menu-world5.svg` arasındadır; bunlar oyun içindeki bölüm temalarından bağımsızdır.
+Ana başlık ve dünya adları Türkçe glifleri doğrulanan yerel Baloo 2 fontunu kullanır (`assets/fonts`, OFL lisansı).
+Yazı tipi yayın kopyasına ve çevrimdışı PWA önbelleğine dahildir. Açılışta başlık
+yukarıdan, çocuklar iki yandan kısa animasyonlarla girer; azaltılmış hareket
+tercihinde bu animasyonlar kapatılır. Stiller `css/menu.css` içindedir.
 Dünya 2, 15. bölüm tamamlanınca açılır. Diğer dünyalar da aynı sırayı izler;
 bölüm verisi yazılmadan boş yerler oynanamaz. Son hazır bölüm tamamlandığında sonraki
 yerin kilit bilgisi de saklanır; bölüm eklendiğinde bu yer otomatik oynanabilir olur.

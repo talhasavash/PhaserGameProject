@@ -54,7 +54,7 @@ export function refreshLevelLocks(worldTabs, levelGrid, worldId) {
     worldTabs.dataset.selected = worldId;
     document.getElementById('character-select').dataset.world = worldId;
     document.getElementById('world-number').textContent = `${worldId}.`;
-    document.getElementById('world-name').textContent = selectedWorld.title;
+    document.getElementById('world-name').textContent = " "+selectedWorld.title;
     document.getElementById('previous-world').disabled = selectedIndex === 0;
     document.getElementById('next-world').disabled = selectedIndex === worlds.length - 1;
     for (const button of worldTabs.querySelectorAll('button')) {

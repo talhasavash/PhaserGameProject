@@ -318,7 +318,9 @@ yerin kilit bilgisi de saklanır; bölüm eklendiğinde bu yer otomatik oynanabi
 Canlar sol üstte, soluk bölüm numarası ortada, dolan üç yıldız ve puan sağ üsttedir.
 Menüde dünya adı ve numarası üstte, bölüm
 numaraları manzara üzerinde büyük yuvarlak düğmelerde gösterilir. Oklar ve alttaki
-noktalar dünya sayfalarını değiştirir. Her dünyanın ayrı arka planı vardır.
+noktalar dünya sayfalarını sağa/sola kaydırarak değiştirir. Geçiş bitince başlık ve
+arka plan güncellenir. Azaltılmış hareket tercihinde geçiş anında yapılır.
+Her dünyanın ayrı arka planı vardır.
 
 Başlangıçta yalnızca Dünya 1 / 1 açıktır; her bölüm bitince sonraki açılır. Kilitli
 dünyalar önizlenebilir, ancak bölüm düğmeleri devre dışıdır. Açık bir bölüm

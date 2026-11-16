@@ -14,10 +14,11 @@
 <g opacity=".85"><use href="#sky-star" x="205" y="170"/><use href="#sky-star" x="432" y="271"/><use href="#sky-star" x="675" y="163"/><use href="#sky-star" x="948" y="247"/><use href="#sky-star" x="1408" y="177"/><use href="#sky-star" x="1085" y="357"/><use href="#sky-star" x="294" y="389"/><use href="#sky-star" x="1465" y="371"/></g>
 <g fill="#fff5cf" opacity=".7"><circle cx="330" cy="124" r="2.5"/><circle cx="539" cy="348" r="2"/><circle cx="796" cy="303" r="2.5"/><circle cx="1004" cy="134" r="2"/><circle cx="1364" cy="281" r="2.5"/><circle cx="1524" cy="226" r="2"/><circle cx="109" cy="306" r="2.5"/></g>
 <path d="M0 584L180 447L365 553L525 461L730 573L1044 448L1240 554L1430 462L1600 563V900H0Z" fill="#a7b8b0" opacity=".7"/>
+<!-- Minareler önce çizilir; revak duvarı ve pencereleri tabanlarını örter. -->
+<use href="#minaret" transform="translate(120 541)"/><use href="#minaret" transform="translate(1480 541)"/>
 <path d="M0 647Q800 558 1600 647V900H0Z" fill="#d8c9a8"/>
 <g transform="translate(-25 525)"><use href="#arch"/><use href="#arch" x="110"/><use href="#arch" x="220"/><use href="#arch" x="330"/><use href="#arch" x="440"/><use href="#arch" x="550"/><use href="#arch" x="660"/><use href="#arch" x="770"/><use href="#arch" x="880"/><use href="#arch" x="990"/><use href="#arch" x="1100"/><use href="#arch" x="1210"/><use href="#arch" x="1320"/><use href="#arch" x="1430"/></g>
 <path d="M0 514Q800 467 1600 514V537Q800 490 0 537Z" fill="#f3e5c5"/>
-<use href="#minaret" transform="translate(120 541)"/><use href="#minaret" transform="translate(1480 541)"/>
 <path d="M0 684Q800 617 1600 684V900H0Z" fill="url(#stone)"/>
 <g stroke="#acaa983f" stroke-width="3"><path d="M800 646L260 900M800 646L550 900M800 646L1050 900M800 646L1340 900M0 759H1600M0 841H1600"/></g>
 <!-- Sade ve saygılı bir Kabe temsili; üzerindeki kuşak yazı taklidi içermez. -->

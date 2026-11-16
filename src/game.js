@@ -3,7 +3,7 @@ import { GameScene, GAME_SCENE_KEY } from './gameplay/GameScene.js';
 import { gameView, setupPwa, enterGameDisplay, releaseGameOrientation, bindDisplayRecovery, bindButtonFeedback } from './ui/browser.js';
 import { levels, worldForLevel } from './world/levels/level.js';
 import { unlockedLevels } from './data/progress.js';
-import { createWorldMenu, createLevelMenu, refreshLevelLocks } from './ui/levelMenu.js';
+import { createWorldMenu, createLevelMenu, refreshLevelLocks, slideWorld } from './ui/levelMenu.js';
 import { showLoading, hideLoading } from './ui/scenePage.js';
 
 // Önce HTML formundan karakter seçilir; ardından Phaser başlatılır.
@@ -36,9 +36,12 @@ function toggleSettings() {
 
 // Kullanıcı dünya seçince bölüm listesi ve kilitleri birlikte yenilenir.
 function selectWorld(worldId) {
-    selectedWorld = worldId;
-    createLevelMenu(levelGrid, selectedWorld, undefined, startSelectedGame);
-    refreshLevelLocks(worldTabs, levelGrid, selectedWorld);
+    if (gameStarted) return;
+    return slideWorld(levelGrid, selectedWorld, worldId, () => {
+        selectedWorld = worldId;
+        createLevelMenu(levelGrid, selectedWorld, undefined, startSelectedGame);
+        refreshLevelLocks(worldTabs, levelGrid, selectedWorld);
+    });
 }
 
 function startSelectedGame(levelIndex) {

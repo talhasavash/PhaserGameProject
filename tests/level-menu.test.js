@@ -1,7 +1,7 @@
 // Dünya sayfalarının gezinmesini, başlıklarını ve kilitli bölüm seçiminin engellenmesini doğrular.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createWorldMenu, createLevelMenu, refreshLevelLocks } from '../src/ui/levelMenu.js';
+import { createWorldMenu, createLevelMenu, refreshLevelLocks, slideWorld } from '../src/ui/levelMenu.js';
 import { levels, worlds } from '../src/world/levels/level.js';
 
 function element(tag = 'div') {
@@ -90,5 +90,65 @@ test('World pages show names, preserve locks, and navigate using arrows and dots
     } finally {
         globalThis.document = previousDocument;
         globalThis.window = previousWindow;
+    }
+});
+
+test('World pages slide in opposite directions, block overlapping transitions and release temporary content', async () => {
+    const previousDocument = globalThis.document;
+    const previousWindow = globalThis.window;
+    const previousMatchMedia = globalThis.matchMedia;
+    const animations = [];
+    const viewport = element();
+    let reducedMotion = false;
+    function animatedElement(tag) {
+        const node = element(tag);
+        node.remove = () => { node.parentElement.children = node.parentElement.children.filter(child => child !== node); };
+        node.animate = frames => {
+            let finish;
+            const animation = { finished: new Promise(resolve => { finish = resolve; }), cancel() { this.cancelled = true; } };
+            animations.push({ frames, finish, animation });
+            return animation;
+        };
+        return node;
+    }
+    const grid = animatedElement();
+    viewport.append(grid);
+    globalThis.document = { createElement: animatedElement };
+    globalThis.window = { localStorage: { getItem: () => '1' } };
+    globalThis.matchMedia = () => ({ matches: reducedMotion });
+    let displayedWorld = 1;
+    try {
+        const moving = slideWorld(grid, 1, 2, () => { displayedWorld = 2; });
+        assert.equal(displayedWorld, 1, 'Keep the old heading until the slide finishes');
+        assert.equal(grid.inert, true);
+        assert.equal(viewport.children.length, 2);
+        const preview = viewport.children[1];
+        assert.equal(preview.inert, true);
+        assert.equal(preview.attributes['aria-hidden'], 'true');
+        assert.equal(preview.querySelectorAll('button').length, 15);
+        assert.equal(animations[0].frames[1].transform, 'translateX(-100%)');
+        assert.equal(animations[1].frames[0].transform, 'translateX(100%)');
+        await slideWorld(grid, 1, 3, () => { throw new Error('Cannot start two transitions together'); });
+        animations.forEach(animation => animation.finish());
+        await moving;
+        assert.equal(displayedWorld, 2);
+        assert.equal(grid.inert, false);
+        assert.equal(grid.dataset.sliding, undefined);
+        assert.equal(viewport.children.length, 1);
+        assert.ok(animations.every(({ animation }) => animation.cancelled));
+        const returning = slideWorld(grid, 2, 1, () => { displayedWorld = 1; });
+        assert.equal(animations[2].frames[1].transform, 'translateX(100%)');
+        assert.equal(animations[3].frames[0].transform, 'translateX(-100%)');
+        animations.slice(2).forEach(animation => animation.finish());
+        await returning;
+        reducedMotion = true;
+        await slideWorld(grid, 1, 5, () => { displayedWorld = 5; });
+        assert.equal(displayedWorld, 5);
+        assert.equal(animations.length, 4, 'Reduced motion changes worlds immediately');
+        assert.equal(viewport.children.length, 1);
+    } finally {
+        globalThis.document = previousDocument;
+        globalThis.window = previousWindow;
+        globalThis.matchMedia = previousMatchMedia;
     }
 });

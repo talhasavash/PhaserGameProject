@@ -45,6 +45,39 @@ export function createLevelMenu(levelGrid, worldId, preferredIndex, startLevel =
         button.append(card);
         levelGrid.append(button);
     }
+    updateLevelLocks(levelGrid, unlockedLevels(LEVEL_SLOT_COUNT));
+}
+
+// Eski sayfa çıkarken yeni sayfa karşı kenardan girer; gerçek liste sonra yenilenir.
+export async function slideWorld(levelGrid, fromWorld, toWorld, render) {
+    if (fromWorld === toWorld || levelGrid.dataset.sliding === 'true') return;
+    if (!levelGrid.animate || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        render();
+        return;
+    }
+    const direction = toWorld > fromWorld ? 1 : -1;
+    const preview = document.createElement('div');
+    preview.className = 'level-grid level-grid-preview';
+    createLevelMenu(preview, toWorld);
+    preview.inert = true;
+    preview.setAttribute('aria-hidden', 'true');
+    levelGrid.dataset.sliding = 'true';
+    levelGrid.inert = true;
+    levelGrid.parentElement.append(preview);
+    const options = { duration: 320, easing: 'cubic-bezier(.22,.65,.28,1)', fill: 'both' };
+    const animations = [
+        levelGrid.animate([{ transform: 'translateX(0)' }, { transform: `translateX(${-direction * 100}%)` }], options),
+        preview.animate([{ transform: `translateX(${direction * 100}%)` }, { transform: 'translateX(0)' }], options)
+    ];
+    try {
+        await Promise.all(animations.map(animation => animation.finished.catch(() => {})));
+        render();
+    } finally {
+        for (const animation of animations) animation.cancel();
+        preview.remove();
+        levelGrid.inert = false;
+        delete levelGrid.dataset.sliding;
+    }
 }
 
 export function refreshLevelLocks(worldTabs, levelGrid, worldId) {
@@ -64,6 +97,10 @@ export function refreshLevelLocks(worldTabs, levelGrid, worldId) {
         button.classList.toggle('locked', worldLocked);
         button.setAttribute('aria-label', `Dünya ${world.id}: ${world.title}${worldLocked ? ' · Kilitli' : ''}`);
     }
+    updateLevelLocks(levelGrid, unlocked);
+}
+
+function updateLevelLocks(levelGrid, unlocked) {
     for (const button of levelGrid.querySelectorAll('button')) {
         const index = Number(button.value);
         const ready = Boolean(levels[index]);

@@ -18,6 +18,8 @@ body:not(.playing) .build-version { display: none; }
 .character-form h2 span { color: #fff8de; -webkit-text-stroke: 1.5px #21493e; paint-order: stroke fill; text-shadow: 0 3px 0 #21493e66; }
 .world-map { width: 100%; height: 100%; margin: 0 auto; align-self: stretch; display: grid; grid-template-columns: 60px minmax(0, 1fr) 60px; align-items: center; gap: 12px; min-height: 0; }
 .level-options { display: grid; place-items: center; min-width: 0; min-height: 0; width: 100%; height: 100%; }
+.level-viewport { position: relative; width: 100%; height: 100%; min-height: 0; overflow: hidden; }
+.level-grid-preview { position: absolute; inset: 0; pointer-events: none; }
 .level-options legend.sr-only { width: 1px; margin: -1px; }
 .level-grid, .level-grid[data-world] { width: 100%; height: 100%; grid-template-columns: repeat(var(--level-columns), minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 0 12px; align-items: center; justify-items: center; }
 .level-option { display: grid; place-items: center; padding: 0; border: 0; border-radius: 50%; background: transparent; }
@@ -27,8 +29,8 @@ body:not(.playing) .build-version { display: none; }
 .level-option .level-card strong { width: var(--level-size); height: var(--level-size); font-size: clamp(21px, calc(var(--level-size) * .48), 60px); border: clamp(3px, .55dvh, 5px) solid #fff5dc; color: #fff8e7; background: radial-gradient(circle at 32% 22%, #80c8ac 0, #438b73 43%, #245e53 100%); box-shadow: 0 5px 0 #244f4655, inset 0 3px 1px #ffffff70; text-shadow: 0 2px 0 #244f46; }
 .level-option[aria-current="true"] .level-card strong { color: #fff8e7; background: radial-gradient(circle at 32% 22%, #b5e1bd, #65aa84 55%, #367459); box-shadow: 0 5px 0 #2d6854, 0 0 0 5px #ffe69180, inset 0 3px 1px #ffffff70; transform: translateY(-2px); }
 .level-option.locked { opacity: 1; }
-.level-option.locked .level-card strong { color: #d7e0dc; background: linear-gradient(145deg, #829b9c, #566e7b); text-shadow: 0 2px 0 #394f5a; box-shadow: 0 4px 0 #344e5d55, inset 0 2px 0 #ffffff45; }
-.level-option.locked .level-card strong::after { right: -4px; bottom: -4px; font-size: clamp(14px, calc(var(--level-size) * .25), 24px); }
+.level-option.locked .level-card strong { color: #fff; border-color: #f7f7f5; background: radial-gradient(circle at 32% 20%, #d2d2d6, #b2b1b8 48%, #85858e); text-shadow: 0 1px 1px #6b6b7480; box-shadow: 0 3px 0 #6a6b7540, inset 0 3px 2px #ffffff90, inset 3px 0 0 #e9e9ed66; }
+.level-option.locked .level-card strong::after { content: none; }
 .level-option.completed .level-card strong::after { content: '★'; position: absolute; right: -5px; bottom: -5px; display: grid; place-items: center; width: clamp(22px, calc(var(--level-size) * .4), 48px); height: clamp(22px, calc(var(--level-size) * .4), 48px); border-radius: 50%; background: #f5ca54; border: 2px solid #fff0a0; color: #93651d; font-size: clamp(15px, calc(var(--level-size) * .24), 28px); text-shadow: none; box-shadow: 0 2px 0 #a37624; }
 .level-option.boss-level { grid-column: auto; }
 .menu-footer { display: grid; grid-template-columns: 160px minmax(0, 1fr) 160px; align-items: center; gap: 12px; min-height: 62px; }

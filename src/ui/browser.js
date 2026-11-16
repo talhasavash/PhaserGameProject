@@ -13,7 +13,7 @@ export function setupPwa() {
     else window.addEventListener('load', registerWorker, { once: true });
 }
 
-// Bu istek yalnızca Oyna düğmesindeki kullanıcı dokunuşundan yapılır.
+// Bu istek bölüm düğmesine yapılan kullanıcı dokunuşundan başlatılır.
 export async function enterGameDisplay(
     doc = document,
     deviceScreen = screen,

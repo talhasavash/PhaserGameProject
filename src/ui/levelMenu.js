@@ -20,30 +20,28 @@ export function createWorldMenu(worldTabs, selectWorld) {
     }
 }
 
-export function createLevelMenu(levelGrid, worldId, preferredIndex) {
+export function createLevelMenu(levelGrid, worldId, preferredIndex, startLevel = () => {}) {
     const world = worlds.find(world => world.id === worldId);
     levelGrid.replaceChildren();
     levelGrid.dataset.world = world.id;
     levelGrid.style.setProperty('--level-columns', Math.min(5, world.count));
     levels.slice(world.start, world.start + world.count).forEach((level, localIndex) => {
         const index = world.start + localIndex;
-        const label = document.createElement('label');
-        label.className = 'level-option';
-        label.dataset.theme = level.theme;
-        if (level.boss) label.classList.add('boss-level');
-        const input = document.createElement('input');
-        input.type = 'radio';
-        input.name = 'level';
-        input.value = index;
-        input.required = true;
-        input.defaultChecked = index === (preferredIndex ?? world.start);
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'level-option';
+        button.dataset.theme = level.theme;
+        button.value = index;
+        button.setAttribute('aria-current', String(index === (preferredIndex ?? world.start)));
+        button.onclick = () => { if (!button.disabled) startLevel(index); };
+        if (level.boss) button.classList.add('boss-level');
         const card = document.createElement('span');
         card.className = 'level-card';
         const number = document.createElement('strong');
         number.textContent = localIndex + 1;
         card.append(number);
-        label.append(input, card);
-        levelGrid.append(label);
+        button.append(card);
+        levelGrid.append(button);
     });
 }
 
@@ -54,7 +52,7 @@ export function refreshLevelLocks(worldTabs, levelGrid, worldId) {
     const locked = selectedWorld.start >= unlocked;
     worldTabs.dataset.selected = worldId;
     document.getElementById('character-select').dataset.world = worldId;
-    document.getElementById('world-number').textContent = `Dünya ${worldId}`;
+    document.getElementById('world-number').textContent = `${worldId}.`;
     document.getElementById('world-name').textContent = selectedWorld.title;
     document.getElementById('world-lock').hidden = !locked;
     document.getElementById('world-lock').textContent = locked ? `Önce Dünya ${worlds[selectedIndex - 1].id}'i tamamla` : '';
@@ -67,15 +65,15 @@ export function refreshLevelLocks(worldTabs, levelGrid, worldId) {
         button.classList.toggle('locked', worldLocked);
         button.setAttribute('aria-label', `Dünya ${world.id}: ${world.title}${worldLocked ? ' · Kilitli' : ''}`);
     }
-    for (const input of levelGrid.querySelectorAll('input')) {
-        const index = Number(input.value);
-        input.disabled = index >= unlocked;
-        if (input.disabled) input.checked = false;
-        input.parentElement.classList.toggle('locked', input.disabled);
-        input.parentElement.classList.toggle('completed', index < unlocked - 1);
+    for (const button of levelGrid.querySelectorAll('button')) {
+        const index = Number(button.value);
+        button.disabled = index >= unlocked;
+        if (button.disabled) button.setAttribute('aria-current', 'false');
+        button.classList.toggle('locked', button.disabled);
+        button.classList.toggle('completed', index < unlocked - 1);
         const bossLabel = levels[index].boss ? ' · Boss' : '';
-        const lockLabel = input.disabled ? ' · Kilitli' : '';
+        const lockLabel = button.disabled ? ' · Kilitli' : '';
         const localNumber = index - selectedWorld.start + 1;
-        input.setAttribute('aria-label', `${localNumber}. bölüm${bossLabel}${lockLabel}`);
+        button.setAttribute('aria-label', `${localNumber}. bölüm${bossLabel}${lockLabel}`);
     }
 }

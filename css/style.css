@@ -104,19 +104,12 @@ button:focus-visible { outline: 3px solid #e5bb6e; outline-offset: 2px; }
     .selection-layout { margin: 8px 0; gap: 12px; }
     .character-note { display: none; }
 }
-/* Son kapı: kilitliyken de altın çemberiyle ayrı görünür. */
-.boss-level { grid-column: 3; }
-.boss-level .level-card strong { width: 64px; height: 64px; color: #67471b; background: linear-gradient(135deg, #fff4bc, #ddb655 48%, #fff2ac 70%, #bd9141); border: 3px solid #ffe7a0; box-shadow: 0 0 0 3px #aa7b32, 0 4px 12px #95702e55; }
-.boss-level.locked { opacity: .85; }
-.boss-level input:checked + .level-card strong { color: #51391b; background: linear-gradient(135deg, #fff9cf, #f1c754, #fff0a8); box-shadow: 0 0 0 4px #a57b30, 0 0 18px #edc46580; }
 .result-verse { font: 21px/1.4 Georgia, serif; color: #526653; margin: 14px 0; padding: 12px 0; border-top: 1px solid #d5c99d; border-bottom: 1px solid #d5c99d; }
 @media (max-height: 500px) {
-    .boss-level .level-card strong { width: 52px; height: 52px; }
     .result-verse { font-size: 18px; margin: 8px 0; padding: 8px 0; }
 }
 @media (orientation: landscape) and (max-height: 340px) {
     .level-card strong { width: 36px; height: 36px; font-size: 19px; }
-    .boss-level .level-card strong { width: 46px; height: 46px; }
     .level-grid { gap: 8px 4px; }
     .level-options legend { margin-bottom: 4px; }
 }

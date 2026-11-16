@@ -41,7 +41,7 @@
             <section id="character-select" class="character-select" aria-labelledby="character-title">
                 <form id="character-form" class="character-form">
                     <header class="world-heading">
-                        <h2 id="character-title" tabindex="-1"><span id="world-number">Dünya 1</span><span id="world-name">Bahçeler ve Geçitler</span></h2>
+                        <h2 id="character-title" tabindex="-1"><span id="world-number">1.</span><span id="world-name">Bahçeler ve Geçitler</span></h2>
                         <p id="world-lock" hidden></p>
                     </header>
                     <div class="world-map">
@@ -63,22 +63,21 @@
                             </label>
                         </fieldset>
                         <div id="world-tabs" class="world-tabs" role="group" aria-label="Dünya seç"></div>
-                        <button id="start-button" type="submit"><span aria-hidden="true">▶</span> OYNA</button>
                     </footer>
                 </form>
             </section>
-            <section id="fall-result" class="result" aria-labelledby="fall-title" hidden>
+            <section id="fall-result" class="result" role="dialog" aria-modal="true" aria-labelledby="fall-title" hidden>
                 <div class="result-card">
                     <h2 id="fall-title">Tekrar deneyelim</h2>
-                    <button id="retry-fall" type="button">Tekrar oyna</button>
+                    <button id="retry-fall" type="button" aria-label="Tekrar oyna"><span aria-hidden="true">↻</span> Tekrar oyna</button>
                 </div>
             </section>
-            <section id="game-result" class="result" aria-labelledby="result-title" hidden>
+            <section id="game-result" class="result" role="dialog" aria-modal="true" aria-labelledby="result-title" hidden>
                 <div class="result-card">
                     <h2 id="result-title">Bölüm tamam!</h2>
                     <blockquote id="result-verse" class="result-verse"></blockquote>
-                    <button id="next-level" type="button">Devam et</button>
-                    <button id="play-again" type="button" hidden>Ana ekran</button>
+                    <button id="next-level" type="button" aria-label="Devam et"><span aria-hidden="true">▶</span> Devam et</button>
+                    <button id="play-again" type="button" aria-label="Ana ekran" hidden><span aria-hidden="true">⌂</span> Ana ekran</button>
                 </div>
             </section>
         </div>

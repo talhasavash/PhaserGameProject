@@ -307,9 +307,10 @@ numaraları manzara üzerinde büyük yuvarlak düğmelerde gösterilir. Oklar v
 noktalar dünya sayfalarını değiştirir. Her dünyanın ayrı arka planı vardır.
 
 Başlangıçta yalnızca Dünya 1 / 1 açıktır; her bölüm bitince sonraki açılır. Kilitli
-dünyalar önizlenebilir, ancak bölümleri seçilemez ve Oyna devre dışı kalır.
+dünyalar önizlenebilir, ancak bölüm düğmeleri devre dışıdır. Açık bir bölüm
+dairesine dokunmak seçili karakterle oyunu doğrudan başlatır; ayrı Oyna düğmesi yoktur.
 Karakter seçimi alt köşedeki iki küçük portreden yapılır; başlangıçta erkek çocuk seçilidir.
-Dünya 1'in 11. bölümü altın renkli özel bir çemberdir. Menü `levels` dizisinden
+Boss bölümleri de diğerleriyle aynı daire stilini kullanır; açılmayanlar kilitlidir. Menü `levels` dizisinden
 üretilir. `progress.js` açılan bölüm sayısını `localStorage` içinde saklar. Önceden
 4 bölüm açmış bir tarayıcı yeni sürümde de 4'ten devam eder; kayıt silinmez.
 Tarayıcı verileri silinirse ilerleme sıfırlanır; farklı cihazlara eşitlenmez.
@@ -448,12 +449,12 @@ menüsünden **Ana Ekrana Ekle** kullanılır.
 Ana ekran simgesiyle açıldığında `display: fullscreen` sayesinde destekleyen
 tarayıcılarda menü dahil tam ekran açılır. Manifestte ekran yönü
 `any` olarak ayarlanır; açılışta zorunlu döndürme yapılmaz.
-`Oyna` dokunuşunda da tam ekran ve mobilde yatay yön istenir; bu istekler uygulama
+Bölüm dairesine dokunulduğunda tam ekran ve mobilde yatay yön istenir; bu istekler uygulama
 açılışında yapılmaz. İzin verilmezse oyun normal ekran boyutunda devam eder.
-`src/ui/browser.js` Oyna dokunuşundaki ekran isteğini yönetir. Ana menüye dönüşte
+`src/ui/browser.js` bölüm seçimi sırasındaki ekran isteğini yönetir. Ana menüye dönüşte
 yalnızca yön kilidi bırakılır, tam ekran korunur. Uygulamayı kapatmak
 için telefonun kendi gezinme ve son uygulamalar kontrolleri kullanılır.
-Kurulu uygulama zaten `display-mode: fullscreen` ile açılmışsa Oyna ikinci bir
+Kurulu uygulama zaten `display-mode: fullscreen` ile açılmışsa bölüm seçimi ikinci bir
 Fullscreen API oturumu başlatmaz. Arka plandan dönüldüğünde sistem tam ekranı
 bırakmışsa ilk normal dokunuşta yeniden istenir; oyun yeniden yüklenmez.
 

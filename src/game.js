@@ -9,7 +9,6 @@ import { showLoading, hideLoading } from './ui/scenePage.js';
 // Önce HTML formundan karakter seçilir; ardından Phaser başlatılır.
 // "import", başka bir dosyanın dışarı açtığı (export) kodu kullanmamızı sağlar.
 const characterForm = document.getElementById('character-form');
-const startButton = document.getElementById('start-button');
 const settingsButton = document.getElementById('settings-button');
 const settingsPanel = document.getElementById('settings-panel');
 const menuButton = document.getElementById('menu-button');
@@ -39,22 +38,13 @@ function toggleSettings() {
 // Kullanıcı dünya seçince bölüm listesi ve kilitleri birlikte yenilenir.
 function selectWorld(worldId) {
     selectedWorld = worldId;
-    createLevelMenu(levelGrid, selectedWorld);
+    createLevelMenu(levelGrid, selectedWorld, undefined, startSelectedGame);
     refreshLevelLocks(worldTabs, levelGrid, selectedWorld);
-    updateStartButton();
 }
 
-function updateStartButton() {
-    const selectedLevel = characterForm.querySelector('input[name="level"]:checked');
-    startButton.disabled = !characterForm.querySelector('input[name="character"]:checked') ||
-        !selectedLevel || selectedLevel.disabled;
-}
-
-function startSelectedGame(event) {
-    event.preventDefault();
+function startSelectedGame(levelIndex) {
     const selected = characterForm.querySelector('input[name="character"]:checked');
-    const selectedLevel = characterForm.querySelector('input[name="level"]:checked');
-    if (!selected || !selectedLevel || Number(selectedLevel.value) >= unlockedLevels(levels.length) || gameStarted) return;
+    if (!selected || levelIndex >= unlockedLevels(levels.length) || gameStarted) return;
     // Await etmeden, doğrudan dokunuş sırasında başlat: tarayıcı bu etkileşimi ister.
     void enterGameDisplay();
     gameStarted = true;
@@ -64,12 +54,11 @@ function startSelectedGame(event) {
     settingsButton.textContent = 'Ⅱ';
     settingsButton.hidden = false;
     document.getElementById('touch-controls').hidden = false;
-    startButton.disabled = true;
     document.getElementById('character-select').hidden = true;
     document.getElementById('game-stage').classList.remove('choosing');
     document.getElementById('toolbar-status').textContent = 'Bahçe hazırlanıyor…';
     menuButton.hidden = false;
-    startGame(selected.value, Number(selectedLevel.value));
+    startGame(selected.value, levelIndex);
 }
 
 function startGame(character, levelIndex) {
@@ -121,7 +110,7 @@ function returnToMenu(game) {
             activeGame = null;
             hideLoading();
             selectedWorld = worldForLevel(currentIndex).id;
-            createLevelMenu(levelGrid, selectedWorld, currentIndex);
+            createLevelMenu(levelGrid, selectedWorld, currentIndex, startSelectedGame);
             refreshLevelLocks(worldTabs, levelGrid, selectedWorld);
             document.body.classList.remove('playing');
             settingsButton.hidden = true;
@@ -133,7 +122,6 @@ function returnToMenu(game) {
             document.getElementById('pause-button').disabled = true;
             menuButton.hidden = true;
             menuButton.disabled = false;
-            startButton.disabled = false;
             document.getElementById('character-title').focus();
             resolve();
         });
@@ -144,11 +132,10 @@ function returnToMenu(game) {
 setupPwa();
 bindDisplayRecovery(() => gameStarted);
 createWorldMenu(worldTabs, selectWorld);
-createLevelMenu(levelGrid, selectedWorld);
+createLevelMenu(levelGrid, selectedWorld, undefined, startSelectedGame);
 refreshLevelLocks(worldTabs, levelGrid, selectedWorld);
 characterForm.reset();
-characterForm.addEventListener('change', updateStartButton);
-characterForm.addEventListener('submit', startSelectedGame);
+characterForm.addEventListener('submit', event => event.preventDefault());
 settingsButton.onclick = toggleSettings;
 document.getElementById('settings-close').onclick = closeSettings;
 document.addEventListener('keydown', event => {

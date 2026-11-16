@@ -88,13 +88,14 @@ PhaserGameProject/
 │   │   ├── levelObjects.js      Toplanacak nesneler, çıkış ve can alanlarını kurma
 │   │   ├── levels/              Bölüm verileri ve dünya sıralaması
 │   │   │   ├── level.js         Dünya listelerini birleştirme ve bölüm sıralaması
-│   │   │   ├── world0.js        Dünya 0 bölüm verileri
 │   │   │   ├── world1.js        Dünya 1 bölüm verileri
-│   │   │   └── world2.js        Dünya 2 bölüm verileri
+│   │   │   ├── world2.js        Dünya 2 bölüm verileri
+│   │   │   └── world3.js        Dünya 3 bölüm verileri
 │   │   ├── scenery/             Arka plan ve dekor çizimleri
-│   │   │   ├── background.js    Tema seçimi, bahçe, cami ve abdest alanı
-│   │   │   ├── chapterScenery.js Diğer Dünya 0 ortamları
-│   │   │   └── world1Scenery.js Dünya 1 ortamları ve çıkış geçitleri
+│   │   │   ├── background.js    Tema seçimi, ortak cami ve abdest alanı
+│   │   │   ├── world1Scenery.js Dünya 1'in tüm arka plan çizimleri
+│   │   │   ├── world2Scenery.js Dünya 2 ortamları ve çıkış geçitleri
+│   │   │   └── world3Scenery.js Dünya 3 için palet ve çizim başlangıcı
 │   │   └── terrain/             Zemin ve basamaklar
 │   │       ├── terrain.js       Zemin, çukur, buz ve platform gövdeleri
 │   │       ├── pits.js          Açık uçurum çizimleri
@@ -144,10 +145,10 @@ sırayı izle; çağrılan her yardımcı fonksiyonun içine hemen girmek gerekm
 | 7 | `src/gameplay/rules.js` | Puan, yıldız, anahtar ve can; sonra GameScene'deki temas metotlarına dön |
 | 8 | `src/ui/hud.js`, `browser.js`, `scenePage.js` | Oyun göstergeleri, mobil ölçüler, HTML düğmeleri ve sonuç kartı |
 | 9 | `src/gameplay/hazards.js`, `fireRain.js`, `guardianFire.js` | Devriye, boss öfkesi/zıplaması ve ateş zamanlaması |
-| 10 | `src/world/scenery/background.js`, `chapterScenery.js`, `src/world/terrain/platforms.js`, `src/graphics/texture.js` | Ortam çizimleri ve ortak doku önbelleği |
+| 10 | `src/world/scenery/background.js`, `world1Scenery.js`, `world2Scenery.js`, `world3Scenery.js`, `src/world/terrain/platforms.js`, `src/graphics/texture.js` | Ortam seçimi, dünyaya özel çizimler ve ortak doku önbelleği |
 | 11 | `src/ui/levelMenu.js`, `src/data/progress.js`, `verses.js` | Bölüm seçimi, kilitler, localStorage ve sonuç metinleri |
 
-İlk küçük deneme: `src/world/levels/world2.js` içindeki bir meyvenin `x` konumunu değiştir.
+İlk küçük deneme: `src/world/levels/world3.js` içindeki bir meyvenin `x` konumunu değiştir.
 Ardından `gameplay/player.js` içindeki `WALK_SPEED` değerini küçük miktarda değiştir.
 Son olarak bir yıldızın `collectFruit → recordFruit → updateHud` yolunu takip et.
 `lib/phaser.min.js` kütüphanenin sıkıştırılmış dosyasıdır; öğrenmek için onu okumuyoruz.
@@ -221,8 +222,8 @@ sürüm bilgisini ve kaynak dosyaların değişmediğini kontrol eder.
 ## Kodun görevleri ve Phaser kullanımı
 
 Dosyalar gameplay, world, ui ve data klasörlerinde görevlerine göre gruplanır. Yeni sınıf,
-bağımlılık veya karmaşık bir katman sistemi eklenmedi. Bölüm tanımları `world0.js`,
-`world1.js` ve `world2.js` içinde veri olarak kalır; `level.js` bu listeleri birleştirir.
+bağımlılık veya karmaşık bir katman sistemi eklenmedi. Bölüm tanımları `world1.js`,
+`world2.js` ve `world3.js` içinde veri olarak kalır; `level.js` bu listeleri birleştirir.
 Yeni bölüm eklemek için ana oyun döngüsü değiştirilmez.
 `world/levels` bölüm verilerini, `world/scenery` dekor çizimlerini, `world/terrain`
 zemin ve basamak işlerini toplar. Ortak çizim altyapısı `graphics` içindedir.
@@ -296,15 +297,19 @@ HTTP kullan; HTML dosyasını çift tıklayarak açma (oyun ES modülleri kullan
 
 ## Dünyalar ve bölüm akışı
 
-Dünya 0 mevcut 11 bölümü, Dünya 1 dört bölümü, Dünya 2 ise öğrenme çalışması olarak
+Dünya 1 mevcut 11 bölümü, Dünya 2 dört bölümü, Dünya 3 ise öğrenme çalışması olarak
 hazırlanan bir bölümü içerir. Ana menüde önce dünya, sonra o dünyadaki bölüm seçilir.
-Dünya 1, Dünya 0 boss bölümü tamamlanınca; Dünya 2 de Dünya 1 tamamlanınca açılır.
+Dünya 2, Dünya 1 boss bölümü tamamlanınca; Dünya 3 de Dünya 2 tamamlanınca açılır.
 Bölüm numaraları her dünyada yeniden 1’den başlar;
 Puan çubuğunda bölüm etiketi yoktur; yalnızca can, yıldız, anahtar, puan ve ilerleme
-görünür. Çubuğun arka planı %20 opaktır. Menüde dünya/bölüm adları yerine yalnızca numaralar gösterilir.
+görünür. Çubuğun arka planı %20 opaktır. Menüde dünya adı ve numarası üstte, bölüm
+numaraları manzara üzerinde büyük yuvarlak düğmelerde gösterilir. Oklar ve alttaki
+noktalar dünya sayfalarını değiştirir. Her dünyanın ayrı arka planı vardır.
 
-Başlangıçta yalnızca Dünya 0 / 1 açıktır; her bölüm bitince sonraki açılır. Ana ekranda yalnızca
-numaralar görünür. Dünya 0'ın 11. bölümü altın renkli özel bir çemberdir. Menü `levels` dizisinden
+Başlangıçta yalnızca Dünya 1 / 1 açıktır; her bölüm bitince sonraki açılır. Kilitli
+dünyalar önizlenebilir, ancak bölümleri seçilemez ve Oyna devre dışı kalır.
+Karakter seçimi alt köşedeki iki küçük portreden yapılır; başlangıçta erkek çocuk seçilidir.
+Dünya 1'in 11. bölümü altın renkli özel bir çemberdir. Menü `levels` dizisinden
 üretilir. `progress.js` açılan bölüm sayısını `localStorage` içinde saklar. Önceden
 4 bölüm açmış bir tarayıcı yeni sürümde de 4'ten devam eder; kayıt silinmez.
 Tarayıcı verileri silinirse ilerleme sıfırlanır; farklı cihazlara eşitlenmez.
@@ -323,9 +328,9 @@ Tarayıcı verileri silinirse ilerleme sıfırlanır; farklı cihazlara eşitlen
 | 10 | Bayram bahçesi; önceki engellerin birleşimi ve daralan geçişler |
 | 11 | Boss; büyük zıplayan muhafızların altından geçerek son camiye ulaşma |
 
-Dünya 1'in bölümleri farklı geçişler ve yeni düşmanlar sunar:
+Dünya 2'in bölümleri farklı geçişler ve yeni düşmanlar sunar:
 
-| Dünya 1 bölümü | Ortam ve oynanış |
+| Dünya 2 bölümü | Ortam ve oynanış |
 | --- | --- |
 | 1 · Lav Vadisi | Lav boşlukları, semenderler, inip yükselen taş kolonlar ve ışıklı çıkış geçidi |
 | 2 · Mekanik Fabrika | Ters yönlü bantlar, robotlar, fazları farklı presler ve asansör çıkışı |
@@ -342,8 +347,8 @@ Açık süre, genişlik, yükseklik aralığı ve başlangıç gecikmesi bölüm
 bölüm yeniden başlayınca zamanlama sıfırlanır. Fabrikadaki bantlar iki yönde de
 çalışır. Bu davranışlar Phaser collider/overlap ve fizik gövdeleriyle uygulanır.
 
-Eski kayıt anahtarı ve Dünya 0 indisleri korunur. Önceden 11. bölüme ulaşmış bir
-kullanıcı Dünya 1'i açmak için boss'u tamamlar; açılan eski bölümler kapanmaz.
+Eski kayıt anahtarı ve Dünya 1 indisleri korunur. Önceden 11. bölüme ulaşmış bir
+kullanıcı Dünya 2'i açmak için boss'u tamamlar; açılan eski bölümler kapanmaz.
 
 Her bölümde 3 görev yıldızı bulunur. Diğer nesneler sadece puan verir. Anahtar
 alınınca cami, geçit, asansör veya kale kapısı açılır ve giriş aydınlanır. Çıkışa ulaşınca çocuk
@@ -354,9 +359,9 @@ aydınlanır; `level-complete.wav` bir kez çalar. Ses düzeyi telefonun kendi s
 kontrolleriyle ayarlanır; oyun menüsünde ses aç/kapat düğmesi bulunmaz.
 Sesi `node scripts/build-sounds.cjs --result-only` yeniden üretir.
 Ayrı bir okuma ekranı veya görünür kaynak bağlantısı yoktur.
-Kart kendiliğinden kapanmaz; Devam et veya Enter ile ilerlenir. Dünya 0 / 11
+Kart kendiliğinden kapanmaz; Devam et veya Enter ile ilerlenir. Dünya 1 / 11
 sonunda da aynı düğmeyle yeni dünya başlar; aynı sahne yeni dünyanın verileriyle kurulur.
-Dünya 1 / 4 sonunda Ana ekran görünür; düğme veya Enter bölüm seçimine döndürür, 1. bölümü
+Dünya 2 / 4 sonunda Ana ekran görünür; düğme veya Enter bölüm seçimine döndürür, 1. bölümü
 kendiliğinden başlatmaz. Açılan bölümler korunur. Kaynak ve sure/ayet numaraları denetlenebilmesi için
 `src/data/verses.js` içinde saklanır; Diyanet meallerinden kısa alıntılar kullanılır.
 Üç nokta ayetin yalnızca bir kısmının alındığını gösterir.
@@ -409,7 +414,7 @@ Başlangıç, abdest alanları, kontrol noktaları ve
 
 Çukurlar düz çerçeveli kuyular yerine kırık kaya kenarlı, aşağıya doğru genişleyen
 karanlık uçurumlar olarak çizilir. `pits.js` her tema/genişlik için bir küçük doku
-üretir; fizik boşlukları `terrain.js` içinde aynı ölçülerde kalır. Dünya 1'in dördüncü
+üretir; fizik boşlukları `terrain.js` içinde aynı ölçülerde kalır. Dünya 2'in dördüncü
 bölümünde 12 boşluk bulunur; aralarında en az 150 birim sağlam zemin vardır.
 
 Finalde iki gözlü dev muhafız, yerdeyken iki aralıklı ateş atar; sonra yüksekten

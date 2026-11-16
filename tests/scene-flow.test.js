@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createGameState, recordFruit, takeKey } from '../src/gameplay/rules.js';
 import { levels } from '../src/world/levels/level.js';
-import { garden, courtyard } from '../src/world/levels/world0.js';
+import { garden, courtyard } from '../src/world/levels/world1.js';
 
 // Exercise scene transitions without requiring WebGL in Node.
 globalThis.Phaser = { Scene: class {} };

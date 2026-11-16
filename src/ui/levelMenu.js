@@ -11,12 +11,20 @@ export function createWorldMenu(worldTabs, selectWorld) {
         button.onclick = () => selectWorld(world.id);
         worldTabs.append(button);
     }
+    for (const [id, direction] of [['previous-world', -1], ['next-world', 1]]) {
+        document.getElementById(id).onclick = () => {
+            const index = worlds.findIndex(world => world.id === Number(worldTabs.dataset.selected));
+            const next = worlds[index + direction];
+            if (next) selectWorld(next.id);
+        };
+    }
 }
 
 export function createLevelMenu(levelGrid, worldId, preferredIndex) {
-    const world = worlds[worldId];
+    const world = worlds.find(world => world.id === worldId);
     levelGrid.replaceChildren();
     levelGrid.dataset.world = world.id;
+    levelGrid.style.setProperty('--level-columns', Math.min(5, world.count));
     levels.slice(world.start, world.start + world.count).forEach((level, localIndex) => {
         const index = world.start + localIndex;
         const label = document.createElement('label');
@@ -41,20 +49,33 @@ export function createLevelMenu(levelGrid, worldId, preferredIndex) {
 
 export function refreshLevelLocks(worldTabs, levelGrid, worldId) {
     const unlocked = unlockedLevels(levels.length);
+    const selectedWorld = worlds.find(world => world.id === worldId);
+    const selectedIndex = worlds.indexOf(selectedWorld);
+    const locked = selectedWorld.start >= unlocked;
+    worldTabs.dataset.selected = worldId;
+    document.getElementById('character-select').dataset.world = worldId;
+    document.getElementById('world-number').textContent = `Dünya ${worldId}`;
+    document.getElementById('world-name').textContent = selectedWorld.title;
+    document.getElementById('world-lock').hidden = !locked;
+    document.getElementById('world-lock').textContent = locked ? `Önce Dünya ${worlds[selectedIndex - 1].id}'i tamamla` : '';
+    document.getElementById('previous-world').disabled = selectedIndex === 0;
+    document.getElementById('next-world').disabled = selectedIndex === worlds.length - 1;
     for (const button of worldTabs.querySelectorAll('button')) {
-        const world = worlds[Number(button.dataset.world)];
-        button.disabled = world.start >= unlocked;
+        const world = worlds.find(world => world.id === Number(button.dataset.world));
+        const worldLocked = world.start >= unlocked;
         button.setAttribute('aria-pressed', String(world.id === worldId));
-        button.textContent = `Dünya ${world.id}${button.disabled ? ' 🔒' : ''}`;
-        button.setAttribute('aria-label', `Dünya ${world.id}${button.disabled ? ' · Dünya 0 tamamlanınca açılır' : ''}`);
+        button.classList.toggle('locked', worldLocked);
+        button.setAttribute('aria-label', `Dünya ${world.id}: ${world.title}${worldLocked ? ' · Kilitli' : ''}`);
     }
     for (const input of levelGrid.querySelectorAll('input')) {
         const index = Number(input.value);
         input.disabled = index >= unlocked;
+        if (input.disabled) input.checked = false;
         input.parentElement.classList.toggle('locked', input.disabled);
+        input.parentElement.classList.toggle('completed', index < unlocked - 1);
         const bossLabel = levels[index].boss ? ' · Boss' : '';
         const lockLabel = input.disabled ? ' · Kilitli' : '';
-        const localNumber = index - worlds[worldId].start + 1;
+        const localNumber = index - selectedWorld.start + 1;
         input.setAttribute('aria-label', `${localNumber}. bölüm${bossLabel}${lockLabel}`);
     }
 }

@@ -40,29 +40,31 @@
                  aria-label="Çocuk karakterle oynanan, klavyeyle kontrol edilen platform oyunu"></div>
             <section id="character-select" class="character-select" aria-labelledby="character-title">
                 <form id="character-form" class="character-form">
-                    <h2 id="character-title" tabindex="-1"><span aria-hidden="true">✦</span> MEYVE BAHÇESİ</h2>
-                    <div class="selection-layout">
+                    <header class="world-heading">
+                        <h2 id="character-title" tabindex="-1"><span id="world-number">Dünya 1</span><span id="world-name">Bahçeler ve Geçitler</span></h2>
+                        <p id="world-lock" hidden></p>
+                    </header>
+                    <div class="world-map">
+                        <button id="previous-world" class="world-arrow" type="button" aria-label="Önceki dünya">‹</button>
+                        <fieldset class="level-options">
+                            <legend class="sr-only">Bölüm seç</legend>
+                            <div id="level-grid" class="level-grid"></div>
+                        </fieldset>
+                        <button id="next-world" class="world-arrow" type="button" aria-label="Sonraki dünya">›</button>
+                    </div>
+                    <footer class="menu-footer">
                         <fieldset class="character-options">
                             <legend class="sr-only">Oynayacağın karakter</legend>
-                            <label class="character-option"><input type="radio" name="character" value="boy"
-                                                                   required><span class="character-card"><span
-                                class="character-portrait"><img src="assets/images/child-0.svg"
-                                                                alt="Sırt çantalı erkek çocuk" width="96" height="120"></span><strong>Erkek çocuk</strong><span
-                                class="character-check" aria-hidden="true">✓</span></span></label>
-                            <label class="character-option"><input type="radio" name="character" value="girl"
-                                                                   required><span class="character-card"><span
-                                class="character-portrait"><img src="assets/images/girl-0.svg"
-                                                                alt="Başörtülü, sırt çantalı kız çocuk" width="96"
-                                                                height="120"></span><strong>Kız çocuk</strong><span
-                                class="character-check" aria-hidden="true">✓</span></span></label>
+                            <label class="character-option"><input type="radio" name="character" value="boy" required checked>
+                                <span class="character-card"><span class="character-portrait"><img src="assets/images/child-0.svg" alt="" width="64" height="80"></span><span class="sr-only">Erkek çocuk</span></span>
+                            </label>
+                            <label class="character-option"><input type="radio" name="character" value="girl" required>
+                                <span class="character-card"><span class="character-portrait"><img src="assets/images/girl-0.svg" alt="" width="64" height="80"></span><span class="sr-only">Kız çocuk</span></span>
+                            </label>
                         </fieldset>
-                        <fieldset class="level-options">
-                            <legend class="sr-only">Dünya ve bölüm seç</legend>
-                            <div id="world-tabs" class="world-tabs" role="group" aria-label="Dünya seç"></div>
-                            <div id="level-grid" class="level-grid"></div>
-                            </fieldset>
-                    </div>
-                    <button id="start-button" type="submit" disabled><span aria-hidden="true">▶</span> OYNA</button>
+                        <div id="world-tabs" class="world-tabs" role="group" aria-label="Dünya seç"></div>
+                        <button id="start-button" type="submit"><span aria-hidden="true">▶</span> OYNA</button>
+                    </footer>
                 </form>
             </section>
             <section id="fall-result" class="result" aria-labelledby="fall-title" hidden>

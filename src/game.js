@@ -17,7 +17,7 @@ const levelGrid = document.getElementById('level-grid');
 const worldTabs = document.getElementById('world-tabs');
 let gameStarted = false;
 let activeGame = null;
-let selectedWorld = 0;
+let selectedWorld = 1;
 
 function closeSettings() {
     if (!settingsPanel.hidden) settingsButton.click();
@@ -45,8 +45,9 @@ function selectWorld(worldId) {
 }
 
 function updateStartButton() {
+    const selectedLevel = characterForm.querySelector('input[name="level"]:checked');
     startButton.disabled = !characterForm.querySelector('input[name="character"]:checked') ||
-        !characterForm.querySelector('input[name="level"]:checked');
+        !selectedLevel || selectedLevel.disabled;
 }
 
 function startSelectedGame(event) {

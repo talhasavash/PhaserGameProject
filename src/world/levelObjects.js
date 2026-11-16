@@ -1,6 +1,6 @@
 // Toplanacak nesneleri, anahtarı, çıkışı, kontrol noktasını ve can kazanma alanlarını oluşturur.
 import { createMosque, createFountain } from './scenery/background.js';
-import { createWorldGate } from './scenery/world1Scenery.js';
+import { createWorldGate } from './scenery/world2Scenery.js';
 
 const COLLECTIBLE_SCALE = 0.75;
 

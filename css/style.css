@@ -124,10 +124,10 @@ button:focus-visible { outline: 3px solid #e5bb6e; outline-offset: 2px; }
 /* Dünya seçimi: bölüm numaraları seçilen dünya içinde yeniden 1'den başlar. */
 .world-tabs { display: flex; gap: 10px; margin-bottom: 9px; }
 .world-tabs button { flex: 1; min-height: 44px; font-weight: bold; background: #dce7d7; }
-.world-tabs button[data-world="1"] { background: #e3deef; color: #5d4d78; }
+.world-tabs button[data-world="2"] { background: #e3deef; color: #5d4d78; }
 .world-tabs button[aria-pressed="true"] { background: #416a54; color: #fff9e8; border-color: #bb9655; }
-.world-tabs button[data-world="1"][aria-pressed="true"] { background: #635278; }
-.level-grid[data-world="1"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.world-tabs button[data-world="2"][aria-pressed="true"] { background: #635278; }
+.level-grid[data-world="2"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .level-option[data-theme="lava"] strong { background: #a56558; color: #fff1cc; }
 .level-option[data-theme="factory"] strong { background: #658c97; color: #fff1cc; }
 .level-option[data-theme="castle"] strong { background: #77668e; color: #fff1cc; }

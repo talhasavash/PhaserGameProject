@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createTerrain } from '../src/world/terrain/terrain.js';
 import { createPitArt } from '../src/world/terrain/pits.js';
-import { brokenPass } from '../src/world/levels/world1.js';
+import { brokenPass } from '../src/world/levels/world2.js';
 import { levels } from '../src/world/levels/level.js';
 
 test('The new jump chapter has twelve real holes with solid landing islands between them', () => {

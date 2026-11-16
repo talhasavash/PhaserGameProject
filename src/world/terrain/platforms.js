@@ -1,7 +1,9 @@
 // Bölüm temasına göre basamak görsellerini çizer ve tekrar kullanılacak dokular üretir.
 import { cacheTexture } from '../../graphics/texture.js';
 // Her genişlik/tema bir kez dokuya çevrilir; oyun sırasında şekiller yeniden çizilmez.
+
 export const platformThemes = {
+    journey: { body: 0x708fb3, edge: 0xd6e7fa, detail: 0x456482 },
     garden: { body: 0x98714d, edge: 0x72a65f, detail: 0xc8a16e },
     courtyard: { body: 0xc9d9d3, edge: 0xf4e9ca, detail: 0x729d9e },
     desert: { body: 0xd6a368, edge: 0xf5d792, detail: 0xb47a4e },
@@ -33,7 +35,15 @@ function drawStep(g, width, theme) {
     const x = 6;
     const end = x + width;
     g.fillStyle(p.body);
-    if (theme === 'garden') {
+
+    if (theme === 'journey') {
+        g.fillRoundedRect(x, 0, width, 28, 6);
+        g.fillStyle(p.edge);
+        g.fillRoundedRect(x, 0, width, 7, 3);
+        g.lineStyle(1, p.detail);
+        g.strokeRoundedRect(x+4,11,width-8,12,3);
+    }
+    else if (theme === 'garden') {
         g.fillRoundedRect(x, 0, width, 27, 5);
         g.fillStyle(p.edge); g.fillRoundedRect(x, 0, width, 8, 4);
         g.fillStyle(p.detail);

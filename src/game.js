@@ -50,7 +50,6 @@ function startSelectedGame(levelIndex) {
     showLoading();
     closeSettings();
     document.body.classList.add('playing');
-    settingsButton.textContent = 'Ⅱ';
     settingsButton.hidden = false;
     document.getElementById('touch-controls').hidden = false;
     document.getElementById('character-select').hidden = true;
@@ -135,6 +134,13 @@ createLevelMenu(levelGrid, selectedWorld, undefined, startSelectedGame);
 refreshLevelLocks(worldTabs, levelGrid, selectedWorld);
 characterForm.reset();
 characterForm.addEventListener('submit', event => event.preventDefault());
+// Karşılama yalnızca açılışta görünür; oyundan dönüş doğrudan bölüm menüsünedir.
+document.getElementById('welcome-play').onclick = () => {
+    void enterGameDisplay();
+    document.getElementById('welcome-screen').hidden = true;
+    document.getElementById('character-select').hidden = false;
+    document.getElementById('character-title').focus();
+};
 settingsButton.onclick = toggleSettings;
 document.getElementById('settings-close').onclick = closeSettings;
 document.addEventListener('keydown', event => {

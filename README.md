@@ -298,11 +298,13 @@ HTTP kullan; HTML dosyasını çift tıklayarak açma (oyun ES modülleri kullan
 ## Dünyalar ve bölüm akışı
 
 Dünya 1 mevcut 11 bölümü, Dünya 2 dört bölümü, Dünya 3 ise öğrenme çalışması olarak
-hazırlanan bir bölümü içerir. Ana menüde önce dünya, sonra o dünyadaki bölüm seçilir.
+hazırlanan bir bölümü içerir. İlk açılışta oyun adı, iki çocuk ve tek oynat düğmesi
+görünür. Oynat düğmesi bölüm menüsünü açar; oyundan dönüş doğrudan bu menüyedir.
+Ana menüde önce dünya, sonra o dünyadaki bölüm seçilir.
 Dünya 2, Dünya 1 boss bölümü tamamlanınca; Dünya 3 de Dünya 2 tamamlanınca açılır.
-Bölüm numaraları her dünyada yeniden 1’den başlar;
-Puan çubuğunda bölüm etiketi yoktur; yalnızca can, yıldız, anahtar, puan ve ilerleme
-görünür. Çubuğun arka planı %20 opaktır. Menüde dünya adı ve numarası üstte, bölüm
+Bölüm numaraları dünyalar arasında kesintisiz ilerler: 1–11, 12–15 ve 16.
+Canlar sol üstte, soluk bölüm numarası ortada, dolan üç yıldız ve puan sağ üsttedir.
+Menüde dünya adı ve numarası üstte, bölüm
 numaraları manzara üzerinde büyük yuvarlak düğmelerde gösterilir. Oklar ve alttaki
 noktalar dünya sayfalarını değiştirir. Her dünyanın ayrı arka planı vardır.
 
@@ -353,16 +355,15 @@ kullanıcı Dünya 2'i açmak için boss'u tamamlar; açılan eski bölümler ka
 
 Her bölümde 3 görev yıldızı bulunur. Diğer nesneler sadece puan verir. Anahtar
 alınınca cami, geçit, asansör veya kale kapısı açılır ve giriş aydınlanır. Çıkışa ulaşınca çocuk
-önce 1,2 saniye yıldızlarla parlar, sonra tamamlanma mesajı ve kısa ayet aynı sonuç
-kartında görünür. Kartta yalnızca “Bölüm tamam!”, ayet ve Devam et düğmesi bulunur;
-son bölümde “Oyun tamam!” ve Ana ekran gösterilir. Yıldız üç kısa, yavaş parlamayla
+önce 1,2 saniye yıldızlarla parlar, sonra sonuç kartında yalnızca ayet ve yuvarlak
+oynat düğmesi görünür. Yıldız üç kısa, yavaş parlamayla
 aydınlanır; `level-complete.wav` bir kez çalar. Ses düzeyi telefonun kendi ses
 kontrolleriyle ayarlanır; oyun menüsünde ses aç/kapat düğmesi bulunmaz.
 Sesi `node scripts/build-sounds.cjs --result-only` yeniden üretir.
 Ayrı bir okuma ekranı veya görünür kaynak bağlantısı yoktur.
-Kart kendiliğinden kapanmaz; Devam et veya Enter ile ilerlenir. Dünya 1 / 11
+Kart kendiliğinden kapanmaz; oynat düğmesi veya Enter ile ilerlenir. Dünya 1 / 11
 sonunda da aynı düğmeyle yeni dünya başlar; aynı sahne yeni dünyanın verileriyle kurulur.
-Dünya 2 / 4 sonunda Ana ekran görünür; düğme veya Enter bölüm seçimine döndürür, 1. bölümü
+Son bölümde oynat düğmesi veya Enter bölüm seçimine döndürür, 1. bölümü
 kendiliğinden başlatmaz. Açılan bölümler korunur. Kaynak ve sure/ayet numaraları denetlenebilmesi için
 `src/data/verses.js` içinde saklanır; Diyanet meallerinden kısa alıntılar kullanılır.
 Üç nokta ayetin yalnızca bir kısmının alındığını gösterir.

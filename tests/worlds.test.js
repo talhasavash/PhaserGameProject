@@ -6,16 +6,16 @@ import { bossGate } from '../src/world/levels/world1.js';
 import { readUnlocked, unlockNext } from '../src/data/progress.js';
 import { columnFrame, columnTiming, prepareColumn, visibleColumn, RAISED_BOTTOM, CLOSED_BOTTOM } from '../src/gameplay/columns.js';
 
-test('World 1 keeps its old indexes and boss; Worlds 2 and 3 restart chapter numbering', () => {
+test('World 1 keeps its old indexes and boss; chapter numbering continues across Worlds 2 and 3', () => {
     assert.deepEqual(worlds.map(world => [world.id, world.start, world.count]), [[1, 0, 11], [2, 11, 4], [3, 15, 1]]);
     assert.equal(levels[10], bossGate);
     assert.equal(worldForLevel(10).id, 1);
     assert.equal(chapterNumber(10), 11);
     assert.equal(worldForLevel(11).id, 2);
-    assert.equal(chapterNumber(11), 1);
-    assert.equal(chapterNumber(13), 3);
+    assert.equal(chapterNumber(11), 12);
+    assert.equal(chapterNumber(13), 14);
     assert.equal(worldForLevel(15).id, 3);
-    assert.equal(chapterNumber(15), 1);
+    assert.equal(chapterNumber(15), 16);
     assert.deepEqual(levels.slice(11, 15).map(level => level.name), ['Lav Vadisi', 'Mekanik Fabrika', 'Kara Kale', 'Uçurum Geçidi']);
     assert.deepEqual(levels.slice(11, 15).map(level => level.exitType), ['gate', 'gate', 'gate', 'mosque']);
 });

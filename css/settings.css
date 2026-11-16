@@ -1,5 +1,5 @@
 /* Sahne görünür kalır; mola işlemleri büyük, yuvarlak oyun düğmelerindedir. */
-.game-toolbar #settings-button { border: 2px solid #fff6d599; border-radius: 50%; width: 38px; height: 38px; background: #21483d88; color: #fff2ce; }
+.game-toolbar #settings-button { display: grid; place-items: center; border: 3px solid #fff4d5; border-radius: 50%; width: 46px; height: 46px; padding: 10px; background: radial-gradient(circle at 30% 20%, #83c7a6, #42886f 55%, #285e50); color: #fff8df; box-shadow: 0 3px 0 #153e35, inset 0 2px 0 #ffffff55; }
 .game-toolbar .settings-panel {
     position: fixed; inset: 0; width: auto; padding: 24px;
     display: grid; place-items: center; background: #102e2899; border: 0; border-radius: 0; box-shadow: none;
@@ -23,3 +23,7 @@
 #settings-close svg { width: 100%; height: 100%; }
 .pause-actions button:active { transform: translateY(3px); box-shadow: 0 2px 0 #153e35; }
 .game-toolbar #settings-button[aria-expanded='true'] { visibility: hidden; }
+
+#settings-button svg { width: 100%; height: 100%; }
+
+.game-toolbar { height: calc(56px + env(safe-area-inset-top)); }

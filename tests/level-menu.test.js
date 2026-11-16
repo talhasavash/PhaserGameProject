@@ -43,6 +43,7 @@ test('World pages show names, preserve locks, and navigate using arrows and dots
         assert.deepEqual(started, [0]);
         nodes.get('next-world').onclick();
         assert.equal(selected, 2);
+        assert.equal(grid.children[0].children[0].children[0].textContent, 12);
         assert.equal(nodes.get('world-name').textContent, 'Gölge Diyarları');
         assert.equal(nodes.get('world-number').textContent, '2.');
         assert.ok(grid.querySelectorAll('button').every(button => button.disabled && button.attributes['aria-current'] === 'false'));
@@ -59,6 +60,7 @@ test('World pages show names, preserve locks, and navigate using arrows and dots
         assert.deepEqual(started, [0, 15]);
         nodes.get('previous-world').onclick();
         assert.equal(selected, 2);
+        assert.equal(grid.children[0].children[0].children[0].textContent, 12);
         assert.equal(tabs.querySelectorAll('button')[1].attributes['aria-pressed'], 'true');
     } finally {
         globalThis.document = previousDocument;

@@ -1,6 +1,11 @@
-// Canları solda, bölüm ve yıldız hedefini ortada, puanı sağda gösterir.
+// Canları solda, soluk bölüm numarasını ortada, yıldızları ve puanı sağda gösterir.
 import { chapterNumber } from '../world/levels/level.js';
 const HEART_COUNT = 3;
+const starPoints = Array.from({ length: 10 }, (_, i) => {
+    const angle = i * Math.PI / 5 - Math.PI / 2;
+    const radius = i % 2 === 0 ? 13 : 6;
+    return { x: 15 + Math.cos(angle) * radius, y: 15 + Math.sin(angle) * radius };
+});
 // Bir kalbin dış hattı: aynı şekli dolu ve boş durumda kullanırız.
 const heartPoints = Array.from({ length: 48 }, (_, i) => {
     const t = i / 48 * Math.PI * 2;
@@ -25,22 +30,16 @@ export function createHud(scene) {
     scene.hud.add(scene.scoreText);
     scene.chapterHud = scene.add.container(0, 0);
     scene.chapterHud.add(scene.add.text(0, 0, `Bölüm ${chapterNumber(scene.levelIndex)}`, {
-        fontFamily: 'Trebuchet MS, sans-serif', fontSize: '25px', fontStyle: 'bold',
-        color: '#fff9e9', stroke: '#254d46', strokeThickness: 2
-    }).setResolution(2).setOrigin(0.5, 0));
-    scene.chapterHud.add(scene.add.image(-57, 44, 'star').setDisplaySize(20, 20));
-    scene.starSegments = Array.from({ length: 3 }, (_, i) => {
-        const segment = scene.add.rectangle(-30 + i * 25, 44, 21, 10, 0x294e4c, 0.25)
-            .setStrokeStyle(1, 0xfff5df, 0.8);
-        scene.chapterHud.add(segment);
-        return segment;
+        fontFamily: 'Trebuchet MS, sans-serif', fontSize: '18px', fontStyle: 'bold',
+        color: '#fff9e9', stroke: '#254d46', strokeThickness: 1
+    }).setResolution(2).setOrigin(0.5, 0).setAlpha(0.65));
+    scene.starHud = scene.add.container(0, 3);
+    scene.starIcons = Array.from({ length: 3 }, (_, i) => {
+        const star = scene.add.graphics({ x: i * 32, y: 0 });
+        scene.starHud.add(star);
+        return star;
     });
-    scene.starText = scene.add.text(43, 35, '', {
-        fontFamily: 'Trebuchet MS, sans-serif', fontSize: '16px', fontStyle: 'bold',
-        color: '#fff9e9', stroke: '#254d46', strokeThickness: 2
-    }).setResolution(2);
-    scene.chapterHud.add(scene.starText);
-    scene.hud.add(scene.chapterHud);
+    scene.hud.add([scene.chapterHud, scene.starHud]);
 }
 
 export function centerHud(scene) {
@@ -49,6 +48,7 @@ export function centerHud(scene) {
     scene.hud.setScale(hudScale).setPosition(14 * hudScale, 12 * hudScale);
     scene.scoreText.setX(scene.scale.width / hudScale - 88);
     scene.chapterHud.setX(scene.scale.width / hudScale / 2 - 14);
+    scene.starHud.setX(scene.scoreText.x - Math.max(50, scene.scoreText.width) - 108);
     // Zemini aynı yerde tut: zıplarken ekran yukarı-aşağı sallanmasın.
     scene.cameras.main.scrollY = Math.max(0, 600 - scene.scale.height);
     scene.cameras.main.setFollowOffset(-Math.min(190, scene.scale.width * 0.2), 0);
@@ -63,9 +63,12 @@ export function updateHud(scene) {
         heart.strokePoints(heartPoints, true);
     });
     scene.scoreText.setText(String(scene.gameState.score));
-    scene.starSegments.forEach((segment, i) => {
-        segment.setFillStyle(i < scene.gameState.stars ? 0xffd35c : 0x294e4c,
-            i < scene.gameState.stars ? 1 : 0.25);
+    scene.starIcons.forEach((star, i) => {
+        star.clear();
+        star.fillStyle(i < scene.gameState.stars ? 0xffd35c : 0x294e4c, i < scene.gameState.stars ? 1 : 0.15);
+        star.fillPoints(starPoints, true);
+        star.lineStyle(1.5, 0xffedb4, 0.9);
+        star.strokePoints(starPoints, true);
     });
-    scene.starText.setText(`${scene.gameState.stars}/3`);
+    scene.starHud.setX(scene.scoreText.x - Math.max(50, scene.scoreText.width) - 108);
 }

@@ -1,5 +1,5 @@
 // Dünya ve bölüm seçim düğmelerini oluşturur; açılan ve kilitli bölümlerin görünümünü günceller.
-import { levels, worlds } from '../world/levels/level.js';
+import { levels, worlds, chapterNumber } from '../world/levels/level.js';
 import { unlockedLevels } from '../data/progress.js';
 
 // Bu dosya yalnızca HTML seçimlerini kurar; seçilen dünya game.js içinde tutulur.
@@ -38,7 +38,7 @@ export function createLevelMenu(levelGrid, worldId, preferredIndex, startLevel =
         const card = document.createElement('span');
         card.className = 'level-card';
         const number = document.createElement('strong');
-        number.textContent = localIndex + 1;
+        number.textContent = chapterNumber(index);
         card.append(number);
         button.append(card);
         levelGrid.append(button);
@@ -70,7 +70,6 @@ export function refreshLevelLocks(worldTabs, levelGrid, worldId) {
         button.classList.toggle('completed', index < unlocked - 1);
         const bossLabel = levels[index].boss ? ' · Boss' : '';
         const lockLabel = button.disabled ? ' · Kilitli' : '';
-        const localNumber = index - selectedWorld.start + 1;
-        button.setAttribute('aria-label', `${localNumber}. bölüm${bossLabel}${lockLabel}`);
+        button.setAttribute('aria-label', `${chapterNumber(index)}. bölüm${bossLabel}${lockLabel}`);
     }
 }

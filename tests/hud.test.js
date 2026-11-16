@@ -5,14 +5,14 @@ import { updateHud } from '../src/ui/hud.js';
 
 test('HUD empties lost hearts, restores healing and shows only the score number', () => {
     const hearts = Array.from({ length: 3 }, () => ({
-        clear() {}, fillStyle(color, alpha) { this.alpha = alpha; },
+        clear() {}, fillStyle(color, alpha) { this.color = color; this.alpha = alpha; },
         fillPoints() {}, lineStyle() {}, strokePoints() {}
     }));
     const scene = {
         hearts, gameState: { hearts: 3, score: 120, stars: 0 },
         scoreText: { setText(value) { this.value = value; } },
-        starText: { setText(value) { this.value = value; } },
-        starSegments: Array.from({ length: 3 }, () => ({ setFillStyle(color, alpha) { this.color = color; this.alpha = alpha; } }))
+        starHud: { setX() {} },
+        starIcons: Array.from({ length: 3 }, () => ({ ...hearts[0] }))
     };
     for (const count of [3, 2, 1, 0, 1, 3]) {
         scene.gameState.hearts = count;
@@ -24,7 +24,6 @@ test('HUD empties lost hearts, restores healing and shows only the score number'
     for (const stars of [0, 1, 2, 3, 0]) {
         scene.gameState.stars = stars;
         updateHud(scene);
-        assert.equal(scene.starSegments.filter(segment => segment.color === 0xffd35c).length, stars);
-        assert.equal(scene.starText.value, `${stars}/3`);
+        assert.equal(scene.starIcons.filter(segment => segment.color === 0xffd35c).length, stars);
     }
 });

@@ -24,7 +24,7 @@
         <div class="game-toolbar"><span id="toolbar-status" class="sr-only">Karakterini seç</span><span
             class="build-version">Demo · yerel</span>
             <button id="settings-button" type="button" aria-label="Oyun menüsünü aç" aria-expanded="false"
-                    aria-controls="settings-panel" hidden>Ⅱ
+                    aria-controls="settings-panel" hidden><svg viewBox="0 0 32 32" aria-hidden="true"><rect x="7" y="5" width="6" height="22" rx="2" fill="currentColor"/><rect x="19" y="5" width="6" height="22" rx="2" fill="currentColor"/></svg>
             </button>
             <div id="settings-panel" class="settings-panel" role="dialog" aria-modal="true" aria-label="Oyun menüsü" hidden>
                 <div class="settings-card">
@@ -43,18 +43,24 @@
         <div id="game-stage" class="game-stage choosing">
             <div id="game" role="img"
                  aria-label="Çocuk karakterle oynanan, klavyeyle kontrol edilen platform oyunu"></div>
-            <section id="character-select" class="character-select" aria-labelledby="character-title">
+            <section id="welcome-screen" class="welcome-screen" aria-labelledby="welcome-title">
+                <h1 id="welcome-title">Meyve Oyunu <span>2026</span></h1>
+                <img class="welcome-child welcome-boy" src="assets/images/child-0.svg" alt="" width="64" height="80">
+                <button id="welcome-play" type="button" aria-label="Bölümleri aç"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M22 13L50 32L22 51Z" fill="currentColor" stroke="currentColor" stroke-width="6" stroke-linejoin="round"/></svg></button>
+                <img class="welcome-child welcome-girl" src="assets/images/girl-0.svg" alt="" width="64" height="80">
+            </section>
+            <section id="character-select" class="character-select" aria-labelledby="character-title" hidden>
                 <form id="character-form" class="character-form">
                     <header class="world-heading">
                         <h2 id="character-title" tabindex="-1"><span id="world-number">1.</span><span id="world-name">Bahçeler ve Geçitler</span></h2>
                     </header>
                     <div class="world-map">
-                        <button id="previous-world" class="world-arrow" type="button" aria-label="Önceki dünya">‹</button>
+                        <button id="previous-world" class="world-arrow" type="button" aria-label="Önceki dünya"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M25 8L13 20L25 32"/></svg></button>
                         <fieldset class="level-options">
                             <legend class="sr-only">Bölüm seç</legend>
                             <div id="level-grid" class="level-grid"></div>
                         </fieldset>
-                        <button id="next-world" class="world-arrow" type="button" aria-label="Sonraki dünya">›</button>
+                        <button id="next-world" class="world-arrow" type="button" aria-label="Sonraki dünya"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M15 8L27 20L15 32"/></svg></button>
                     </div>
                     <footer class="menu-footer">
                         <fieldset class="character-options">
@@ -72,16 +78,16 @@
             </section>
             <section id="fall-result" class="result" role="dialog" aria-modal="true" aria-labelledby="fall-title" hidden>
                 <div class="result-card">
-                    <h2 id="fall-title">Tekrar deneyelim</h2>
-                    <button id="retry-fall" type="button" aria-label="Tekrar oyna"><span aria-hidden="true">↻</span> Tekrar oyna</button>
+                    <h2 id="fall-title" hidden>Tekrar deneyelim</h2>
+                    <button id="retry-fall" type="button" aria-label="Tekrar oyna"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M49 25A20 20 0 1 0 51 41M49 25V10M49 25H34" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
                 </div>
             </section>
             <section id="game-result" class="result" role="dialog" aria-modal="true" aria-labelledby="result-title" hidden>
                 <div class="result-card">
                     <h2 id="result-title" hidden>Bölüm tamam!</h2>
                     <blockquote id="result-verse" class="result-verse"></blockquote>
-                    <button id="next-level" type="button" aria-label="Devam"><span aria-hidden="true">▶</span> Devam</button>
-                    <button id="play-again" type="button" aria-label="Devam" hidden><span aria-hidden="true">▶</span> Devam</button>
+                    <button id="next-level" type="button" aria-label="Devam"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M22 13L50 32L22 51Z" fill="currentColor" stroke="currentColor" stroke-width="6" stroke-linejoin="round"/></svg></button>
+                    <button id="play-again" type="button" aria-label="Devam" hidden><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M22 13L50 32L22 51Z" fill="currentColor" stroke="currentColor" stroke-width="6" stroke-linejoin="round"/></svg></button>
                 </div>
             </section>
         </div>

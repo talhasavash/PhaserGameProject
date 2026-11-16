@@ -17,5 +17,5 @@ export function worldForLevel(index) {
 }
 
 export function chapterNumber(index) {
-    return index - worldForLevel(index).start + 1;
+    return index + 1;
 }

@@ -29,9 +29,6 @@ body:not(.playing) .build-version { display: none; }
 .level-option.completed .level-card strong::after { content: '★'; position: absolute; right: -5px; bottom: -5px; display: grid; place-items: center; width: 25px; height: 25px; border-radius: 50%; background: #f5ca54; border: 2px solid #fff0a0; color: #93651d; font-size: 16px; text-shadow: none; box-shadow: 0 2px 0 #a37624; }
 .level-option.boss-level { grid-column: auto; }
 .level-grid[data-world="1"] .level-option.boss-level:last-child { grid-column: 3; }
-.world-arrow { padding: 0; width: 60px; height: 80px; min-height: 44px; border: 0; background: transparent; color: #fff5de; font: 900 80px/.8 'Trebuchet MS', sans-serif; text-shadow: 3px 0 #356b5b, -3px 0 #356b5b, 0 3px #c85b49, 0 -3px #c85b49; }
-.world-arrow:hover { background: transparent; transform: scale(1.08); }
-.world-arrow:disabled { opacity: .2; }
 .menu-footer { display: grid; grid-template-columns: 160px minmax(0, 1fr) 160px; align-items: center; gap: 12px; min-height: 62px; }
 .character-options { justify-content: start; gap: 10px; }
 .character-option { width: 54px; }
@@ -52,7 +49,6 @@ body:not(.playing) .build-version { display: none; }
     .world-heading { min-height: 94px; padding: 0 18px; }
     .character-form h2 { font-size: clamp(28px, 7vw, 40px); }
     .world-map { grid-template-columns: 44px minmax(0, 1fr) 44px; gap: 4px; }
-    .world-arrow { width: 44px; height: 64px; font-size: 64px; }
     .level-grid[data-world="1"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .level-grid[data-world="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .level-grid[data-world="1"] .level-option.boss-level:last-child { grid-column: auto; }
@@ -66,9 +62,33 @@ body:not(.playing) .build-version { display: none; }
     .world-heading { min-height: 66px; padding-top: 10px; }
     .character-form h2 { font-size: clamp(30px, 4.4vw, 38px); }
     .world-map { grid-template-columns: 44px minmax(0, 1fr) 44px; }
-    .world-arrow { width: 44px; font-size: 68px; }
     .menu-footer { min-height: 54px; }
     .character-card, .character-option { width: 48px; }
     .character-card, .character-portrait { height: 48px; }
 }
-@media (prefers-reduced-motion: reduce) { .world-arrow:hover { transform: none; } }
+/* İlk açılış: oyun adı, iki karakter ve tek büyük oynat düğmesi. */
+.welcome-screen { position: absolute; inset: 0; overflow: hidden; isolation: isolate; background: #a6dcf0 url('../assets/images/menu-world1.svg') center / cover no-repeat; }
+.welcome-screen::before { content: ''; position: absolute; inset: 0; z-index: -1; background: radial-gradient(ellipse at 50% 30%, #fff7cf55, transparent 65%); }
+.welcome-screen h1 { position: absolute; top: 9%; left: 12%; right: 12%; margin: 0; text-align: center; color: #fff8de; font: 900 clamp(40px, 7.5vw, 96px)/1.05 'Trebuchet MS', sans-serif; text-shadow: 0 4px 0 #346c56, 0 7px 18px #254d4640; }
+.welcome-screen h1 span { display: block; margin-top: 12px; color: #fce3a0; font-size: .42em; letter-spacing: .16em; text-shadow: 0 2px 0 #346c56; }
+.welcome-child { position: absolute; bottom: -6%; width: auto; height: min(72dvh, 600px); filter: drop-shadow(0 10px 8px #315c4b30); pointer-events: none; }
+.welcome-boy { left: 2%; transform: rotate(-8deg); }
+.welcome-girl { right: 2%; transform: rotate(8deg); }
+#welcome-play { position: absolute; left: 50%; top: 59%; transform: translate(-50%, -50%); display: grid; place-items: center; width: clamp(100px, 17dvh, 154px); height: clamp(100px, 17dvh, 154px); padding: 24px; border: 5px solid #fff8dc; border-radius: 50%; color: #fff8df; background: radial-gradient(circle at 30% 20%, #88cfac, #438d70 55%, #245d4e); box-shadow: 0 7px 0 #24533f, inset 0 4px 0 #ffffff66, 0 14px 30px #264d4530; }
+#welcome-play svg { width: 100%; height: 100%; }
+#welcome-play:active { transform: translate(-50%, calc(-50% + 4px)); box-shadow: 0 3px 0 #24533f; }
+/* Yuvarlak çerçeve, kalın ok ve geniş dokunma alanı. */
+.world-arrow { display: grid; place-items: center; width: 60px; height: 60px; padding: 11px; border: 3px solid #fff6dc; border-radius: 50%; color: #fff8df; background: linear-gradient(145deg, #77b99b, #326c59); box-shadow: 0 4px 0 #275441, inset 0 2px 0 #ffffff55; text-shadow: none; }
+.world-arrow svg { width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
+.world-arrow:hover { background: linear-gradient(145deg, #91cbae, #438570); }
+.world-arrow:active { transform: translateY(3px); box-shadow: 0 1px 0 #275441; }
+.world-arrow:disabled { opacity: .4; }
+@media (orientation: landscape) and (max-height: 450px) { .world-map { grid-template-columns: 56px minmax(0, 1fr) 56px; gap: 8px; } .world-arrow { width: 56px; height: 56px; } }
+@media (orientation: portrait) {
+    .welcome-screen h1 { top: 12%; left: 4%; right: 4%; font-size: clamp(38px, 11vw, 70px); }
+    .welcome-child { height: min(42dvh, 430px); bottom: -2%; }
+    .welcome-boy { left: -9%; } .welcome-girl { right: -9%; }
+    #welcome-play { top: 44%; }
+    .world-map { grid-template-columns: 48px minmax(0, 1fr) 48px; }
+    .world-arrow { width: 48px; height: 52px; padding: 8px; }
+}

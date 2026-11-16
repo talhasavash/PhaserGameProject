@@ -77,18 +77,18 @@ body:not(.playing) .build-version { display: none; }
 #welcome-play { position: absolute; left: 50%; top: 59%; transform: translate(-50%, -50%); display: grid; place-items: center; width: clamp(100px, 17dvh, 154px); height: clamp(100px, 17dvh, 154px); padding: 24px; border: 5px solid #fff8dc; border-radius: 50%; color: #fff8df; background: radial-gradient(circle at 30% 20%, #88cfac, #438d70 55%, #245d4e); box-shadow: 0 7px 0 #24533f, inset 0 4px 0 #ffffff66, 0 14px 30px #264d4530; }
 #welcome-play svg { width: 100%; height: 100%; }
 #welcome-play:active { transform: translate(-50%, calc(-50% + 4px)); box-shadow: 0 3px 0 #24533f; }
-/* Yuvarlak çerçeve, kalın ok ve geniş dokunma alanı. */
-.world-arrow { display: grid; place-items: center; width: 60px; height: 60px; padding: 11px; border: 3px solid #fff6dc; border-radius: 50%; color: #fff8df; background: linear-gradient(145deg, #77b99b, #326c59); box-shadow: 0 4px 0 #275441, inset 0 2px 0 #ffffff55; text-shadow: none; }
-.world-arrow svg { width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
-.world-arrow:hover { background: linear-gradient(145deg, #91cbae, #438570); }
-.world-arrow:active { transform: translateY(3px); box-shadow: 0 1px 0 #275441; }
+/* Bölüm dairelerinden ayrılan, geniş dokunma alanlı çerçevesiz oklar. */
+.world-arrow { display: grid; place-items: center; width: 60px; height: 84px; padding: 0; border: 0; border-radius: 0; color: #fff8df; background: transparent; box-shadow: none; }
+.world-arrow svg { width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 2px 1px #275441); }
+.world-arrow:hover { color: #ffe29a; background: transparent; }
+.world-arrow:active { transform: scale(.94); }
 .world-arrow:disabled { opacity: .4; }
-@media (orientation: landscape) and (max-height: 450px) { .world-map { grid-template-columns: 56px minmax(0, 1fr) 56px; gap: 8px; } .world-arrow { width: 56px; height: 56px; } }
+@media (orientation: landscape) and (max-height: 450px) { .world-map { grid-template-columns: 56px minmax(0, 1fr) 56px; gap: 8px; } .world-arrow { width: 56px; height: 80px; } }
 @media (orientation: portrait) {
     .welcome-screen h1 { top: 12%; left: 4%; right: 4%; font-size: clamp(38px, 11vw, 70px); }
     .welcome-child { height: min(42dvh, 430px); bottom: -2%; }
     .welcome-boy { left: -9%; } .welcome-girl { right: -9%; }
     #welcome-play { top: 44%; }
     .world-map { grid-template-columns: 48px minmax(0, 1fr) 48px; }
-    .world-arrow { width: 48px; height: 52px; padding: 8px; }
+    .world-arrow { width: 48px; height: 72px; }
 }

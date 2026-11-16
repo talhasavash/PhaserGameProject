@@ -1,6 +1,6 @@
 // Oyunun giriş noktasıdır; menü seçimini, Phaser oyununu başlatmayı ve ana ekrana dönüşü yönetir.
 import { GameScene, GAME_SCENE_KEY } from './gameplay/GameScene.js';
-import { gameView, setupPwa, enterGameDisplay, releaseGameOrientation, bindDisplayRecovery } from './ui/browser.js';
+import { gameView, setupPwa, enterGameDisplay, releaseGameOrientation, bindDisplayRecovery, bindButtonFeedback } from './ui/browser.js';
 import { levels, worldForLevel } from './world/levels/level.js';
 import { unlockedLevels } from './data/progress.js';
 import { createWorldMenu, createLevelMenu, refreshLevelLocks } from './ui/levelMenu.js';
@@ -128,6 +128,7 @@ function returnToMenu(game) {
 }
 
 setupPwa();
+bindButtonFeedback();
 bindDisplayRecovery(() => gameStarted);
 createWorldMenu(worldTabs, selectWorld);
 createLevelMenu(levelGrid, selectedWorld, undefined, startSelectedGame);

@@ -9,7 +9,8 @@ body { height: 100vh; height: 100dvh; overscroll-behavior: none; }
 .game-toolbar .settings-panel button { font-size: 15px; min-height: 40px; }
 .toolbar-actions { display: flex; justify-content: flex-end; align-items: center; gap: 8px; }
 .build-version { margin-right: auto; color: #d5e3d7; font-size: 10px; }
-button { font: inherit; cursor: pointer; border: 1px solid #789082; border-radius: 8px; background: #f7f6e8; color: #294d46; padding: 7px 12px; touch-action: manipulation; }
+button { font: inherit; cursor: pointer; border: 1px solid #789082; border-radius: 8px; background: #f7f6e8; color: #294d46; padding: 7px 12px; touch-action: manipulation; transition: scale 100ms ease-out; }
+button:not(:disabled):not(.touch-button):active { scale: .94; }
 button:hover { background: #e8eddf; }
 button:disabled { opacity: .45; cursor: default; }
 button:focus-visible { outline: 3px solid #e5bb6e; outline-offset: 2px; }
@@ -48,14 +49,14 @@ button:focus-visible { outline: 3px solid #e5bb6e; outline-offset: 2px; }
 .character-option input:focus-visible + .character-card { outline: 3px solid #b47e47; outline-offset: 3px; }
 #start-button { background: #416a54; color: #fff9e8; padding: 12px 28px; font-size: 14px; }
 .character-note { font-size: 12px; color: #63785f; margin: 13px 0 0; }
-.touch-controls { --control-bottom: calc(8px + env(safe-area-inset-bottom)); display: none; position: absolute; inset: auto 0 0; height: 160px; padding: 0; z-index: 2; touch-action: none; user-select: none; -webkit-user-select: none; pointer-events: none; }
+.touch-controls { --control-bottom: calc(8px + env(safe-area-inset-bottom)); display: none; position: absolute; inset: auto 0 0; height: 180px; padding: 0; z-index: 2; touch-action: none; user-select: none; -webkit-user-select: none; pointer-events: none; }
 .direction-buttons { position: absolute; left: max(0px, env(safe-area-inset-left)); bottom: var(--control-bottom); display: flex; gap: clamp(10px, 1.5vw, 16px); }
-.touch-button { position: relative; display: grid; place-items: center; width: clamp(114px, 16vw, 156px); height: clamp(106px, 30dvh, 140px); padding: 4px; border: 0; border-radius: 0; background: transparent; touch-action: none; -webkit-touch-callout: none; pointer-events: auto; }
+.touch-button { position: relative; display: grid; place-items: center; width: clamp(104px, 15vw, 140px); height: clamp(124px, 35dvh, 160px); padding: 4px; border: 0; border-radius: 0; background: transparent; touch-action: none; -webkit-touch-callout: none; pointer-events: auto; }
 .touch-button:hover, .touch-button.pressed { background: transparent; }
 .touch-button svg { position: absolute; inset: 4px; width: calc(100% - 8px); height: calc(100% - 8px); display: block; overflow: visible; pointer-events: none; }
 .touch-button path, .touch-button circle { fill: #fff9e80d; stroke: #fff9e880; stroke-width: 3; stroke-linejoin: round; }
 .touch-button.pressed path, .touch-button.pressed circle { fill: #fff9e82b; stroke: #fff9e8d9; }
-.jump-button { position: absolute; right: max(0px, env(safe-area-inset-right)); bottom: var(--control-bottom); width: clamp(124px, 17vw, 164px); }
+.jump-button { position: absolute; right: max(0px, env(safe-area-inset-right)); bottom: var(--control-bottom); width: clamp(140px, 20vw, 184px); }
 .result { position: absolute; inset: 0; z-index: 4; background: #213f3dcc; display: grid; place-items: center; overflow: auto; padding: 16px; }
 .result-card { border-radius: 24px; background: #fff9e8; padding: 28px; text-align: center; max-width: 480px; }
 .result h2 { font: 32px Georgia, serif; margin: 12px 0; }
@@ -99,8 +100,7 @@ button:focus-visible { outline: 3px solid #e5bb6e; outline-offset: 2px; }
 }
 @media (orientation: landscape) and (max-height: 340px) {
     .touch-controls { --control-bottom: calc(4px + env(safe-area-inset-bottom)); }
-    .touch-button { width: 114px; height: 100px; }
-    .jump-button { width: 124px; }
+    .touch-button { height: 116px; }
     .selection-layout { margin: 8px 0; gap: 12px; }
     .character-note { display: none; }
 }
@@ -134,7 +134,13 @@ button:focus-visible { outline: 3px solid #e5bb6e; outline-offset: 2px; }
     .level-options legend { display: none; }
 }
 
-/* Yönler daha dar ve dolgun; daire zıplama düğmesi kendi ölçüsünü korur. */
-.direction-buttons .touch-button { width: clamp(88px, 12vw, 116px); height: clamp(112px, 33dvh, 144px); }
+/* Geniş yön tuşları; basılıyken önceki görünüm ve sabit dokunma alanı korunur. */
 .direction-buttons .touch-button path { stroke-width: 3.5; }
 .direction-buttons .touch-button svg { inset: 0; width: 100%; height: 100%; }
+@media (orientation: portrait) {
+    .direction-buttons .touch-button { width: clamp(90px, 26vw, 116px); }
+    .jump-button { width: clamp(112px, 35vw, 152px); }
+}
+@media (prefers-reduced-motion: reduce) {
+    button { transition: none; }
+}

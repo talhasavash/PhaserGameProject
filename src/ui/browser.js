@@ -50,6 +50,21 @@ export function releaseGameOrientation(deviceScreen = screen) {
     try { deviceScreen.orientation?.unlock?.(); } catch { /* Desteklenmeyebilir. */ }
 }
 
+// Tek bağlantıyla menü, bölüm ve sonuç düğmelerine kısa bir basma hissi verir.
+export function bindButtonFeedback(root = document) {
+    const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+    function press(event) {
+        if (event.type === 'keydown' && (event.repeat || !['Enter', ' '].includes(event.key))) return;
+        if (event.type === 'pointerdown' && event.button !== 0) return;
+        const button = event.target.closest('button, .character-option');
+        // Hareket tuşlarının görseli, parmak basılı kaldığı sürece controls.js tarafından yönetilir.
+        if (!button || button.disabled || button.matches('.touch-button') || reducedMotion.matches) return;
+        button.animate([{ scale: '.94' }, { scale: '1' }], { duration: 180, easing: 'ease-out' });
+    }
+    root.addEventListener('pointerdown', press, { capture: true });
+    root.addEventListener('keydown', press);
+}
+
 // Platformların, karakterin ve fizik kurallarının gerçek boyutları değişmez.
 export function gameView(width, height, touchLayout) {
     if (touchLayout && width > height) {

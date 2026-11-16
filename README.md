@@ -297,12 +297,17 @@ HTTP kullan; HTML dosyasını çift tıklayarak açma (oyun ES modülleri kullan
 
 ## Dünyalar ve bölüm akışı
 
-Dünya 1 mevcut 11 bölümü, Dünya 2 dört bölümü, Dünya 3 ise öğrenme çalışması olarak
-hazırlanan bir bölümü içerir. İlk açılışta oyun adı, iki çocuk ve tek oynat düğmesi
+Menüde 5 dünya ve her dünyada 15 numaralı bölüm yeri vardır: 1–15, 16–30,
+31–45, 46–60 ve 61–75. Mevcut 16 bölüm sırasını korur: ilk 15'i Dünya 1'de,
+öğrenme bölümü Dünya 2'nin 16 numaralı yerindedir. Henüz yazılmayan yerler kilitlidir.
+Kaynak verileri `world1.js`, `world2.js`, `world3.js` dosyalarında kalır;
+`level.js` bunları birleştirip menüde 15'er yerlik dünyalara böler.
+İlk açılışta oyun adı, iki çocuk ve tek oynat düğmesi
 görünür. Oynat düğmesi bölüm menüsünü açar; oyundan dönüş doğrudan bu menüyedir.
 Ana menüde önce dünya, sonra o dünyadaki bölüm seçilir.
-Dünya 2, Dünya 1 boss bölümü tamamlanınca; Dünya 3 de Dünya 2 tamamlanınca açılır.
-Bölüm numaraları dünyalar arasında kesintisiz ilerler: 1–11, 12–15 ve 16.
+Dünya 2, 15. bölüm tamamlanınca açılır. Diğer dünyalar da aynı sırayı izler;
+bölüm verisi yazılmadan boş yerler oynanamaz. Son hazır bölüm tamamlandığında sonraki
+yerin kilit bilgisi de saklanır; bölüm eklendiğinde bu yer otomatik oynanabilir olur.
 Canlar sol üstte, soluk bölüm numarası ortada, dolan üç yıldız ve puan sağ üsttedir.
 Menüde dünya adı ve numarası üstte, bölüm
 numaraları manzara üzerinde büyük yuvarlak düğmelerde gösterilir. Oklar ve alttaki
@@ -312,8 +317,10 @@ Başlangıçta yalnızca Dünya 1 / 1 açıktır; her bölüm bitince sonraki a�
 dünyalar önizlenebilir, ancak bölüm düğmeleri devre dışıdır. Açık bir bölüm
 dairesine dokunmak seçili karakterle oyunu doğrudan başlatır; ayrı Oyna düğmesi yoktur.
 Karakter seçimi alt köşedeki iki küçük portreden yapılır; başlangıçta erkek çocuk seçilidir.
-Boss bölümleri de diğerleriyle aynı daire stilini kullanır; açılmayanlar kilitlidir. Menü `levels` dizisinden
-üretilir. `progress.js` açılan bölüm sayısını `localStorage` içinde saklar. Önceden
+Boss bölümleri de diğerleriyle aynı daire stilini kullanır; açılmayanlar kilitlidir.
+Yatay ekranda 5 sütun × 3 satır, dikey telefonda 3 sütun × 5 satır gösterilir.
+Yeni bölüm `levels` sırasına eklendiğinde menüdeki karşılık gelen yer hazır hale gelir.
+`progress.js` açılan bölüm sayısını `localStorage` içinde saklar. Önceden
 4 bölüm açmış bir tarayıcı yeni sürümde de 4'ten devam eder; kayıt silinmez.
 Tarayıcı verileri silinirse ilerleme sıfırlanır; farklı cihazlara eşitlenmez.
 
@@ -331,14 +338,14 @@ Tarayıcı verileri silinirse ilerleme sıfırlanır; farklı cihazlara eşitlen
 | 10 | Bayram bahçesi; önceki engellerin birleşimi ve daralan geçişler |
 | 11 | Boss; büyük zıplayan muhafızların altından geçerek son camiye ulaşma |
 
-Dünya 2'in bölümleri farklı geçişler ve yeni düşmanlar sunar:
+12–15. bölümler farklı geçişler ve yeni düşmanlar sunar (`world2.js` verileri):
 
-| Dünya 2 bölümü | Ortam ve oynanış |
+| Bölüm | Ortam ve oynanış |
 | --- | --- |
-| 1 · Lav Vadisi | Lav boşlukları, semenderler, inip yükselen taş kolonlar ve ışıklı çıkış geçidi |
-| 2 · Mekanik Fabrika | Ters yönlü bantlar, robotlar, fazları farklı presler ve asansör çıkışı |
-| 3 · Kara Kale | Dar koridorlar, zırhlı böcekler, yarasalar, kolon çiftleri ve yükselen kale kapısı |
-| 4 · Uçurum Geçidi · Boss | 12 boşluk, iniş adaları ve camiden önce ateş püskürten dev muhafız |
+| 12 · Lav Vadisi | Lav boşlukları, semenderler, inip yükselen taş kolonlar ve ışıklı çıkış geçidi |
+| 13 · Mekanik Fabrika | Ters yönlü bantlar, robotlar, fazları farklı presler ve asansör çıkışı |
+| 14 · Kara Kale | Dar koridorlar, zırhlı böcekler, yarasalar, kolon çiftleri ve yükselen kale kapısı |
+| 15 · Uçurum Geçidi · Boss | 12 boşluk, iniş adaları ve camiden önce ateş püskürten dev muhafız |
 
 Kolonlar fizik gövdesine sahiptir ve tavana kadar uzanır; üstlerinden atlanamaz.
 Başlangıç yüksekliği her denemede bir kez rastgele seçilir (140–340 aralığı);
@@ -350,8 +357,7 @@ Açık süre, genişlik, yükseklik aralığı ve başlangıç gecikmesi bölüm
 bölüm yeniden başlayınca zamanlama sıfırlanır. Fabrikadaki bantlar iki yönde de
 çalışır. Bu davranışlar Phaser collider/overlap ve fizik gövdeleriyle uygulanır.
 
-Eski kayıt anahtarı ve Dünya 1 indisleri korunur. Önceden 11. bölüme ulaşmış bir
-kullanıcı Dünya 2'i açmak için boss'u tamamlar; açılan eski bölümler kapanmaz.
+Eski kayıt anahtarı ve bölüm indisleri korunur; açılan eski bölümler kapanmaz.
 
 Her bölümde 3 görev yıldızı bulunur. Diğer nesneler sadece puan verir. Anahtar
 alınınca cami, geçit, asansör veya kale kapısı açılır ve giriş aydınlanır. Çıkışa ulaşınca çocuk
@@ -361,7 +367,7 @@ aydınlanır; `level-complete.wav` bir kez çalar. Ses düzeyi telefonun kendi s
 kontrolleriyle ayarlanır; oyun menüsünde ses aç/kapat düğmesi bulunmaz.
 Sesi `node scripts/build-sounds.cjs --result-only` yeniden üretir.
 Ayrı bir okuma ekranı veya görünür kaynak bağlantısı yoktur.
-Kart kendiliğinden kapanmaz; oynat düğmesi veya Enter ile ilerlenir. Dünya 1 / 11
+Kart kendiliğinden kapanmaz; oynat düğmesi veya Enter ile ilerlenir. Dünya 1 / 15
 sonunda da aynı düğmeyle yeni dünya başlar; aynı sahne yeni dünyanın verileriyle kurulur.
 Son bölümde oynat düğmesi veya Enter bölüm seçimine döndürür, 1. bölümü
 kendiliğinden başlatmaz. Açılan bölümler korunur. Kaynak ve sure/ayet numaraları denetlenebilmesi için

@@ -19,7 +19,7 @@ export function createHud(scene) {
     // Kamera kayarken bilgiler ekranda sabit kalır.
     scene.hud = scene.add.container(0, 0).setScrollFactor(0).setDepth(100);
     scene.hearts = Array.from({ length: HEART_COUNT }, (_, i) => {
-        const heart = scene.add.graphics({ x: i * 49, y: 0 });
+        const heart = scene.add.graphics({ x: i * 34, y: 0 }).setScale(0.8);
         scene.hud.add(heart);
         return heart;
     });
@@ -33,9 +33,9 @@ export function createHud(scene) {
         fontFamily: 'Trebuchet MS, sans-serif', fontSize: '18px', fontStyle: 'bold',
         color: '#fff9e9', stroke: '#254d46', strokeThickness: 1
     }).setResolution(2).setOrigin(0.5, 0).setAlpha(0.65));
-    scene.starHud = scene.add.container(0, 3);
+    scene.starHud = scene.add.container(0, 8);
     scene.starIcons = Array.from({ length: 3 }, (_, i) => {
-        const star = scene.add.graphics({ x: i * 32, y: 0 });
+        const star = scene.add.graphics({ x: i * 21, y: 0 }).setScale(0.8);
         scene.starHud.add(star);
         return star;
     });
@@ -48,7 +48,7 @@ export function centerHud(scene) {
     scene.hud.setScale(hudScale).setPosition(14 * hudScale, 12 * hudScale);
     scene.scoreText.setX(scene.scale.width / hudScale - 88);
     scene.chapterHud.setX(scene.scale.width / hudScale / 2 - 14);
-    scene.starHud.setX(scene.scoreText.x - Math.max(50, scene.scoreText.width) - 108);
+    scene.starHud.setX(scene.scoreText.x - Math.max(50, scene.scoreText.width) - 78);
     // Zemini aynı yerde tut: zıplarken ekran yukarı-aşağı sallanmasın.
     scene.cameras.main.scrollY = Math.max(0, 600 - scene.scale.height);
     scene.cameras.main.setFollowOffset(-Math.min(190, scene.scale.width * 0.2), 0);
@@ -70,5 +70,5 @@ export function updateHud(scene) {
         star.lineStyle(1.5, 0xffedb4, 0.9);
         star.strokePoints(starPoints, true);
     });
-    scene.starHud.setX(scene.scoreText.x - Math.max(50, scene.scoreText.width) - 108);
+    scene.starHud.setX(scene.scoreText.x - Math.max(50, scene.scoreText.width) - 78);
 }

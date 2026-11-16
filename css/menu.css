@@ -2,7 +2,7 @@
 body:not(.playing) .game-stage { inset: 0; }
 body:not(.playing) .build-version { display: none; }
 .character-select {
-    --level-size: clamp(50px, 15dvh, 84px);
+    --level-size: clamp(44px, 14dvh, 80px);
     display: block; overflow: hidden; color: #fff7e5;
     padding: max(18px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
     background: #a6dcf0 url('../assets/images/menu-world1.svg') center / cover no-repeat;
@@ -16,19 +16,18 @@ body:not(.playing) .build-version { display: none; }
 .world-map { width: min(100%, 1100px); margin: auto; align-self: stretch; display: grid; grid-template-columns: 60px minmax(0, 1fr) 60px; align-items: center; gap: 12px; min-height: 0; }
 .level-options { display: grid; place-items: center; min-width: 0; width: 100%; }
 .level-options legend.sr-only { width: 1px; margin: -1px; }
-.level-grid, .level-grid[data-world="2"] { width: min(100%, calc(var(--level-columns) * 140px)); grid-template-columns: repeat(var(--level-columns), minmax(0, 1fr)); gap: clamp(12px, 4dvh, 28px) 12px; align-items: center; justify-items: center; }
+.level-grid, .level-grid[data-world] { width: min(100%, calc(var(--level-columns) * 140px)); grid-template-columns: repeat(var(--level-columns), minmax(0, 1fr)); gap: clamp(10px, 3dvh, 24px) 12px; align-items: center; justify-items: center; }
 .level-option { display: grid; place-items: center; padding: 0; border: 0; border-radius: 50%; background: transparent; }
 .level-option:hover { background: transparent; }
 .level-option:disabled { opacity: 1; }
 .level-card { gap: 0; }
-.level-option .level-card strong { width: var(--level-size); height: var(--level-size); font-size: clamp(24px, 6dvh, 39px); border: 3px solid #fff5dc; color: #fff8e7; background: radial-gradient(circle at 32% 22%, #80c8ac 0, #438b73 43%, #245e53 100%); box-shadow: 0 5px 0 #244f4655, inset 0 3px 1px #ffffff70; text-shadow: 0 2px 0 #244f46; }
+.level-option .level-card strong { width: var(--level-size); height: var(--level-size); font-size: clamp(20px, calc(var(--level-size) * .47), 36px); border: 3px solid #fff5dc; color: #fff8e7; background: radial-gradient(circle at 32% 22%, #80c8ac 0, #438b73 43%, #245e53 100%); box-shadow: 0 5px 0 #244f4655, inset 0 3px 1px #ffffff70; text-shadow: 0 2px 0 #244f46; }
 .level-option[aria-current="true"] .level-card strong { color: #fff8e7; background: radial-gradient(circle at 32% 22%, #b5e1bd, #65aa84 55%, #367459); box-shadow: 0 5px 0 #2d6854, 0 0 0 5px #ffe69180, inset 0 3px 1px #ffffff70; transform: translateY(-2px); }
 .level-option.locked { opacity: 1; }
 .level-option.locked .level-card strong { color: #d7e0dc; background: linear-gradient(145deg, #829b9c, #566e7b); text-shadow: 0 2px 0 #394f5a; box-shadow: 0 4px 0 #344e5d55, inset 0 2px 0 #ffffff45; }
 .level-option.locked .level-card strong::after { right: -4px; bottom: -4px; font-size: 17px; }
 .level-option.completed .level-card strong::after { content: '★'; position: absolute; right: -5px; bottom: -5px; display: grid; place-items: center; width: 25px; height: 25px; border-radius: 50%; background: #f5ca54; border: 2px solid #fff0a0; color: #93651d; font-size: 16px; text-shadow: none; box-shadow: 0 2px 0 #a37624; }
 .level-option.boss-level { grid-column: auto; }
-.level-grid[data-world="1"] .level-option.boss-level:last-child { grid-column: 3; }
 .menu-footer { display: grid; grid-template-columns: 160px minmax(0, 1fr) 160px; align-items: center; gap: 12px; min-height: 62px; }
 .character-options { justify-content: start; gap: 10px; }
 .character-option { width: 54px; }
@@ -45,13 +44,11 @@ body:not(.playing) .build-version { display: none; }
 .world-tabs button.locked::before { background: #627b86; }
 .world-tabs button.locked[aria-pressed="true"]::before { background: #f4d27a; }
 @media (orientation: portrait) {
-    .character-select { --level-size: clamp(50px, 18vw, 76px); padding: max(28px, env(safe-area-inset-top)) 12px max(20px, env(safe-area-inset-bottom)); }
-    .world-heading { min-height: 94px; padding: 0 18px; }
+    .character-select { --level-size: clamp(42px, 14.5vw, 64px); padding: max(28px, env(safe-area-inset-top)) 12px max(20px, env(safe-area-inset-bottom)); }
+    .world-heading { min-height: 76px; padding: 0 18px; }
+    .level-grid[data-world] { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(8px, 2dvh, 14px) 6px; }
     .character-form h2 { font-size: clamp(28px, 7vw, 40px); }
     .world-map { grid-template-columns: 44px minmax(0, 1fr) 44px; gap: 4px; }
-    .level-grid[data-world="1"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .level-grid[data-world="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .level-grid[data-world="1"] .level-option.boss-level:last-child { grid-column: auto; }
     .menu-footer { grid-template-columns: 1fr 1fr; gap: 10px; }
     .world-tabs { grid-column: 1 / -1; grid-row: 1; }
     .character-options { grid-column: 1; grid-row: 2; }
@@ -91,4 +88,14 @@ body:not(.playing) .build-version { display: none; }
     #welcome-play { top: 44%; }
     .world-map { grid-template-columns: 48px minmax(0, 1fr) 48px; }
     .world-arrow { width: 48px; height: 72px; }
+}
+
+/* Son iki dünya da aynı 15 yerli düzeni kullanır. */
+.character-select[data-world="4"] { background-color: #49657c; background-image: linear-gradient(#5d477c44, #23375533), url('../assets/images/menu-world3.svg'); }
+.character-select[data-world="5"] { background-color: #18294c; background-image: linear-gradient(#493e7344, #16223e33), url('../assets/images/menu-world2.svg'); }
+@media (orientation: landscape) and (max-height: 340px) {
+    .world-heading { min-height: 48px; padding-top: 4px; }
+    .character-form h2 { font-size: 28px; }
+    .menu-footer { min-height: 48px; }
+    .character-form { gap: 4px; }
 }

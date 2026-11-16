@@ -1,5 +1,5 @@
 // Phaser sahnesidir; bölümü kurar, oyun döngüsünü ve toplama, çarpışma, kazanma akışını yönetir.
-import { levels, worldForLevel, chapterNumber } from '../world/levels/level.js';
+import { levels, worldForLevel, chapterNumber, LEVEL_SLOT_COUNT } from '../world/levels/level.js';
 import { createGameState, isKeyReady, recordFruit, takeKey, finishLevel, healAtFountain } from './rules.js';
 import { createPlayer, movePlayer, resetPlayerMovement, showPlayerExpression, showRecovery, updatePlayerEffects } from './player.js';
 import { createScenery } from '../world/scenery/background.js';
@@ -211,7 +211,7 @@ export class GameScene extends Phaser.Scene {
 
     reachExit() {
         if (finishLevel(this.gameState)) {
-            unlockNext(this.levelIndex, levels.length);
+            unlockNext(this.levelIndex, LEVEL_SLOT_COUNT);
             this.touchControls.reset();
             this.player.setVelocity(0, 0);
             this.player.setAlpha(1);

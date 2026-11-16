@@ -55,7 +55,7 @@ test('Random fire targets vary, stay near the player and avoid safe spots and ot
     assert.equal(chooseFireX(levels[2], 100, () => 0), null, 'Do not fall back to an unsafe target');
 });
 test('Every chapter has three reachable stars before its key and exit', () => {
-    assert.equal(levels.length, worlds.reduce((count, world) => count + world.count, 0));
+    assert.ok(levels.length <= worlds.reduce((count, world) => count + world.count, 0), 'Playable chapters fit within reserved menu slots');
     const maxRise = 590 ** 2 / (2 * 1600);
     for (const level of levels) {
         const reached = [];

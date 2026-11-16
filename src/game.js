@@ -43,7 +43,7 @@ function selectWorld(worldId) {
 
 function startSelectedGame(levelIndex) {
     const selected = characterForm.querySelector('input[name="character"]:checked');
-    if (!selected || levelIndex >= unlockedLevels(levels.length) || gameStarted) return;
+    if (!selected || !levels[levelIndex] || levelIndex >= unlockedLevels(levels.length) || gameStarted) return;
     // Await etmeden, doğrudan dokunuş sırasında başlat: tarayıcı bu etkileşimi ister.
     void enterGameDisplay();
     gameStarted = true;

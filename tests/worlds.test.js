@@ -1,20 +1,21 @@
 // Dünya ve bölüm sıralamasını, bölüm verilerini ve dünyalar arası kilit ilerlemesini doğrular.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { levels, worlds, worldForLevel, chapterNumber } from '../src/world/levels/level.js';
+import { levels, worlds, worldForLevel, chapterNumber, LEVEL_SLOT_COUNT } from '../src/world/levels/level.js';
 import { bossGate } from '../src/world/levels/world1.js';
 import { readUnlocked, unlockNext } from '../src/data/progress.js';
 import { columnFrame, columnTiming, prepareColumn, visibleColumn, RAISED_BOTTOM, CLOSED_BOTTOM } from '../src/gameplay/columns.js';
 
-test('World 1 keeps its old indexes and boss; chapter numbering continues across Worlds 2 and 3', () => {
-    assert.deepEqual(worlds.map(world => [world.id, world.start, world.count]), [[1, 0, 11], [2, 11, 4], [3, 15, 1]]);
+test('Five worlds reserve 15 sequential slots each without changing playable level indexes', () => {
+    assert.deepEqual(worlds.map(world => [world.id, world.start, world.count]), [[1, 0, 15], [2, 15, 15], [3, 30, 15], [4, 45, 15], [5, 60, 15]]);
+    assert.equal(LEVEL_SLOT_COUNT, 75);
     assert.equal(levels[10], bossGate);
     assert.equal(worldForLevel(10).id, 1);
     assert.equal(chapterNumber(10), 11);
-    assert.equal(worldForLevel(11).id, 2);
+    assert.equal(worldForLevel(11).id, 1);
     assert.equal(chapterNumber(11), 12);
     assert.equal(chapterNumber(13), 14);
-    assert.equal(worldForLevel(15).id, 3);
+    assert.equal(worldForLevel(15).id, 2);
     assert.equal(chapterNumber(15), 16);
     assert.deepEqual(levels.slice(11, 15).map(level => level.name), ['Lav Vadisi', 'Mekanik Fabrika', 'Kara Kale', 'Uçurum Geçidi']);
     assert.deepEqual(levels.slice(11, 15).map(level => level.exitType), ['gate', 'gate', 'gate', 'mosque']);
@@ -32,7 +33,8 @@ test('Existing saved progress is retained; completing each world unlocks the nex
     assert.equal(unlockNext(13, levels.length), 15);
     assert.equal(unlockNext(14, levels.length), 16);
     assert.equal(saved, '16');
-    assert.equal(unlockNext(15, levels.length), 16);
+    assert.equal(unlockNext(15, LEVEL_SLOT_COUNT), 17, 'Remember the next slot before its level is implemented');
+    assert.equal(saved, '17');
 });
 
 test('Columns warn before slamming, remain closed, then retract continuously', () => {

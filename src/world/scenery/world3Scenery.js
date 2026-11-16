@@ -14,8 +14,10 @@ export function createWorldThreeScenery(scene, width, theme) {
     scene.add.rectangle(width / 2, 560, width, 80, p.earth).setDepth(-5);
     scene.add.rectangle(width / 2, 524, width, 8, p.edge).setDepth(-4);
 
+    //Güneş
     scene.add.circle(650, 150, 60, 0xffdf87).setDepth(-90).setScrollFactor(0.08);
 
+    // Bulutlar
     for (let x = 200; x < width; x += 500) {
         createCloud(scene, x, 150);
     }

@@ -18,7 +18,6 @@ export function prepareScenePage() {
 export function bindSceneButtons(scene) {
     const result = document.getElementById('game-result');
     result.hidden = true;
-    document.getElementById('pause-button').textContent = 'Devam et';
     document.getElementById('pause-button').setAttribute('aria-label', 'Devam et');
     document.getElementById('pause-button').disabled = false;
     document.getElementById('toolbar-status').textContent = `${scene.level.name} seni bekliyor`;

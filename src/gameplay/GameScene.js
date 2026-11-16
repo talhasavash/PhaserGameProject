@@ -8,7 +8,7 @@ import { createFireRain, updateFireRain } from './fireRain.js';
 import { unlockNext } from '../data/progress.js';
 import { resetBossRage, createHazards, updateHazards } from './hazards.js';
 import { createTerrain } from '../world/terrain/terrain.js';
-import { createHud, centerHud, updateHud, updateProgress } from '../ui/hud.js';
+import { createHud, centerHud, updateHud } from '../ui/hud.js';
 import { loadGameAssets } from '../data/assets.js';
 import { createColumns, updateColumns } from './columns.js';
 import { createCollectibles, createLandmarks, createHealingSpots } from '../world/levelObjects.js';
@@ -295,7 +295,6 @@ export class GameScene extends Phaser.Scene {
         updateGuardianFire(this);
         this.updateConveyor(delta);
         this.updateCheckpoint();
-        updateProgress(this);
         this.checkPits();
     }
 

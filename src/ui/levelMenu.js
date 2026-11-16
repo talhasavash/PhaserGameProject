@@ -49,13 +49,10 @@ export function refreshLevelLocks(worldTabs, levelGrid, worldId) {
     const unlocked = unlockedLevels(levels.length);
     const selectedWorld = worlds.find(world => world.id === worldId);
     const selectedIndex = worlds.indexOf(selectedWorld);
-    const locked = selectedWorld.start >= unlocked;
     worldTabs.dataset.selected = worldId;
     document.getElementById('character-select').dataset.world = worldId;
     document.getElementById('world-number').textContent = `${worldId}.`;
     document.getElementById('world-name').textContent = selectedWorld.title;
-    document.getElementById('world-lock').hidden = !locked;
-    document.getElementById('world-lock').textContent = locked ? `Önce Dünya ${worlds[selectedIndex - 1].id}'i tamamla` : '';
     document.getElementById('previous-world').disabled = selectedIndex === 0;
     document.getElementById('next-world').disabled = selectedIndex === worlds.length - 1;
     for (const button of worldTabs.querySelectorAll('button')) {

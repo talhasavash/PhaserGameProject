@@ -18,7 +18,7 @@ function element(tag = 'div') {
 test('World pages show names, preserve locks, and navigate using arrows and dots', () => {
     const previousDocument = globalThis.document;
     const previousWindow = globalThis.window;
-    const ids = ['character-select', 'world-number', 'world-name', 'world-lock', 'previous-world', 'next-world'];
+    const ids = ['character-select', 'world-number', 'world-name', 'previous-world', 'next-world'];
     const nodes = new Map(ids.map(id => [id, element()]));
     const tabs = element();
     const grid = element();
@@ -45,7 +45,6 @@ test('World pages show names, preserve locks, and navigate using arrows and dots
         assert.equal(selected, 2);
         assert.equal(nodes.get('world-name').textContent, 'Gölge Diyarları');
         assert.equal(nodes.get('world-number').textContent, '2.');
-        assert.equal(nodes.get('world-lock').hidden, false);
         assert.ok(grid.querySelectorAll('button').every(button => button.disabled && button.attributes['aria-current'] === 'false'));
         grid.querySelectorAll('button')[0].onclick();
         assert.deepEqual(started, [0], 'Locked chapters must not start');
@@ -54,7 +53,6 @@ test('World pages show names, preserve locks, and navigate using arrows and dots
         assert.equal(nodes.get('next-world').disabled, true);
         saved = '16';
         selectWorld(3);
-        assert.equal(nodes.get('world-lock').hidden, true);
         assert.equal(grid.querySelectorAll('button')[0].disabled, false);
         assert.equal(grid.querySelectorAll('button')[0].attributes['aria-current'], 'true');
         grid.querySelectorAll('button')[0].onclick();

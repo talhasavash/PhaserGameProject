@@ -26,7 +26,6 @@ function toggleSettings() {
     settingsPanel.hidden = !opening;
     settingsButton.setAttribute('aria-expanded', String(opening));
     settingsButton.setAttribute('aria-label', opening ? 'Oyun menüsünü kapat' : 'Oyun menüsünü aç');
-    document.getElementById('settings-title').textContent = gameStarted ? 'Bir mola' : 'Ayarlar';
     document.getElementById('pause-button').hidden = !gameStarted;
     document.getElementById('game-stage').inert = opening;
     document.getElementById('touch-controls').inert = opening;

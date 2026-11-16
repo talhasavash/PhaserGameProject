@@ -26,12 +26,17 @@
             <button id="settings-button" type="button" aria-label="Oyun menüsünü aç" aria-expanded="false"
                     aria-controls="settings-panel" hidden>Ⅱ
             </button>
-            <div id="settings-panel" class="settings-panel" role="dialog" aria-modal="true" aria-labelledby="settings-title" hidden>
+            <div id="settings-panel" class="settings-panel" role="dialog" aria-modal="true" aria-label="Oyun menüsü" hidden>
                 <div class="settings-card">
-                <button id="settings-close" type="button" aria-label="Menüyü kapat">×</button>
-                <h2 id="settings-title">Ayarlar</h2>
-                <button id="pause-button" type="button" aria-label="Devam et" hidden disabled>Devam et</button>
-                <button id="menu-button" type="button" aria-label="Bölüm seçimine dön" hidden>Ana ekran</button>
+                <button id="settings-close" type="button" aria-label="Menüyü kapat"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M7 7L25 25M25 7L7 25" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/></svg></button>
+                <div class="pause-actions">
+                    <button id="menu-button" type="button" aria-label="Bölüm seçimine dön" hidden>
+                        <svg viewBox="0 0 64 64" aria-hidden="true"><g fill="currentColor"><rect x="8" y="8" width="18" height="18" rx="5"/><rect x="38" y="8" width="18" height="18" rx="5"/><rect x="8" y="38" width="18" height="18" rx="5"/><rect x="38" y="38" width="18" height="18" rx="5"/></g></svg>
+                    </button>
+                    <button id="pause-button" type="button" aria-label="Devam et" hidden disabled>
+                        <svg viewBox="0 0 64 64" aria-hidden="true"><path fill="currentColor" d="M19 10 Q17 8 17 14 V50 Q17 56 23 53 L51 36 Q57 32 51 28 L23 11 Q21 10 19 10Z"/></svg>
+                    </button>
+                </div>
                 </div>
             </div>
         </div>
@@ -42,7 +47,6 @@
                 <form id="character-form" class="character-form">
                     <header class="world-heading">
                         <h2 id="character-title" tabindex="-1"><span id="world-number">1.</span><span id="world-name">Bahçeler ve Geçitler</span></h2>
-                        <p id="world-lock" hidden></p>
                     </header>
                     <div class="world-map">
                         <button id="previous-world" class="world-arrow" type="button" aria-label="Önceki dünya">‹</button>
@@ -74,10 +78,10 @@
             </section>
             <section id="game-result" class="result" role="dialog" aria-modal="true" aria-labelledby="result-title" hidden>
                 <div class="result-card">
-                    <h2 id="result-title">Bölüm tamam!</h2>
+                    <h2 id="result-title" hidden>Bölüm tamam!</h2>
                     <blockquote id="result-verse" class="result-verse"></blockquote>
-                    <button id="next-level" type="button" aria-label="Devam et"><span aria-hidden="true">▶</span> Devam et</button>
-                    <button id="play-again" type="button" aria-label="Ana ekran" hidden><span aria-hidden="true">⌂</span> Ana ekran</button>
+                    <button id="next-level" type="button" aria-label="Devam"><span aria-hidden="true">▶</span> Devam</button>
+                    <button id="play-again" type="button" aria-label="Devam" hidden><span aria-hidden="true">▶</span> Devam</button>
                 </div>
             </section>
         </div>

@@ -6,7 +6,7 @@ const IMAGE_GROUPS = [
     { width: 40, height: 44, keys: [...FRUIT_TYPES, 'bead'] },
     { width: 44, height: 44, keys: ['star'] },
     { width: 32, height: 36, keys: ['berry'] },
-    { width: 76, height: 52, keys: ['hedgehog', 'snail', 'bee', 'fox', 'penguin', 'frog', 'turtle', 'bat', 'bird', 'spider', 'salamander', 'robot', 'scarab'] },
+    { width: 76, height: 52, keys: ['hedgehog', 'snail', 'bee', 'fox', 'penguin', 'frog', 'turtle', 'bat', 'bird', 'spider', 'salamander', 'robot', 'scarab', 'night-owl', 'shadow-fox', 'moon-scorpion', 'moon-moth', 'cave-crab', 'dusk-wolf'] },
     { width: 52, height: 52, keys: ['ball', 'wheel'] },
     { width: 96, height: 100, keys: ['ogre', 'ogre-moss', 'ogre-stone', 'ogre-ember', 'ogre-ember-angry', 'ogre-flame'] },
     { width: 96, height: 76, keys: ['allah-plaque'] },

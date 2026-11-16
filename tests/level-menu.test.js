@@ -60,6 +60,10 @@ test('World pages show names, preserve locks, and navigate using arrows and dots
         assert.equal(grid.querySelectorAll('button')[0].attributes['aria-current'], 'true');
         grid.querySelectorAll('button')[0].onclick();
         assert.deepEqual(started, [0, 15]);
+        saved = '17';
+        selectWorld(2);
+        assert.equal(grid.querySelectorAll('button')[1].disabled, false, 'Completing 16 unlocks 17');
+        assert.equal(grid.querySelectorAll('button')[2].disabled, true, '18 remains locked until 17 is complete');
         nodes.get('previous-world').onclick();
         assert.equal(selected, 1);
         assert.equal(tabs.querySelectorAll('button')[0].attributes['aria-pressed'], 'true');
@@ -80,12 +84,14 @@ test('World pages show names, preserve locks, and navigate using arrows and dots
         }
         assert.deepEqual(started, [0, 15], 'Placeholder buttons cannot start scenes');
         // Sonraki bölüm eklendiğinde aynı menü yeri otomatik olarak oynanabilir olur.
+        const nextIndex = levels.length;
         levels.push(levels[0]);
         try {
             selectWorld(2);
-            assert.equal(grid.querySelectorAll('button')[1].disabled, false);
-            grid.querySelectorAll('button')[1].onclick();
-            assert.deepEqual(started, [0, 15, 16]);
+            const nextButton = grid.querySelectorAll('button').find(button => Number(button.value) === nextIndex);
+            assert.equal(nextButton.disabled, false);
+            nextButton.onclick();
+            assert.deepEqual(started, [0, 15, nextIndex]);
         } finally { levels.pop(); }
     } finally {
         globalThis.document = previousDocument;

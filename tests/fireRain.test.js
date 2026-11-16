@@ -59,18 +59,36 @@ test('Every chapter has three reachable stars before its key and exit', () => {
     const maxRise = 590 ** 2 / (2 * 1600);
     for (const level of levels) {
         const reached = [];
-        for (const p of level.platforms) {
-            if (level.groundY - p.y < maxRise || reached.some(step =>
-                step.y - p.y >= 0 && step.y - p.y < maxRise &&
-                p.x - (step.x + step.width) >= 0 && p.x - (step.x + step.width) < 100)) reached.push(p);
+        let groundStart = 0;
+        for (const gap of [...(level.gaps || []), { x: level.width, width: 0 }]) {
+            reached.push({ x: groundStart, y: level.groundY, width: gap.x - groundStart });
+            groundStart = gap.x + gap.width;
         }
+        // Sağ ve sol yönlü, yukarı ve aşağı atlayışları gerçek hız/yerçekimiyle doğrula.
+        let remaining = [...level.platforms];
+        let progress = true;
+        while (progress) {
+            progress = false;
+            remaining = remaining.filter(platform => {
+                const reachable = reached.some(step => {
+                    const rise = step.y - platform.y;
+                    if (rise > maxRise) return false;
+                    const distance = Math.max(0, platform.x - step.x - step.width, step.x - platform.x - platform.width);
+                    const flightTime = (590 + Math.sqrt(590 ** 2 - 3200 * rise)) / 1600;
+                    return distance + 24 < 265 * flightTime;
+                });
+                if (reachable) { reached.push(platform); progress = true; }
+                return !reachable;
+            });
+        }
+        assert.equal(remaining.length, 0, `${level.name}: unreachable platform`);
         const stars = level.fruits.filter(item => item.type === 'star');
         assert.equal(stars.length, 3);
         assert.equal(new Set(level.fruits.map(item => item.id)).size, level.fruits.length);
         for (const star of stars) {
             const onGround = star.y >= level.groundY - 60 &&
                 (level.gaps || []).every(gap => star.x < gap.x || star.x > gap.x + gap.width);
-            assert.ok(onGround || reached.some(p => star.x > p.x && star.x < p.x + p.width && p.y - star.y < 60), level.name);
+            assert.ok(onGround || reached.some(p => star.x > p.x && star.x < p.x + p.width && p.y - star.y >= 0 && p.y - star.y < 60), level.name);
             assert.ok(star.x < level.key.x);
         }
         assert.ok(level.key.x < level.exit.x && level.exit.x < level.width);

@@ -3,6 +3,9 @@ import { cacheTexture } from '../../graphics/texture.js';
 // Her genişlik/tema bir kez dokuya çevrilir; oyun sırasında şekiller yeniden çizilmez.
 
 export const platformThemes = {
+    moonwood: { body: 0x405b67, edge: 0xb0d8ca, detail: 0x89b7b0 },
+    nightRuins: { body: 0x66627f, edge: 0xd0bde6, detail: 0xaaa0c4 },
+    nightKeep: { body: 0x465978, edge: 0xb9d9e9, detail: 0x839eb9 },
     journey: { body: 0x708fb3, edge: 0xd6e7fa, detail: 0x456482 },
     garden: { body: 0x98714d, edge: 0x72a65f, detail: 0xc8a16e },
     courtyard: { body: 0xc9d9d3, edge: 0xf4e9ca, detail: 0x729d9e },
@@ -36,7 +39,21 @@ function drawStep(g, width, theme) {
     const end = x + width;
     g.fillStyle(p.body);
 
-    if (theme === 'journey') {
+    if (theme === 'moonwood') {
+        g.fillRoundedRect(x, 0, width, 27, 10);
+        g.fillStyle(p.edge); g.fillRoundedRect(x, 0, width, 6, 3);
+        g.lineStyle(2, p.detail); g.strokeCircle(x + 13, 16, 6);
+        for (let xx = x + 30; xx < end - 10; xx += 24) g.lineBetween(xx, 14, xx + 15, 20);
+    } else if (theme === 'nightRuins' || theme === 'nightKeep') {
+        g.fillRoundedRect(x, 0, width, 28, 4);
+        g.fillStyle(p.edge); g.fillRoundedRect(x, 0, width, 5, 2);
+        g.lineStyle(2, p.detail);
+        for (let xx = x + 5; xx < end - 8; xx += 27) g.strokeRect(xx, 10, Math.min(23, end - xx - 4), 12);
+        if (theme === 'nightKeep') {
+            g.fillStyle(p.edge);
+            for (const xx of [x + 10, end - 10]) g.fillCircle(xx, 16, 2);
+        }
+    } else if (theme === 'journey') {
         g.fillRoundedRect(x, 0, width, 28, 6);
         g.fillStyle(p.edge);
         g.fillRoundedRect(x, 0, width, 7, 3);

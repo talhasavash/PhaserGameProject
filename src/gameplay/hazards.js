@@ -1,4 +1,4 @@
-// Düşmanları oluşturur; devriyeyi, boss zıplamasını, öfkesini ve seslerini yönetir.
+// Düşmanları kurar; devriyeyi, dikey ağ hareketini, görünmezliği ve boss davranışlarını yönetir.
 
 const ENEMY_SCALE = 0.8;
 
@@ -14,7 +14,8 @@ export function createHazards(scene) {
 
 function createHazard(scene, data) {
     // Küçülünce de ayaklar yerde kalsın. Kutuların alt kenarı zeminle aynı hizada.
-    let y = scene.level.groundY - 24 * ENEMY_SCALE;
+    const platform = data.platform === undefined ? null : scene.level.platforms[data.platform];
+    let y = (platform?.y ?? scene.level.groundY) - 24 * ENEMY_SCALE;
     if (data.type === 'ball' || data.type === 'wheel') y = scene.level.groundY - 22 * ENEMY_SCALE;
     if (data.y !== undefined) y = data.y;
     if (data.type === 'ogre') y = scene.level.groundY - 44 * data.scale;
@@ -25,6 +26,7 @@ function createHazard(scene, data) {
         maxX: data.maxX,
         speed: data.speed,
         type: data.type,
+        baseX: data.x,
         baseY: y,
         bob: data.bob || 0,
         grounded: data.y === undefined,
@@ -33,10 +35,12 @@ function createHazard(scene, data) {
         jumpClock: 0,
         rage: data.rage || false,
         engagedAt: null,
-        direction: 1
+        direction: 1,
+        period: data.period || 2400, offset: data.offset || 0,
+        threadTop: data.threadTop ?? 220, visibility: data.visibility
     });
     if (data.type === 'spider') {
-        const thread = scene.add.line(data.x, 0, 0, 250, 0, 480, 0x9b919f, 0.65).setOrigin(0).setDepth(8);
+        const thread = scene.add.line(data.x, 0, 0, data.threadTop ?? 220, 0, y - 12, 0xd0cde0, 0.7).setOrigin(0).setDepth(8);
         sprite.setData('thread', thread);
     }
     if (data.type === 'ogre') {
@@ -49,6 +53,7 @@ function createHazard(scene, data) {
     } else {
         sprite.body.setSize(53, 27).setOffset(12, 23);
     }
+    updateVisibility(scene, sprite, sprite.getData('patrol'));
 }
 
 export function updateHazards(scene, delta) {
@@ -57,10 +62,19 @@ export function updateHazards(scene, delta) {
         if (patrol.jump) updateGuardJump(scene, hazard, patrol, delta);
         updatePatrol(scene, hazard, patrol);
         updateHazardAppearance(hazard, patrol, delta);
+        updateVisibility(scene, hazard, patrol);
     }
 }
 
 function updatePatrol(scene, hazard, patrol) {
+    if (patrol.type === 'spider') {
+        // Ağın bağlandığı x sabittir; örümcek yalnızca aynı ip boyunca inip çıkar.
+        const wave = Math.sin((scene.elapsed + patrol.offset) / patrol.period * Math.PI * 2);
+        hazard.body.reset(patrol.baseX, patrol.baseY + wave * patrol.bob);
+        hazard.setVelocityX(0);
+        hazard.setVelocityY(0);
+        return;
+    }
     if (hazard.x >= patrol.maxX) patrol.direction = -1;
     if (hazard.x <= patrol.minX) patrol.direction = 1;
     hazard.setVelocityX(patrol.speed * patrol.direction);
@@ -73,12 +87,33 @@ function updatePatrol(scene, hazard, patrol) {
 
 function updateHazardAppearance(hazard, patrol, delta) {
     const thread = hazard.getData('thread');
-    if (thread) thread.geom.y2 = hazard.y;
+    if (thread) thread.setTo(0, patrol.threadTop, 0, hazard.y - 12);
     if (patrol.type === 'ball' || patrol.type === 'wheel') {
         hazard.rotation += patrol.direction * delta * 0.003;
     } else {
         hazard.setFlipX(patrol.direction < 0);
     }
+}
+
+// Süreler ms: görünmez düşman devriyeye devam eder, ancak görünmeden hasar vermez.
+export function hazardVisibility(elapsed, { visibleMs = 2800, hiddenMs = 1800, fadeMs = 220, offset = 0 }) {
+    const visible = Math.max(1, visibleMs);
+    const hidden = Math.max(0, hiddenMs);
+    const phase = ((elapsed + offset) % (visible + hidden) + visible + hidden) % (visible + hidden);
+    const fade = Math.max(0, Math.min(fadeMs, visible / 2));
+    const alpha = phase >= visible ? 0 : fade === 0 ? 1 : Math.min(1, phase / fade, (visible - phase) / fade);
+    return { alpha, collidable: alpha >= 1 };
+}
+
+function updateVisibility(scene, hazard, patrol) {
+    if (!patrol.visibility) return;
+    const state = hazardVisibility(scene.elapsed, patrol.visibility);
+    hazard.setAlpha(state.alpha);
+    hazard.body.checkCollision.none = !state.collidable;
+    const thread = hazard.getData('thread');
+    if (thread) thread.setAlpha(state.alpha * 0.7);
+    const shadow = hazard.getData('shadow');
+    if (shadow) shadow.setAlpha(state.alpha * 0.23);
 }
 
 function guardJumpSpeed(scene, hazard, patrol) {

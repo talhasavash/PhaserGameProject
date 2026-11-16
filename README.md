@@ -298,8 +298,21 @@ HTTP kullan; HTML dosyasını çift tıklayarak açma (oyun ES modülleri kullan
 ## Dünyalar ve bölüm akışı
 
 Menüde 5 dünya ve her dünyada 15 numaralı bölüm yeri vardır: 1–15, 16–30,
-31–45, 46–60 ve 61–75. Mevcut 16 bölüm sırasını korur: ilk 15'i Dünya 1'de,
-öğrenme bölümü Dünya 2'nin 16 numaralı yerindedir. Henüz yazılmayan yerler kilitlidir.
+31–45, 46–60 ve 61–75. İlk 15 bölüm Dünya 1'de,
+öğrenme bölümü Dünya 2'nin 16 numaralı yerindedir. Gece Karanlığı'nın 17–19.
+bölümleri `nightLevels.js` içinde tanımlıdır: Ay Işığı Ormanı, Sessiz Harabeler,
+Gecenin Muhafızı. Dar kütük ve taş basamaklar, uçurumlar, yarasalar, örümcekler,
+sıralı kolonlar ve zıplayan taş muhafız giderek zorlaşan yollar oluşturur.
+17–19'da kısa yükselişler, geri dönüşlü basamaklar ve yüksek kule yolları farklıdır.
+Sayfa açılışında basamaklara x yönünde ±10, y yönünde ±5 piksel sapma verilir;
+yıldızlar ve muhafızlar kendi basamağını izler. Gece baykuşu, ay güvesi,
+gölge tilkisi, alacakaranlık kurdu, ay akrebi ve mağara yengeci devriye gezer.
+Hızları önceki gece düzenine göre %25 azaltılmıştır. Bu üç bölümde tüm düşmanlar
+aralıklı kaybolur; yıldız bekçileri 2,4 saniye görünmez kalarak toplama fırsatı verir.
+Her bölümde en az 20 meyve zemin ve basamaklara farklı yüksekliklerde serpiştirilir.
+Üç caminin cepheleri, kubbeleri ve minare sayıları farklıdır.
+20. bölüm ve sonraki henüz yazılmayan yerler kilitlidir. Gece çizimleri
+`src/world/scenery/nightScenery.js`, platformları `src/world/terrain/platforms.js` içindedir.
 Kaynak verileri `world1.js`, `world2.js`, `world3.js` dosyalarında kalır;
 `level.js` bunları birleştirip menüde 15'er yerlik dünyalara böler.
 İlk açılışta oyun adı, iki çocuk ve tek oynat düğmesi
@@ -315,6 +328,21 @@ tercihinde bu animasyonlar kapatılır. Stiller `css/menu.css` içindedir.
 Dünya 2, 15. bölüm tamamlanınca açılır. Diğer dünyalar da aynı sırayı izler;
 bölüm verisi yazılmadan boş yerler oynanamaz. Son hazır bölüm tamamlandığında sonraki
 yerin kilit bilgisi de saklanır; bölüm eklendiğinde bu yer otomatik oynanabilir olur.
+
+Düşman verisindeki `platform: 2`, `platforms` dizisinin üçüncü basamağını seçer;
+düşmanın y konumu bu basamaktan hesaplanır. `minX` ve `maxX` devriyeyi basamağın
+kenarlarından içeride tutmalıdır. Örümcekler x konumunu sabit tutar; `bob` dikey
+hareket mesafesini, `period` tam iniş/çıkış süresini, `threadTop` ağın başladığı y'yi belirler.
+
+Her düşmana isteğe bağlı görünme/kaybolma döngüsü eklenebilir (süreler ms):
+
+```js
+visibility: { visibleMs: 2600, hiddenMs: 1600, fadeMs: 220, offset: 500 }
+```
+
+`offset` döngünün başlangıcını kaydırır. Düşman kaybolurken devriyesine devam eder;
+solma, görünmezlik ve yeniden belirme sırasında hasar vermez. Tam görünür olunca
+temas hasarı geri açılır. Özellik verilmezse düşman her zaman görünürdür.
 Canlar sol üstte, soluk bölüm numarası ortada, dolan üç yıldız ve puan sağ üsttedir.
 Menüde dünya adı ve numarası üstte, bölüm
 numaraları manzara üzerinde büyük yuvarlak düğmelerde gösterilir. Oklar ve alttaki

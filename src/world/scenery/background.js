@@ -2,8 +2,10 @@
 import { createWorldOneScenery } from './world1Scenery.js';
 import { createWorldTwoScenery } from './world2Scenery.js';
 import { createWorldThreeScenery } from './world3Scenery.js';
+import { createNightScenery } from './nightScenery.js';
 
 export function createScenery(scene, width, theme = 'garden') {
+    if (createNightScenery(scene, width, theme)) return;
     if (createWorldThreeScenery(scene, width, theme)) return;
     if (createWorldTwoScenery(scene, width, theme)) return;
     createWorldOneScenery(scene, width, theme);
@@ -18,6 +20,9 @@ export function createMosque(scene, x, theme = 'garden') {
         courtyard: { wall: 0xe5e8eb, roof: 0x427fa4, trim: 0x77bfc2, width: 218, top: 446, towers: [-132], domes: [[-72, 437, 70, 58], [72, 437, 70, 58], [0, 410, 116, 100]] },
         desert: { wall: 0xe8bc8c, roof: 0xcb8256, trim: 0xf5dd9c, width: 194, top: 428, towers: [126], domes: [[0, 410, 94, 70]] },
         night: { wall: 0xe8dff0, roof: 0x7763a7, trim: 0xe8c77a, width: 230, top: 450, towers: [-140, -104, 104, 140], domes: [[-78, 435, 68, 68], [78, 435, 68, 68], [0, 399, 122, 116]] },
+        moonwood: { wall: 0xcbe0d7, roof: 0x3d807b, trim: 0xe8cb8a, width: 190, top: 450, towers: [-118], domes: [[0, 420, 154, 94]] },
+        nightRuins: { wall: 0xd5cde5, roof: 0x716791, trim: 0xdcc69d, width: 236, top: 442, towers: [-140, 140], domes: [[-72, 425, 75, 65], [72, 425, 75, 65], [0, 396, 108, 108]] },
+        nightKeep: { wall: 0xc8d9e6, roof: 0x395d89, trim: 0xf2d491, width: 260, top: 430, towers: [-158, -119, 119, 158], domes: [[-87, 412, 80, 78], [87, 412, 80, 78], [0, 375, 133, 130]] },
         forest: { wall: 0xe3d9b2, roof: 0x53876a, trim: 0xa77d4f, width: 180, top: 450, towers: [112], domes: [[0, 421, 150, 90]] },
         interior: { wall: 0xddceb1, roof: 0x728e91, trim: 0xbb9658, width: 220, top: 352, towers: [], domes: [] },
         snow: { wall: 0xf5f0eb, roof: 0x80adca, trim: 0xc9dce2, width: 208, top: 448, towers: [-126, 126], domes: [[-65, 435, 75, 60], [65, 435, 75, 60], [0, 401, 108, 110]] },
@@ -31,6 +36,7 @@ export function createMosque(scene, x, theme = 'garden') {
     const finishes = {
         garden: 0xb8e2d5, abyss: 0xb9e6df, courtyard: 0xc0e4ee,
         desert: 0xf4dcad, night: 0xd3c8ed,
+        moonwood: 0x9fd9c9, nightRuins: 0xd5b8e5, nightKeep: 0x9ecce9,
         forest: 0xc9e2b9, interior: 0xb5e2df,
         snow: 0xd9f0f4, river: 0xb7e7e6,
         canyon: 0xebcbd1, festival: 0xf3e2ad,

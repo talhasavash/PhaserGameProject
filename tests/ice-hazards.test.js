@@ -36,7 +36,7 @@ test('Snowmen aim both ways, wait between throws, skip invisible enemies and reu
         physics: { add: { group: () => ({ create() {
             created++;
             const sprite = { body: { setCircle() {}, reset(x, y) { sprite.x = x; sprite.y = y; } },
-                setScale() { return this; }, setDepth() { return this; },
+                setScale() { return this; }, setDepth() { return this; }, setRotation() { return this; }, setTexture() { return this; },
                 disableBody() { this.active = false; }, enableBody(reset, x, y) { this.active = true; this.x = x; this.y = y; } };
             return sprite;
         } }) } } };
@@ -63,6 +63,17 @@ test('Snowmen aim both ways, wait between throws, skip invisible enemies and reu
     scene.player.x = 2000;
     updateSnowballs(scene);
     assert.ok(scene.snowShots.every(shot => !shot.plan && !shot.sprite.active));
+    scene.elapsed = 14000;
+    scene.player = { x: 300, y: 490 };
+    enemy.y = 325;
+    enemy.setTint = () => {};
+    data.patrol.snowball = { kind: 'shard', volley: 3, speed: 230, period: 2900, range: 720 };
+    updateSnowballs(scene);
+    const volley = scene.snowShots.filter(shot => shot.plan);
+    assert.equal(volley.length, 3);
+    assert.ok(volley.every(shot => shot.plan.vx < 0 && shot.plan.kind === 'shard'));
+    assert.equal(new Set(volley.map(shot => shot.plan.vy)).size, 3);
+    assert.equal(created, 6, 'Boss volleys reuse the existing projectile pool');
 });
 
 test('Crushing plays once and automatically restarts the current chapter after flattening', async () => {

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
+<defs><linearGradient id="ice" x2=".8" y2="1"><stop stop-color="#efffff"/><stop offset=".45" stop-color="#8deeff"/><stop offset="1" stop-color="#6656c4"/></linearGradient></defs>
+<!-- Kanatlı kristal bir muhafız: eski canavar gövdelerini kullanmaz. -->
+<path d="M53 53L13 20 3 76l39 27M107 53l40-33 10 56-39 27" fill="url(#ice)" stroke="#4e458b" stroke-width="3"/>
+<path d="M13 20l22 56L3 76M147 20l-22 56 32 0" fill="none" stroke="#d7ffff" stroke-width="2"/>
+<path d="M38 48l16-14L49 8l27 19L90 2l16 32 20 13-13 17H49Z" fill="#d4faff" stroke="#5f59a4" stroke-width="3"/>
+<path d="M80 29l42 36-8 57-34 33-34-33-8-57Z" fill="url(#ice)" stroke="#4e458b" stroke-width="3"/>
+<path d="M80 29L61 78l19 77 20-77Z" fill="#c7f7ff" opacity=".6"/>
+<path d="M46 76q15-15 27 0M87 76q15-15 27 0" fill="#fff" stroke="#536398" stroke-width="2"/>
+<ellipse cx="62" cy="76" rx="5" ry="8" fill="#514176"/><ellipse cx="98" cy="76" rx="5" ry="8" fill="#514176"/>
+<path d="M77 84l-6 14h16Z" fill="#7396d5"/><path d="M67 110q13-8 26 0" fill="none" stroke="#655085" stroke-width="3" stroke-linecap="round"/>
+<path d="M43 108L26 137l25-8M117 108l17 29-25-8" fill="#9eeeff" stroke="#5e63aa" stroke-width="2"/>
+<path d="M70 40l10-8 10 8-10 16Z" fill="#e6afff" stroke="#fff" stroke-width="2"/>
+<g fill="#fff"><circle cx="60" cy="73" r="2"/><circle cx="96" cy="73" r="2"/></g></svg>

@@ -1,4 +1,4 @@
-// Dünya 3'ün 31–33. bölümlerini; buz yüzeylerini, karlı rotaları ve kutup düşmanlarını tanımlar.
+// Dünya 3'ün 31–34. bölümlerini; buz yüzeylerini, karlı rotaları ve kutup düşmanlarını tanımlar.
 function iceChapter(data) {
     const platforms = data.platforms.map(platform => ({ ...platform, ice: true }));
     const fruits = data.fruits.map(item => item.platform === undefined ? item : {
@@ -114,4 +114,34 @@ const polarLights = iceChapter({
         domes: [[-80, 425, 80, 70], [80, 425, 80, 70], [0, 389, 125, 120]] }
 });
 
-export const iceLevels = [frozenLake, frozenCave, polarLights];
+const crystalPalace = iceChapter({
+    name: 'Kristal Sarayın Muhafızı', theme: 'crystalPalace', width: 5700,
+    boss: true, frozenItems: true,
+    checkpoint: { x: 4050, y: 480 }, fountains: [{ id: 'fountain-1', x: 1900 }, { id: 'fountain-2', x: 4140 }],
+    platforms: [
+        { x: 390, y: 440, width: 140 }, { x: 580, y: 360, width: 130 }, { x: 760, y: 280, width: 210 },
+        { x: 1670, y: 440, width: 160 }, { x: 2170, y: 435, width: 130 }, { x: 2350, y: 355, width: 130 },
+        { x: 2530, y: 275, width: 220 }, { x: 3420, y: 435, width: 130 }, { x: 3600, y: 355, width: 220 },
+        { x: 4380, y: 435, width: 150 }, { x: 4600, y: 400, width: 140 }
+    ],
+    gaps: [{ x: 1130, width: 150 }, { x: 2870, width: 155 }, { x: 3890, width: 145 }],
+    columns: [{ x: 1430, width: 84, raisedBottom: 180, openMs: 2100 },
+        { x: 3120, width: 80, raisedBottom: 190, offset: 1200 }, { x: 3290, width: 80, raisedBottom: 230, offset: 1900 }],
+    fruits: [
+        { id: 'star-1', type: 'star', platform: 2 }, { id: 'star-2', type: 'star', platform: 6 }, { id: 'star-3', type: 'star', platform: 8 },
+        { id: 'palace-lantern', type: 'lantern', x: 1960, y: 480 },
+        { id: 'palace-crescent', type: 'crescent', x: 4230, y: 480 }, { id: 'palace-bead', type: 'bead', x: 4540, y: 480 }
+    ],
+    enemies: [
+        { type: 'ice-crab', platform: 2, speed: 105 }, { type: 'penguin', platform: 6, speed: 110 },
+        { type: 'snow-fox', platform: 8, speed: 115 },
+        { type: 'snowman', x: 2050, minX: 2000, maxX: 2090, speed: 35, snowball: { period: 3100, speed: 220 } },
+        { type: 'frost-bat', x: 3460, y: 335, minX: 3350, maxX: 3540, speed: 105, bob: 18 },
+        { type: 'frost-warden', x: 4930, y: 325, minX: 4880, maxX: 5010, speed: 35, scale: 1.3, bob: 18,
+            snowball: { kind: 'shard', volley: 3, period: 2900, speed: 230, range: 720 } }
+    ],
+    mosqueStyle: { wall: 0xe3dafa, roof: 0x748ae1, trim: 0x97f2ef, width: 250, towers: [-150, 150],
+        domes: [[-82, 427, 82, 70], [82, 427, 82, 70], [0, 382, 132, 125]] }
+});
+
+export const iceLevels = [frozenLake, frozenCave, polarLights, crystalPalace];

@@ -40,6 +40,10 @@ export function createHud(scene) {
         return star;
     });
     scene.hud.add([scene.chapterHud, scene.starHud]);
+    if (scene.level?.theme === 'crystalPalace') {
+        scene.scoreText.setStyle({ color: '#c9ffff', stroke: '#51417b' });
+        scene.chapterHud.list[0].setStyle({ color: '#e6cbff', stroke: '#49376e' });
+    }
 }
 
 export function centerHud(scene) {

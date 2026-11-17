@@ -7,11 +7,11 @@ import { iceLevels } from '../src/world/levels/iceLevels.js';
 import { isIcySurface } from '../src/world/terrain/terrain.js';
 import { createScenery } from '../src/world/scenery/background.js';
 
-test('World 3 starts at 31 with three icy chapters and clear ground around gaps', () => {
-    assert.equal(levels.length, 33);
-    assert.equal(iceLevels.length, 3);
+test('World 3 starts at 31 with four icy chapters and clear ground around gaps', () => {
+    assert.equal(levels.length, 34);
+    assert.equal(iceLevels.length, 4);
     assert.deepEqual(levels.slice(30), iceLevels);
-    assert.deepEqual(iceLevels.map(level => level.theme), ['glacier', 'iceCave', 'aurora']);
+    assert.deepEqual(iceLevels.map(level => level.theme), ['glacier', 'iceCave', 'aurora', 'crystalPalace']);
     for (const [index, level] of iceLevels.entries()) {
         assert.equal(worldForLevel(index + 30).id, 3);
         assert.ok(level.platforms.every(platform => platform.ice));
@@ -56,6 +56,7 @@ test('Snow uses one capped emitter, resizes with the screen and releases listene
         cameras: { main: { setBackgroundColor() {} } },
         textures: { exists: key => cached.has(key) }, make: { graphics: () => graphics },
         scale: Object.assign(new EventEmitter(), { width: 900, height: 500 }), events: new EventEmitter(),
+        tweens: { add() {} },
         add: {
             circle() { objects++; return item; }, tileSprite() { objects++; return item; },
             particles(x, y, key, config) {
@@ -82,9 +83,9 @@ test('Snow uses one capped emitter, resizes with the screen and releases listene
         assert.equal(scene.scale.listenerCount('resize'), 0);
         assert.equal(scene.events.listenerCount('destroy'), 0);
     }
-    assert.equal(generated, 13);
+    assert.equal(generated, 17);
     createScenery(scene, iceLevels[0].width, iceLevels[0].theme);
     scene.events.emit('destroy');
     assert.equal(scene.scale.listenerCount('resize'), 0);
-    assert.equal(generated, 13, 'Restart reuses snow and scenery textures');
+    assert.equal(generated, 17, 'Restart reuses snow and scenery textures');
 });

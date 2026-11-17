@@ -9,6 +9,7 @@ const IMAGE_GROUPS = [
     { folder: 'enemy', width: 76, height: 52, keys: ['hedgehog', 'snail', 'bee', 'fox', 'penguin', 'frog', 'turtle', 'bat', 'bird', 'spider', 'salamander', 'robot', 'scarab', 'night-owl', 'shadow-fox', 'moon-scorpion', 'moon-moth', 'cave-crab', 'dusk-wolf', 'snow-fox', 'ice-crab', 'frost-bat'] },
     { folder: 'enemy', width: 52, height: 52, keys: ['ball', 'wheel'] },
     { folder: 'enemy', width: 64, height: 80, keys: ['snowman'] },
+    { folder: 'enemy', width: 160, height: 160, keys: ['frost-warden'] },
     { folder: 'enemy', width: 96, height: 100, keys: ['ogre', 'ogre-moss', 'ogre-stone', 'ogre-ember', 'ogre-ember-angry', 'ogre-flame'] },
     { folder: 'scene', width: 96, height: 76, keys: ['allah-plaque'] },
     { folder: 'collect', width: 64, height: 40, keys: ['key'] },

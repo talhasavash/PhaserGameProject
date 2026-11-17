@@ -4,8 +4,10 @@ import { createWorldTwoScenery } from './world2Scenery.js';
 import { createWorldThreeScenery } from './world3Scenery.js';
 import { createNightScenery } from './nightScenery.js';
 import { createIceScenery } from './iceScenery.js';
+import { createCrystalPalace } from './crystalPalace.js';
 
 export function createScenery(scene, width, theme = 'garden') {
+    if (theme === 'crystalPalace') { createCrystalPalace(scene, width); return; }
     if (createIceScenery(scene, width, theme)) return;
     if (createNightScenery(scene, width, theme)) return;
     if (createWorldThreeScenery(scene, width, theme)) return;
@@ -33,7 +35,7 @@ export function createMosque(scene, x, theme = 'garden', style = {}) {
         festival: { wall: 0xf9e7c7, roof: 0x488f80, trim: 0xe2b951, width: 246, top: 441, towers: [-156, -116, 116, 156], domes: [[-85, 426, 72, 70], [85, 426, 72, 70], [0, 387, 125, 126]] },
         boss: { wall: 0xeee5d6, roof: 0x665d94, trim: 0xe5c275, width: 250, top: 434, towers: [-154, -116, 116, 154], domes: [[-88, 421, 80, 76], [88, 421, 80, 76], [0, 380, 136, 138]] }
     };
-    const icy = ['glacier', 'iceCave', 'aurora'].includes(theme);
+    const icy = ['glacier', 'iceCave', 'aurora', 'crystalPalace'].includes(theme);
     const design = { ...(designs[theme] || (icy ? designs.snow : designs.garden)), ...style };
     // Her bölüme uygun açık renk vitraylar.
     const finishes = {

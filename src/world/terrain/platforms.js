@@ -3,6 +3,7 @@ import { cacheTexture } from '../../graphics/texture.js';
 // Her genişlik/tema bir kez dokuya çevrilir; oyun sırasında şekiller yeniden çizilmez.
 
 export const platformThemes = {
+    crystalPalace: { body: 0x8874bf, edge: 0xbdfbff, detail: 0xf0bbf5 },
     glacier: { body: 0x82bfd5, edge: 0xf0fcff, detail: 0xc4eaf4 },
     iceCave: { body: 0x508fab, edge: 0xc6f2ff, detail: 0x93cedd },
     aurora: { body: 0x698eb9, edge: 0xd0edf5, detail: 0xb3cbef },
@@ -42,7 +43,15 @@ function drawStep(g, width, theme) {
     const end = x + width;
     g.fillStyle(p.body);
 
-    if (theme === 'moonwood') {
+    if (theme === 'crystalPalace') {
+        g.fillRoundedRect(x, 0, width, 24, 7);
+        g.fillStyle(p.edge); g.fillRoundedRect(x, 0, width, 7, 3);
+        for (let xx = x + 12; xx < end - 8; xx += 28) {
+            g.fillStyle(p.detail); g.fillTriangle(xx - 8, 14, xx, 7, xx + 8, 14);
+            g.fillStyle(0x94cce8); g.fillTriangle(xx - 8, 14, xx, 23, xx + 8, 14);
+        }
+        g.fillStyle(p.edge); g.fillEllipse(x + width / 2, 30, width * 0.6, 5);
+    } else if (theme === 'moonwood') {
         g.fillRoundedRect(x, 0, width, 27, 10);
         g.fillStyle(p.edge); g.fillRoundedRect(x, 0, width, 6, 3);
         g.lineStyle(2, p.detail); g.strokeCircle(x + 13, 16, 6);

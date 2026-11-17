@@ -48,6 +48,8 @@ function createHazard(scene, data) {
     if (data.type === 'ogre') {
         sprite.body.setSize(58, 66).setOffset(19, 28);
         sprite.setData('shadow', scene.add.ellipse(data.x, 517, 76 * data.scale, 12, 0x332d4b, 0.23).setDepth(8));
+    } else if (data.type === 'frost-warden') {
+        sprite.body.setSize(82, 106).setOffset(39, 35);
     } else if (data.type === 'snowman') {
         sprite.body.setSize(42, 64).setOffset(11, 12);
         // Diğer düşmanların ayak yüksekliğinden bağımsız, uzun SVG'nin ayaklarını zemine oturt.

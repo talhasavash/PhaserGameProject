@@ -16,6 +16,7 @@ import { prepareScenePage, bindSceneButtons, clearSceneButtons, showCompletion, 
 import { createGuardianFire, updateGuardianFire, resetGuardianFire } from './guardianFire.js';
 import { createSnowballs, updateSnowballs } from './snowballs.js';
 import { createFeedback, animateCollection, updateIceSparks } from './feedback.js';
+import { touchFrozenItem, updateFrozenItems } from './frozenItems.js';
 
 export const GAME_SCENE_KEY = 'Garden';
 const ITEM_MESSAGES = {
@@ -158,6 +159,7 @@ export class GameScene extends Phaser.Scene {
 
     // Phaser, karakter meyveye değdiğinde bu fonksiyonu çağırır.
     collectFruit(player, fruit) {
+        if (touchFrozenItem(this, fruit)) return;
         const item = fruit.getData('item');
         if (!recordFruit(this.gameState, item.id, item.type)) return;
         this.sound.play('collect', { volume: 0.18 });
@@ -173,6 +175,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     collectKey() {
+        if (touchFrozenItem(this, this.keySprite)) return;
         if (!takeKey(this.gameState)) return;
         this.sound.play('key', { volume: 0.20 });
         animateCollection(this, this.keySprite);
@@ -318,6 +321,7 @@ export class GameScene extends Phaser.Scene {
         }
         if (this.lost || this.paused) return;
         this.elapsed += delta;
+        updateFrozenItems(this);
         updateFireRain(this);
         updateColumns(this);
         if (this.lost) return;

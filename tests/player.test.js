@@ -39,19 +39,19 @@ test('All four skins blink briefly while idle; walking, jumping and expressions 
         player.character = character;
         player.setTexture = key => { player.texture = key; };
         player.play = key => { player.animation = key; };
-        movePlayer(player, 3640, 16, 0);
+        movePlayer(player, 1950, 16, 0);
         assert.equal(player.texture, `${base}-blink`);
-        movePlayer(player, 3800, 16, 0);
+        movePlayer(player, 2000, 16, 0);
         assert.equal(player.texture, `${base}-0`);
         player.expression = 'sad'; player.expressionUntil = 5000;
-        movePlayer(player, 3650, 16, 0);
+        movePlayer(player, 1960, 16, 0);
         assert.equal(player.texture, `${base}-sad-0`);
         player.body.blocked.down = false;
-        movePlayer(player, 3650, 16, 0);
+        movePlayer(player, 1960, 16, 0);
         assert.equal(player.texture, `${base}-sad-3`);
         player.body.blocked.down = true;
         player.body.velocity.x = 200;
-        movePlayer(player, 3650, 16, 0);
+        movePlayer(player, 1960, 16, 0);
         assert.equal(player.animation, `${base}-walk-sad`);
     }
 });

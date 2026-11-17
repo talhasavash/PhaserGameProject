@@ -60,7 +60,7 @@ export function createIceScenery(scene, width, theme) {
     return true;
 }
 
-function createSnowfall(scene) {
+export function createSnowfall(scene) {
     cacheTexture(scene, 'snowflake', 16, 16, g => { g.fillStyle(0xffffff); g.fillCircle(8, 8, 3); });
     const config = {
         x: { min: -20, max: scene.scale.width + 20 }, y: -12,

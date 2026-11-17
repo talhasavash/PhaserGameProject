@@ -18,4 +18,4 @@ const worldOneVerses = [
 // Yeni dünyada da doğrulanmış mevcut kısa alıntılar kullanılır.
 export const verses = [...worldOneVerses, worldOneVerses[6], worldOneVerses[5], worldOneVerses[10], worldOneVerses[8], worldOneVerses[3],
     worldOneVerses[0], worldOneVerses[6], worldOneVerses[10], ...worldOneVerses,
-    worldOneVerses[2], worldOneVerses[6], worldOneVerses[3]];
+    worldOneVerses[2], worldOneVerses[6], worldOneVerses[3], worldOneVerses[6]];

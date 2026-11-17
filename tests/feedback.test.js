@@ -48,12 +48,12 @@ test('Ice sparks require sliding on a supported icy surface and throttle particl
     assert.equal(bursts.length, 0);
     updateIceSparks(scene, true);
     updateIceSparks(scene, true);
-    assert.deepEqual(bursts, [[291, 348, 2]]);
+    assert.deepEqual(bursts, [[291, 348, 3]]);
     scene.elapsed = 200;
     scene.player.body.velocity.x = 0;
     updateIceSparks(scene, true);
     assert.equal(bursts.length, 1);
     scene.player.body.velocity.x = -100;
     updateIceSparks(scene, true);
-    assert.deepEqual(bursts[1], [309, 348, 2]);
+    assert.deepEqual(bursts[1], [309, 348, 3]);
 });

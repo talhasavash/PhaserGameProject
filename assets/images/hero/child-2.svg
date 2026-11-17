@@ -21,6 +21,10 @@
       <path d="M26 17.5q3-1 5 0 M36.5 17.5q3-1 5 0" fill="none" stroke="#543e34" stroke-width="1.5"/>
       <path d="M33.5 26v2h2" fill="none" stroke="#c18d65" stroke-width="1.2"/>
       <path d="M29.5 31q4.5 4 9 0" fill="none" stroke="#8f5f4c" stroke-width="1.6"/>
-
+          <!-- Beyaz takke -->
+          <path d="M18.5 12.5 C17.5 6.5 23.5 1.5 32 1.5 C40.5 1.5 46.5 6.5 45.5 12.5 Q32 16.5 18.5 12.5Z"
+                fill="#fffdf4" stroke="#b8a98e" stroke-width="1.2"/>
+          <path d="M19 11.5 Q32 15 45 11.5" fill="none" stroke="#d5c9b5" stroke-width="1.1"/>
+          <path d="M25 5.5 Q32 2.5 39 5.5" fill="none" stroke="#e3dac9" stroke-width="1"/>
       </g>
     </g></svg>

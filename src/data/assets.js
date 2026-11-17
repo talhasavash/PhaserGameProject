@@ -8,6 +8,7 @@ const IMAGE_GROUPS = [
     { folder: 'collect', width: 32, height: 36, keys: ['berry'] },
     { folder: 'enemy', width: 76, height: 52, keys: ['hedgehog', 'snail', 'bee', 'fox', 'penguin', 'frog', 'turtle', 'bat', 'bird', 'spider', 'salamander', 'robot', 'scarab', 'night-owl', 'shadow-fox', 'moon-scorpion', 'moon-moth', 'cave-crab', 'dusk-wolf', 'snow-fox', 'ice-crab', 'frost-bat'] },
     { folder: 'enemy', width: 52, height: 52, keys: ['ball', 'wheel'] },
+    { folder: 'enemy', width: 64, height: 80, keys: ['snowman'] },
     { folder: 'enemy', width: 96, height: 100, keys: ['ogre', 'ogre-moss', 'ogre-stone', 'ogre-ember', 'ogre-ember-angry', 'ogre-flame'] },
     { folder: 'scene', width: 96, height: 76, keys: ['allah-plaque'] },
     { folder: 'collect', width: 64, height: 40, keys: ['key'] },
@@ -25,6 +26,10 @@ export function loadGameAssets(scene, character, level = scene.level) {
     if (character === 'girl') base = 'girl';
     if (character === 'ice_girl') base = 'ice_girl';
     if (character === 'ice_boy') base = 'ice_boy';
+
+    if (!scene.textures?.exists(`${base}-blink`)) {
+        scene.load.svg(`${base}-blink`, `assets/images/hero/${base}-blink.svg`, { width: 64, height: 80 });
+    }
     
     for (const expression of ['normal', 'sad', 'happy']) {
         const prefix = expression === 'normal' ? `${base}-` : `${base}-${expression}-`;

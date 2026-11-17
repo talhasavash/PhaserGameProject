@@ -4,6 +4,14 @@ const COLUMN_HEIGHT = 512;
 export const RAISED_BOTTOM = 260;
 export const CLOSED_BOTTOM = 520;
 
+// Aşağı inen alt yüzeyin iki kare arasında geçtiği alanı da kontrol et.
+export function columnCrushes(playerBody, columnBody, previousBottom, frame) {
+    return frame.state === 'falling' || frame.state === 'closed'
+        ? frame.bottom > previousBottom && previousBottom <= playerBody.bottom &&
+            frame.bottom >= playerBody.top && playerBody.right > columnBody.left && playerBody.left < columnBody.right
+        : false;
+}
+
 export function columnTiming(column) {
     return { open: column.openMs ?? 2100, warning: 500, fall: 220, closed: 750, rise: 900 };
 }
@@ -50,6 +58,17 @@ export function createColumns(scene) {
     if (definitions.length === 0) return;
     const key = `column-${scene.level.theme}`;
     cacheTexture(scene, key, 80, COLUMN_HEIGHT, g => {
+        if (['glacier', 'iceCave', 'aurora'].includes(scene.level.theme)) {
+            g.fillStyle(0x68afca); g.fillRoundedRect(4, 0, 72, COLUMN_HEIGHT, 6);
+            g.fillStyle(0xbdebf5); g.fillRect(10, 0, 15, COLUMN_HEIGHT - 12);
+            g.fillStyle(0xe7faff, 0.75); g.fillRect(14, 0, 4, COLUMN_HEIGHT - 20);
+            g.lineStyle(2, 0xf0fcff, 0.8);
+            for (let y = 40; y < COLUMN_HEIGHT - 30; y += 65) {
+                g.lineBetween(27, y, 50, y + 24); g.lineBetween(50, y + 24, 42, y + 45);
+            }
+            g.fillStyle(0xe3f8ff); g.fillRoundedRect(0, COLUMN_HEIGHT - 20, 80, 20, 5);
+            return;
+        }
         const metal = scene.level.theme === 'factory';
         g.fillStyle(metal ? 0x718e9c : 0x6f627c); g.fillRect(8, 0, 64, COLUMN_HEIGHT);
         g.fillStyle(metal ? 0xa9c4c7 : 0xa093ae); g.fillRect(13, 0, 8, COLUMN_HEIGHT - 18);
@@ -68,7 +87,7 @@ export function createColumns(scene) {
         column.setScale(definition.width / 80, 1);
         column.body.setSize(80, COLUMN_HEIGHT);
         const lamp = scene.add.rectangle(definition.x, frame.bottom - 14, definition.width - 16, 5, 0x91dfb1).setDepth(14);
-        column.setData('column', { definition, lamp, wasClosed: frame.state === 'closed' });
+        column.setData('column', { definition, lamp, bottom: frame.bottom, wasClosed: frame.state === 'closed' });
     }
 }
 
@@ -76,6 +95,8 @@ export function updateColumns(scene) {
     for (const column of scene.columns.getChildren()) {
         const data = column.getData('column');
         const frame = columnFrame(scene.elapsed, visibleColumn(data.definition, scene.scale.height, scene.level.groundY));
+        if (columnCrushes(scene.player.body, column.body, data.bottom, frame)) scene.crushPlayer(frame.bottom);
+        data.bottom = frame.bottom;
         column.body.reset(data.definition.x, frame.bottom - COLUMN_HEIGHT / 2);
         data.lamp.setPosition(column.x, frame.bottom - 14);
         data.lamp.setFillStyle(frame.state === 'open' ? 0x91dfb1 : 0xffa66b);

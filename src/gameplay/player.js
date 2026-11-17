@@ -245,7 +245,9 @@ function updatePlayerAnimation(player, time, direction, grounded) {
         player.anims.timeScale = 0.6 + Math.abs(player.body.velocity.x) / WALK_SPEED * 0.8;
     } else {
         player.anims.stop();
-        player.setTexture(`${prefix}0`);
+        // Her birkaç saniyede kısa bir göz kırpma; yürürken ve zıplarken uygulanmaz.
+        const blink = expression === 'normal' && time % 2000>= 1900;
+        player.setTexture(blink ? `${characterPrefix('normal', player.character)}blink` : `${prefix}0`);
     }
 }
 

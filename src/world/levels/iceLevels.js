@@ -12,11 +12,13 @@ function iceChapter(data) {
         const radius = Math.min(40, platform.width / 2 - 32);
         return { ...enemy, x, minX: x - radius, maxX: x + radius };
     });
-    // Çukur alanında buz şeridi çizme; her sağlam zemin parçası kaygandır.
+    // Sağlam zeminde aralıklı buz adaları; aralarında kuru ve güvenli durma alanları kalır.
     const ice = [];
     let start = 0;
     for (const gap of [...data.gaps, { x: data.width, width: 0 }]) {
-        if (gap.x > start) ice.push({ x: start, width: gap.x - start });
+        for (let x = start + 140; x + 160 < gap.x - 60; x += 480) {
+            ice.push({ x, width: Math.min(250, gap.x - 60 - x) });
+        }
         start = gap.x + gap.width;
     }
     const types = ['apple', 'orange', 'pear', 'grapes', 'banana', 'strawberry'];
@@ -29,7 +31,8 @@ function iceChapter(data) {
     }
     return { groundY: 520, spawn: { x: 100, y: 480 }, belt: { x: 0, width: 1, speed: 0 },
         key: { x: data.width - 420, y: 477 }, exit: { x: data.width - 180, y: 468 },
-        ...data, platforms, fruits, enemies, ice };
+        ...data, platforms, fruits, enemies, ice,
+        fireRain: [{ kind: 'snow', period: 10000, speed: 310, offset: 4500 }] };
 }
 
 const frozenLake = iceChapter({
@@ -41,11 +44,13 @@ const frozenLake = iceChapter({
         { x: 2630, y: 440, width: 110 }, { x: 2780, y: 360, width: 110 }, { x: 2930, y: 280, width: 170 }
     ],
     gaps: [{ x: 900, width: 130 }, { x: 2120, width: 140 }, { x: 3240, width: 140 }],
+    columns: [{ x: 1140, width: 76, raisedBottom: 190, openMs: 2400 }, { x: 2550, width: 82, raisedBottom: 220, offset: 1300 }, { x: 3150, width: 76, raisedBottom: 180, offset: 2200 }],
     fruits: [
         { id: 'star-1', type: 'star', platform: 1 }, { id: 'star-2', type: 'star', platform: 2 }, { id: 'star-3', type: 'star', platform: 6 },
         { id: 'lantern-1', type: 'lantern', x: 1300, y: 480 }
     ],
     enemies: [
+        { type: 'snowman', x: 1380, minX: 1320, maxX: 1420, speed: 35, snowball: { period: 3100, speed: 210 } },
         { type: 'penguin', platform: 1, speed: 90 }, { type: 'snow-fox', platform: 2, speed: 105 },
         { type: 'ice-crab', platform: 6, speed: 100, hop: { walkMs: 2800, pauseMs: 400, height: 45, duration: 700 } },
         { type: 'frost-bat', x: 1900, y: 390, minX: 1800, maxX: 2010, speed: 105, bob: 25 },
@@ -63,11 +68,14 @@ const frozenCave = iceChapter({
         { x: 3280, y: 440, width: 100 }, { x: 3420, y: 360, width: 100 }, { x: 3560, y: 285, width: 170 }
     ],
     gaps: [{ x: 1050, width: 140 }, { x: 2180, width: 150 }, { x: 3920, width: 150 }],
+    columns: [{ x: 1260, width: 80, raisedBottom: 180 }, { x: 1710, width: 80, raisedBottom: 210, offset: 1100 }, { x: 3100, width: 86, raisedBottom: 170, openMs: 1800 }],
     fruits: [
         { id: 'star-1', type: 'star', platform: 2 }, { id: 'star-2', type: 'star', platform: 3 }, { id: 'star-3', type: 'star', platform: 7 },
         { id: 'bead-1', type: 'bead', x: 3060, y: 480 }
     ],
     enemies: [
+        { type: 'snowman', x: 1560, minX: 1480, maxX: 1600, speed: 40, snowball: { period: 2700, speed: 230 } },
+        { type: 'snowman', x: 4200, minX: 4140, maxX: 4250, speed: 40, snowball: { period: 2900, speed: 220 } },
         { type: 'ice-crab', platform: 2, speed: 110 },
         { type: 'penguin', platform: 3, speed: 115, visibility: { visibleMs: 2900, hiddenMs: 2300, offset: 700 } },
         { type: 'snow-fox', platform: 7, speed: 120, hop: { walkMs: 2600, pauseMs: 400, height: 55, duration: 750 } },
@@ -87,11 +95,14 @@ const polarLights = iceChapter({
         { x: 3380, y: 435, width: 110 }, { x: 3530, y: 355, width: 170 }, { x: 3810, y: 430, width: 100 }
     ],
     gaps: [{ x: 1000, width: 150 }, { x: 1360, width: 150 }, { x: 2670, width: 155 }, { x: 3060, width: 155 }, { x: 4170, width: 160 }],
+    columns: [{ x: 1190, width: 74, raisedBottom: 180, openMs: 1900 }, { x: 2980, width: 78, raisedBottom: 200, offset: 950 }, { x: 3260, width: 78, raisedBottom: 160, offset: 1900 }, { x: 4490, width: 88, raisedBottom: 190, openMs: 1700 }],
     fruits: [
         { id: 'star-1', type: 'star', platform: 2 }, { id: 'star-2', type: 'star', platform: 6 }, { id: 'star-3', type: 'star', platform: 8 },
         { id: 'crescent-1', type: 'crescent', x: 4510, y: 480 }
     ],
     enemies: [
+        { type: 'snowman', x: 1610, minX: 1560, maxX: 1650, speed: 45, snowball: { period: 2500, speed: 245 } },
+        { type: 'snowman', x: 4930, minX: 4870, maxX: 4970, speed: 45, snowball: { period: 2600, speed: 235 } },
         { type: 'snow-fox', platform: 2, speed: 120, hop: { walkMs: 2500, pauseMs: 350, height: 60, duration: 750 } },
         { type: 'ice-crab', platform: 6, speed: 125, visibility: { visibleMs: 2600, hiddenMs: 2300, offset: 500 } },
         { type: 'penguin', platform: 8, speed: 130 },

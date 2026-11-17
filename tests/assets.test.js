@@ -28,6 +28,7 @@ test('Both characters load existing assets and every chapter item and enemy has 
             for (const enemy of enemies) assert.ok(images.has(enemy.texture || enemy.type), enemy.type);
         }
         const base = character === 'boy' ? 'child' : character;
+        assert.ok(images.has(`${base}-blink`));
         for (const expression of ['', 'sad-', 'happy-']) {
             for (let frame = 0; frame < 6; frame++) assert.ok(images.has(`${base}-${expression}${frame}`));
         }

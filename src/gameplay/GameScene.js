@@ -14,6 +14,8 @@ import { createColumns, updateColumns } from './columns.js';
 import { createCollectibles, createLandmarks, createHealingSpots } from '../world/levelObjects.js';
 import { prepareScenePage, bindSceneButtons, clearSceneButtons, showCompletion, showLoading, updateLoading, hideLoading, finishLoading } from '../ui/scenePage.js';
 import { createGuardianFire, updateGuardianFire, resetGuardianFire } from './guardianFire.js';
+import { createSnowballs, updateSnowballs } from './snowballs.js';
+import { createFeedback, animateCollection, updateIceSparks } from './feedback.js';
 
 export const GAME_SCENE_KEY = 'Garden';
 const ITEM_MESSAGES = {
@@ -64,6 +66,7 @@ export class GameScene extends Phaser.Scene {
         createTerrain(this);
         createCollectibles(this);
         createHazards(this);
+        createSnowballs(this);
         createGuardianFire(this);
         createFireRain(this);
         createColumns(this);
@@ -71,6 +74,7 @@ export class GameScene extends Phaser.Scene {
         createHealingSpots(this);
         // Ardından karakter, kontroller ve çarpışma bağlantıları hazırlanır.
         this.player = createPlayer(this, this.level.spawn.x, this.level.spawn.y, this.characterSkin);
+        createFeedback(this);
         this.player.onJump = () => this.sound.play('jump', { volume: 0.20 });
         this.touchControls = bindTouchControls();
         this.player.touchKeys = this.touchControls.keys;
@@ -109,6 +113,7 @@ export class GameScene extends Phaser.Scene {
         this.physics.add.overlap(this.player, this.fruits, this.collectFruit, null, this);
         this.physics.add.overlap(this.player, this.hazards, this.hitHazard, null, this);
         this.physics.add.overlap(this.player, this.fireballs, this.hitHazard, null, this);
+        this.physics.add.overlap(this.player, this.snowballs, this.hitHazard, null, this);
         this.physics.add.overlap(this.player, this.guardianFlames, this.hitHazard, null, this);
         this.physics.add.overlap(this.player, this.keySprite, this.collectKey, null, this);
         this.physics.add.overlap(this.player, this.exitZone, this.reachExit, null, this);
@@ -156,8 +161,7 @@ export class GameScene extends Phaser.Scene {
         const item = fruit.getData('item');
         if (!recordFruit(this.gameState, item.id, item.type)) return;
         this.sound.play('collect', { volume: 0.18 });
-        fruit.disableBody(true, true);
-        this.tweens.killTweensOf(fruit);
+        animateCollection(this, fruit);
         if (item.type === 'star') {
             this.announce(`${this.gameState.stars} / 3 yıldız! ${isKeyReady(this.gameState) ? 'Anahtar ileride seni bekliyor.' : 'Yıldızları aramaya devam et.'}`);
         }
@@ -171,7 +175,7 @@ export class GameScene extends Phaser.Scene {
     collectKey() {
         if (!takeKey(this.gameState)) return;
         this.sound.play('key', { volume: 0.20 });
-        this.keySprite.disableBody(true, true);
+        animateCollection(this, this.keySprite);
         this.door.open();
         this.announce(`Anahtar sende! Şimdi ${this.level.exitLabel || 'cami girişine'} ulaş.`);
         this.updateHud();
@@ -179,7 +183,7 @@ export class GameScene extends Phaser.Scene {
 
     // Tehlikeye temas: can azalt, kısa süre koru, gerekirse geri döndür.
     hitHazard(player, hazard) {
-        if (this.paused || this.gameState.complete || this.elapsed < this.hurtUntil) return;
+        if (this.paused || this.lost || this.gameState.complete || this.elapsed < this.hurtUntil) return;
         this.gameState.hearts -= 1;
         this.sound.play('hurt', { volume: 0.23 });
         this.cameras.main.shake(110, 0.002);
@@ -196,6 +200,23 @@ export class GameScene extends Phaser.Scene {
             ? 'Kolonun yükselmesini bekle, altından yürüyerek geç. Kısa süre korunuyorsun.'
             : 'Biraz mesafe bırak ve zıpla. Kısa süre korunuyorsun.');
         this.updateHud();
+    }
+
+    crushPlayer(bottom) {
+        if (this.lost || this.paused || this.gameState.complete || this.falling) return;
+        this.lost = true;
+        this.touchControls.reset();
+        this.physics.pause();
+        this.player.setVelocity(0, 0).setAlpha(1);
+        showPlayerExpression(this.player, 'sad', this.elapsed, 1500);
+        this.player.recoveryGlow.setVisible(false);
+        this.player.recoveryStars.forEach(star => star.setVisible(false));
+        this.sound.play('hurt', { volume: 0.23 });
+        this.cameras.main.shake(160, 0.004);
+        // Fizik durur, Phaser Tween çocuğu temas noktasında zararsız bir çizgi film gibi yassılaştırır.
+        this.tweens.add({ targets: this.player, scaleX: 1.1, scaleY: 0.12,
+            y: Math.min(this.level.groundY, bottom) - 5, duration: 160, ease: 'Quad.easeOut' });
+        this.time.delayedCall(950, () => this.restart());
     }
 
     respawn(point = null) {
@@ -299,10 +320,12 @@ export class GameScene extends Phaser.Scene {
         this.elapsed += delta;
         updateFireRain(this);
         updateColumns(this);
+        if (this.lost) return;
         this.updatePlayer(delta);
         this.updateCamera(delta);
         updateHazards(this, delta);
         updateGuardianFire(this);
+        updateSnowballs(this);
         this.updateConveyor(delta);
         this.updateCheckpoint();
         this.checkPits();
@@ -314,6 +337,7 @@ export class GameScene extends Phaser.Scene {
             onGround && this.player.x >= strip.x && this.player.x <= strip.x + strip.width);
         const conveyorSpeed = belt ? belt.speed : 0;
         const onIce = isIcySurface(this.level, this.player);
+        updateIceSparks(this, onIce);
         if (this.elapsed > this.knockbackUntil && !this.falling) {
             movePlayer(this.player, this.elapsed, delta, conveyorSpeed, onIce ? 0.14 : 1);
         }

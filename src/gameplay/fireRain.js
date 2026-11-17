@@ -1,5 +1,6 @@
 // Gökyüzünden düşen ateş toplarının rastgele konumlarını, zamanlamasını ve hareketini yönetir.
 import { cacheTexture } from '../graphics/texture.js';
+import { createSnowballTexture } from './snowballs.js';
 const WARNING_MS = 1500;
 
 export function fireWait(rain, random = Math.random) {
@@ -30,14 +31,17 @@ export function createFireRain(scene) {
     scene.fireballs = scene.physics.add.group({ allowGravity: false, immovable: true });
     scene.rainDrops = [];
     if (!scene.level.fireRain?.length) return;
+    if (scene.level.fireRain.some(rain => rain.kind === 'snow')) createSnowballTexture(scene);
     cacheTexture(scene, 'fireball', 32, 40, g => {
         g.fillStyle(0xef7d44); g.fillTriangle(6, 24, 16, 0, 27, 24); g.fillCircle(16, 22, 12);
         g.fillStyle(0xffdf88); g.fillCircle(16, 24, 6);
     });
     // Aynı anda yalnızca bir ateş: yeni atış, önceki bittikten uzun süre sonra gelir.
     scene.rainDrops = scene.level.fireRain.slice(0, 1).map(rain => {
-        const sprite = scene.fireballs.create(0, 80, 'fireball').setDepth(14);
-        sprite.body.setCircle(10, 6, 14);
+        const snow = rain.kind === 'snow';
+        const sprite = scene.fireballs.create(0, 80, snow ? 'snowball' : 'fireball').setDepth(14);
+        if (snow) { sprite.setScale(1.3); sprite.body.setCircle(21, 3, 3); }
+        else sprite.body.setCircle(10, 6, 14);
         sprite.disableBody(true, true);
         return { rain, sprite, plan: null, nextAt: 600 + rain.offset };
     });

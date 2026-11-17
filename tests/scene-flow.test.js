@@ -22,7 +22,7 @@ test('A collectible plays one quiet effect, even with repeated overlaps', () => 
     const scene = {
         gameState: createGameState(),
         sound: { play(key, options) { played.push({ key, volume: options.volume }); } },
-        tweens: { killTweensOf() {} }, updateHud() {}, announce() {}
+        tweens: { killTweensOf() {}, add() {} }, collectSparks: { emitParticleAt() {} }, updateHud() {}, announce() {}
     };
     const fruit = { getData: () => ({ id: 'berry-1', type: 'berry' }), disableBody() {} };
     GameScene.prototype.collectFruit.call(scene, {}, fruit);
@@ -188,7 +188,9 @@ test('Taking the key opens the mosque once and does not finish the chapter remot
     const run = createGameState();
     run.stars = 3;
     let opened = 0;
-    const scene = { level: garden, gameState: run, sound: { play() {} }, keySprite: { disableBody() {} }, door: { open() { opened++; } }, announce() {}, updateHud() {} };
+    const scene = { level: garden, gameState: run, sound: { play() {} }, keySprite: { disableBody() {} },
+        tweens: { killTweensOf() {}, add() {} }, collectSparks: { emitParticleAt() {} },
+        door: { open() { opened++; } }, announce() {}, updateHud() {} };
     GameScene.prototype.collectKey.call(scene);
     GameScene.prototype.collectKey.call(scene);
     assert.equal(opened, 1);

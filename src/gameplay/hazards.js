@@ -33,6 +33,7 @@ function createHazard(scene, data) {
         jump: data.jump,
         hop: data.hop, hopActive: false,
         breath: data.breath,
+        snowball: data.snowball,
         jumpClock: 0,
         rage: data.rage || false,
         engagedAt: null,
@@ -47,6 +48,12 @@ function createHazard(scene, data) {
     if (data.type === 'ogre') {
         sprite.body.setSize(58, 66).setOffset(19, 28);
         sprite.setData('shadow', scene.add.ellipse(data.x, 517, 76 * data.scale, 12, 0x332d4b, 0.23).setDepth(8));
+    } else if (data.type === 'snowman') {
+        sprite.body.setSize(42, 64).setOffset(11, 12);
+        // Diğer düşmanların ayak yüksekliğinden bağımsız, uzun SVG'nin ayaklarını zemine oturt.
+        sprite.y = (platform?.y ?? scene.level.groundY) - 36 * sprite.scaleY;
+        sprite.body.reset(sprite.x, sprite.y);
+        sprite.getData('patrol').baseY = sprite.y;
     } else if (data.type === 'ball' || data.type === 'wheel') {
         sprite.body.setCircle(22, 4, 4);
     } else if (data.y !== undefined) {

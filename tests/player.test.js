@@ -33,6 +33,29 @@ test('With both arrows held, the latest press wins; releasing it restores the he
     assert.equal(readDirection(player), 1);
 });
 
+test('All four skins blink briefly while idle; walking, jumping and expressions keep their own frames', () => {
+    for (const [character, base] of [['boy', 'child'], ['girl', 'girl'], ['ice_boy', 'ice_boy'], ['ice_girl', 'ice_girl']]) {
+        const player = playerForTest();
+        player.character = character;
+        player.setTexture = key => { player.texture = key; };
+        player.play = key => { player.animation = key; };
+        movePlayer(player, 3640, 16, 0);
+        assert.equal(player.texture, `${base}-blink`);
+        movePlayer(player, 3800, 16, 0);
+        assert.equal(player.texture, `${base}-0`);
+        player.expression = 'sad'; player.expressionUntil = 5000;
+        movePlayer(player, 3650, 16, 0);
+        assert.equal(player.texture, `${base}-sad-0`);
+        player.body.blocked.down = false;
+        movePlayer(player, 3650, 16, 0);
+        assert.equal(player.texture, `${base}-sad-3`);
+        player.body.blocked.down = true;
+        player.body.velocity.x = 200;
+        movePlayer(player, 3650, 16, 0);
+        assert.equal(player.animation, `${base}-walk-sad`);
+    }
+});
+
 test('A released A/D key cannot override a newer held arrow', () => {
     const player = playerForTest();
     player.keys.A = { isDown: false, timeDown: 900 };

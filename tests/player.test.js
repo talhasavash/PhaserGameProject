@@ -187,22 +187,31 @@ test('The stopped character remains perfectly still at different times', () => {
     }
 });
 
-test('The girl keeps her own sad and happy appearances while moving', () => {
-    const player = playerForTest();
-    player.character = 'girl';
-    let texture;
-    let animation;
-    player.setTexture = value => { texture = value; };
-    player.play = value => { animation = value; };
-    showPlayerExpression(player, 'sad', 1000, 1500);
-    assert.equal(texture, 'girl-sad-0');
-    player.cursors.right.isDown = true;
-    movePlayer(player, 1100, 40, 0);
-    assert.equal(animation, 'girl-walk-sad');
-    showRecovery(player, 1200);
-    assert.equal(texture, 'girl-happy-0');
-    movePlayer(player, 1300, 40, 0);
-    assert.equal(animation, 'girl-walk-happy');
+test('Girl and ice skins keep their own normal, sad, happy and jumping frames', () => {
+    for (const character of ['girl', 'ice_girl', 'ice_boy']) {
+        const player = playerForTest();
+        player.character = character;
+        let texture;
+        let animation;
+        player.setTexture = value => { texture = value; };
+        player.play = value => { animation = value; };
+        showPlayerExpression(player, 'sad', 1000, 1500);
+        assert.equal(texture, `${character}-sad-0`);
+        player.cursors.right.isDown = true;
+        movePlayer(player, 1100, 40, 0);
+        assert.equal(animation, `${character}-walk-sad`);
+        showRecovery(player, 1200);
+        assert.equal(texture, `${character}-happy-0`);
+        movePlayer(player, 1300, 40, 0);
+        assert.equal(animation, `${character}-walk-happy`);
+        player.cursors.right.isDown = false;
+        player.body.velocity.x = 0;
+        movePlayer(player, 4100, 40, 0);
+        assert.equal(texture, `${character}-0`);
+        player.body.blocked.down = false;
+        movePlayer(player, 4200, 16, 0);
+        assert.equal(texture, `${character}-3`);
+    }
 });
 
 test('Ice takes longer to brake and reverse, while jump strength stays unchanged', () => {

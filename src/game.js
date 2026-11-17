@@ -87,6 +87,13 @@ function startGame(character, levelIndex) {
         render: { antialias: true, roundPixels: true }
     });
     activeGame = game;
+    const alignPause = () => {
+        if (!game.canvas) return;
+        const top = game.canvas.getBoundingClientRect().top;
+        document.documentElement.style.setProperty('--game-canvas-top', `${Math.round(top)}px`);
+    };
+    game.events.once('postrender', alignPause);
+    game.scale.on(Phaser.Scale.Events.RESIZE, alignPause);
     const observer = new ResizeObserver(() => {
         const size = view();
         if (game.scale.width !== size.width || game.scale.height !== size.height) {
@@ -94,7 +101,11 @@ function startGame(character, levelIndex) {
         }
     });
     observer.observe(area);
-    game.events.once(Phaser.Core.Events.DESTROY, () => observer.disconnect());
+    game.events.once(Phaser.Core.Events.DESTROY, () => {
+        observer.disconnect();
+        game.scale.off(Phaser.Scale.Events.RESIZE, alignPause);
+        document.documentElement.style.removeProperty('--game-canvas-top');
+    });
     const openMenu = async levelIndex => {
         await returnToMenu(game, levelIndex);
         releaseGameOrientation();

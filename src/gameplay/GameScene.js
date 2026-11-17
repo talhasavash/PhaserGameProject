@@ -42,7 +42,9 @@ export class GameScene extends Phaser.Scene {
         this.level = levels[this.levelIndex];
         const world = worldForLevel(this.levelIndex);
 
-      this.characterSkin = world.id === 3 && this.character === 'girl' ? 'ice_girl' : this.character;
+        this.characterSkin = world.id === 3
+            ? (this.character === 'girl' ? 'ice_girl' : (this.character === 'boy' ? 'ice_boy' : this.character))
+            : this.character;
     }
 
     // Phaser önce preload'u çağırır: görselleri hazırla.

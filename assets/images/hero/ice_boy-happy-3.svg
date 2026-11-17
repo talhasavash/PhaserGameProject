@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="80" viewBox="0 0 64 80">
+  <g transform="translate(0 0)" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Bacaklar -->
+    <path d="M28 56 L24 66 M35 56 L39 66" stroke="#0369a1" stroke-width="9"/>
+    <!-- Kar Botları -->
+    <path d="M18 69h9 M37 69h9" stroke="#0284c7" stroke-width="7"/>
+    <path d="M18 66h9 M37 66h9" stroke="#bae6fd" stroke-width="2.5"/>
+
+    <g transform="translate(0 3)">
+      <!-- Sırt Çantası -->
+      <rect x="10" y="34" width="18" height="22" rx="6" fill="#0284c7" stroke="#0369a1" stroke-width="2"/>
+
+      <!-- Buzul Mavisi Kışlık Kaban Gövdesi -->
+      <path d="M21 35 Q32 32 43 35 L47 61 Q32 66 17 61 Z" fill="#38bdf8" stroke="#0284c7" stroke-width="2"/>
+      <!-- Kaban Orta Fermuar ve Kapitone Dikişleri -->
+      <path d="M32 37 L32 63" stroke="#0284c7" stroke-width="1.5"/>
+      <path d="M20 45 Q26 46 32 45 M32 45 Q38 46 44 45 M19 53 Q25 54 32 53 M32 53 Q39 54 45 53" fill="none" stroke="#7dd3fc" stroke-width="1.3"/>
+      <!-- Kaban Etek Ucu Kürklü Şerit -->
+      <path d="M17.5 60 Q32 64.5 46.5 60" fill="none" stroke="#e0f2fe" stroke-width="3.5"/>
+
+      <!-- Kollar -->
+      <path d="M23 39 L19 52" stroke="#0369a1" stroke-width="7"/>
+      <path d="M23 38 L19.5 48" stroke="#38bdf8" stroke-width="9.5"/>
+      <path d="M17.5 48 L22 49.5" stroke="#e0f2fe" stroke-width="2.5"/>
+      <path d="M41 44 L48 33" stroke="#38bdf8" stroke-width="9.5"/>
+      <path d="M48 33 L50 28" stroke="#0369a1" stroke-width="7"/>
+      <path d="M46 33.5 L50.5 35.5" stroke="#e0f2fe" stroke-width="2.5"/>
+    </g>
+
+    <g transform="translate(0 2)">
+      <!-- Boyun ve Kürklü Kaban Yakası -->
+      <rect x="28" y="28" width="10" height="10" rx="4" fill="#e6a777"/>
+      <path d="M22 35 Q32 40 42 35" fill="none" stroke="#e0f2fe" stroke-width="5.5"/>
+      <path d="M22 35 Q32 40 42 35" fill="none" stroke="#7dd3fc" stroke-width="1"/>
+
+      <!-- Yüz -->
+      <ellipse cx="33" cy="22.5" rx="14.5" ry="16" fill="#f5cda7" stroke="#b48160" stroke-width="1.2"/>
+
+      <!-- Buzul Mavisi Başörtüsü (Kapşonun Altında) -->
+      <path d="M17 27Q17 37 31 42L23 49L16 44Z" fill="#38bdf8"/>
+      <path d="M48 27Q47 39 31 42L39 50L49 45Z" fill="#38bdf8"/>
+      <path d="M19 32Q22 39 32 42M45 33Q41 39 34 42" fill="none" stroke="#bae6fd" stroke-width="1.3"/>
+      <circle cx="39" cy="43" r="1.7" fill="#e0f2fe"/>
+
+      <!-- Gözler, Kaşlar, Burun ve Ağız -->
+      <ellipse cx="28.5" cy="23" rx="3.4" ry="4.2" fill="#fff9ed"/>
+      <ellipse cx="39" cy="23" rx="3.4" ry="4.2" fill="#fff9ed"/>
+      <ellipse cx="29.3" cy="23.4" rx="1.9" ry="2.8" fill="#273d42"/>
+      <ellipse cx="39.8" cy="23.4" rx="1.9" ry="2.8" fill="#273d42"/>
+      <circle cx="29.7" cy="22.4" r="0.7" fill="#fff"/>
+      <circle cx="40.2" cy="22.4" r="0.7" fill="#fff"/>
+      <path d="M26 17.5q3-1 5 0 M36.5 17.5q3-1 5 0" fill="none" stroke="#543e34" stroke-width="1.5"/>
+      <path d="M33.5 26v2h2" fill="none" stroke="#c18d65" stroke-width="1.2"/>
+      <path d="M28.5 30 Q34 38 39.5 30 Z" fill="#7c4d3b" stroke="#8f5f4c" stroke-width="1"/>
+        <path d="M29.5 30.5 Q34 32 38.5 30.5" fill="none" stroke="#ffffff" stroke-width="1.5"/>
+
+      <!-- Buzul Mavisi Kapşon (Başörtüsünün Üzerinde) -->
+      <path d="M15 25 Q13 3 32 3 Q51 3 49 25 Q51 11 32 10 Q13 11 15 25 Z" fill="#0ea5e9" stroke="#0369a1" stroke-width="1.5"/>
+      <path d="M15 25 Q14 16 22 9 M49 25 Q50 16 42 9" fill="none" stroke="#e0f2fe" stroke-width="3.5" stroke-linecap="round"/>
+    </g>
+  </g>
+</svg>

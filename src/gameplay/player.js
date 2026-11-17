@@ -68,6 +68,7 @@ function characterPrefix(expression, character = 'boy') {
 
     if (character === 'girl') base = 'girl';
     if (character === 'ice_girl') base = 'ice_girl';
+    if (character === 'ice_boy') base = 'ice_boy';
 
     if (expression === 'normal') return `${base}-`;
     return `${base}-${expression}-`;

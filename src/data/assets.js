@@ -24,6 +24,7 @@ export function loadGameAssets(scene, character, level = scene.level) {
     let base = 'child';
     if (character === 'girl') base = 'girl';
     if (character === 'ice_girl') base = 'ice_girl';
+    if (character === 'ice_boy') base = 'ice_boy';
     
     for (const expression of ['normal', 'sad', 'happy']) {
         const prefix = expression === 'normal' ? `${base}-` : `${base}-${expression}-`;

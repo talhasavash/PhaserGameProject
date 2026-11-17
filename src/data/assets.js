@@ -20,7 +20,11 @@ const SOUND_KEYS = ['jump', 'collect', 'hurt', 'heal', 'key', 'boss-jump', 'boss
 // Phaser Loader yüklemeyi yönetir; GameScene.preload yalnızca bu fonksiyonu çağırır.
 export function loadGameAssets(scene, character, level = scene.level) {
     const needed = level ? requiredImages(level) : null;
-    const base = character === 'girl' ? 'girl' : 'child';
+
+    let base = 'child';
+    if (character === 'girl') base = 'girl';
+    if (character === 'ice_girl') base = 'ice_girl';
+    
     for (const expression of ['normal', 'sad', 'happy']) {
         const prefix = expression === 'normal' ? `${base}-` : `${base}-${expression}-`;
         for (let frame = 0; frame < 6; frame++) {

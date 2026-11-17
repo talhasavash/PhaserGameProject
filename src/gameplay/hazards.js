@@ -31,6 +31,7 @@ function createHazard(scene, data) {
         bob: data.bob || 0,
         grounded: data.y === undefined,
         jump: data.jump,
+        hop: data.hop, hopActive: false,
         breath: data.breath,
         jumpClock: 0,
         rage: data.rage || false,
@@ -75,6 +76,18 @@ function updatePatrol(scene, hazard, patrol) {
         hazard.setVelocityY(0);
         return;
     }
+    if (patrol.hop && patrol.grounded && !patrol.jump) {
+        const step = patrolHop(scene.elapsed, patrol.hop);
+        if (step.stopped) {
+            hazard.body.reset(hazard.x, patrol.baseY - step.lift);
+            hazard.setVelocityX(0);
+            hazard.setVelocityY(0);
+            patrol.hopActive = true;
+            return;
+        }
+        if (patrol.hopActive) hazard.body.reset(hazard.x, patrol.baseY);
+        patrol.hopActive = false;
+    }
     if (hazard.x >= patrol.maxX) patrol.direction = -1;
     if (hazard.x <= patrol.minX) patrol.direction = 1;
     hazard.setVelocityX(patrol.speed * patrol.direction);
@@ -83,6 +96,15 @@ function updatePatrol(scene, hazard, patrol) {
         const targetY = patrol.baseY + (patrol.grounded ? -Math.abs(wave) : wave) * patrol.bob;
         hazard.setVelocityY((targetY - hazard.y) * 10);
     }
+}
+
+// Yürü → kısa süre bekle → bulunduğun yerde zıpla → devriyeye devam et.
+export function patrolHop(elapsed, { walkMs = 2400, pauseMs = 350, duration = 650, height = 65, offset = 0 }) {
+    const phase = (elapsed + offset) % (walkMs + pauseMs + duration);
+    if (phase < walkMs) return { stopped: false, lift: 0 };
+    if (phase < walkMs + pauseMs) return { stopped: true, lift: 0 };
+    const t = (phase - walkMs - pauseMs) / duration;
+    return { stopped: true, lift: 4 * height * t * (1 - t) };
 }
 
 function updateHazardAppearance(hazard, patrol, delta) {

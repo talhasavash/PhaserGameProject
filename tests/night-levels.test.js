@@ -8,11 +8,12 @@ import { createScenery } from '../src/world/scenery/background.js';
 import { createMosque } from '../src/world/scenery/background.js';
 import { bossLift } from '../src/gameplay/hazards.js';
 
-test('Night chapters occupy 17–19, preserve chapter 16 and leave chapter 20 unimplemented', () => {
+test('The first night chapters preserve 16–19 while the campaign now reaches chapter 30', () => {
     assert.equal(levels[15], firstJourney);
-    assert.deepEqual(levels.slice(16), nightLevels);
+    assert.deepEqual(levels.slice(16, 19), nightLevels);
     assert.equal(nightLevels.length, 3);
-    assert.equal(levels[19], undefined);
+    assert.equal(levels.length, 30);
+    assert.equal(levels[30], undefined);
     for (let i = 16; i < 19; i++) assert.equal(worldForLevel(i).id, 2);
     assert.deepEqual(nightLevels.map(level => level.theme), ['moonwood', 'nightRuins', 'nightKeep']);
 });

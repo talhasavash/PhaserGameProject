@@ -1,7 +1,7 @@
 // Düşman hareketlerinin ve boss güncellemelerinin beklenen şekilde çalıştığını doğrular.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { updateHazards, hazardVisibility, createHazards } from '../src/gameplay/hazards.js';
+import { updateHazards, hazardVisibility, createHazards, patrolHop } from '../src/gameplay/hazards.js';
 
 function hazardForTest(overrides = {}) {
     const patrol = { type: 'fox', minX: 100, maxX: 200, speed: 80, direction: 1, baseX: 150, baseY: 480, period: 2400, offset: 0, threadTop: 220, ...overrides };
@@ -37,6 +37,33 @@ test('Patrols reverse at either boundary; floating animals keep their vertical m
     updateHazards(scene, 16);
     assert.equal(hazard.velocityX, 80);
     assert.equal(hazard.flipped, false);
+});
+
+test('A patrol stops, jumps in place, lands on the same ledge and resumes its direction', () => {
+    const hop = { walkMs: 2000, pauseMs: 300, duration: 600, height: 60, offset: 0 };
+    assert.deepEqual(patrolHop(1000, hop), { stopped: false, lift: 0 });
+    assert.deepEqual(patrolHop(2100, hop), { stopped: true, lift: 0 });
+    assert.deepEqual(patrolHop(2600, hop), { stopped: true, lift: 60 });
+    assert.deepEqual(patrolHop(2900, hop), { stopped: false, lift: 0 });
+    const hazard = hazardForTest({ grounded: true, baseY: 335, hop });
+    hazard.y = 335;
+    const scene = sceneForTest(hazard);
+    updateHazards(scene, 16);
+    assert.equal(hazard.velocityX, -80);
+    scene.elapsed = 2100;
+    updateHazards(scene, 16);
+    assert.equal(hazard.velocityX, 0);
+    assert.equal(hazard.y, 335);
+    scene.elapsed = 2600;
+    updateHazards(scene, 16);
+    assert.equal(hazard.x, 200);
+    assert.equal(hazard.y, 275);
+    scene.elapsed = 2900;
+    updateHazards(scene, 16);
+    assert.equal(hazard.y, 335);
+    assert.equal(hazard.velocityX, -80);
+    assert.equal(hazard.patrol.hopActive, false);
+    assert.deepEqual(patrolHop(1000, { ...hop, offset: 1600 }), patrolHop(2600, hop));
 });
 
 test('Spiders descend on a fixed vertical thread even if their old data contains a horizontal patrol', () => {

@@ -40,13 +40,16 @@ export class GameScene extends Phaser.Scene {
         if (data.levelIndex !== undefined) this.levelIndex = data.levelIndex;
         if (data.score !== undefined) this.carriedScore = data.score;
         this.level = levels[this.levelIndex];
+        const world = worldForLevel(this.levelIndex);
+
+      this.characterSkin = world.id === 3 && this.character === 'girl' ? 'ice_girl' : this.character;
     }
 
     // Phaser önce preload'u çağırır: görselleri hazırla.
     preload() {
         showLoading();
         this.load.on('progress', updateLoading);
-        loadGameAssets(this, this.character, this.level);
+        loadGameAssets(this, this.characterSkin, this.level);
     }
 
     // Görseller yüklenince Phaser create'i bir kez çağırır: bölümü kur.
@@ -65,7 +68,7 @@ export class GameScene extends Phaser.Scene {
         createLandmarks(this);
         createHealingSpots(this);
         // Ardından karakter, kontroller ve çarpışma bağlantıları hazırlanır.
-        this.player = createPlayer(this, this.level.spawn.x, this.level.spawn.y, this.character);
+        this.player = createPlayer(this, this.level.spawn.x, this.level.spawn.y, this.characterSkin);
         this.player.onJump = () => this.sound.play('jump', { volume: 0.20 });
         this.touchControls = bindTouchControls();
         this.player.touchKeys = this.touchControls.keys;
@@ -240,6 +243,11 @@ export class GameScene extends Phaser.Scene {
     continueAfterResult() {
         if (!this.gameState.complete || !this.resultShown) return;
         this.resultShown = false;
+        const nextWorld = worldForLevel(this.levelIndex + 1);
+        if (nextWorld && nextWorld.id !== worldForLevel(this.levelIndex).id) {
+            this.game.events.emit('world-complete', nextWorld.start);
+            return;
+        }
         if (this.levelIndex === levels.length - 1) {
             document.getElementById('menu-button').click();
             return;

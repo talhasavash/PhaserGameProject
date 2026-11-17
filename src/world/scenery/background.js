@@ -12,7 +12,7 @@ export function createScenery(scene, width, theme = 'garden') {
 }
 
 // Cami görünümünü çiz; giriş kapısını oyun akışının kullanması için geri döndür.
-export function createMosque(scene, x, theme = 'garden') {
+export function createMosque(scene, x, theme = 'garden', style = {}) {
     // Her bölümün cephesi, kubbe düzeni ve minare sayısı farklıdır.
     const designs = {
         garden: { wall: 0xf0e6c5, roof: 0x4b897b, trim: 0xc5a86a, width: 168, top: 455, towers: [-106, 106], domes: [[0, 444, 144, 106]] },
@@ -31,7 +31,7 @@ export function createMosque(scene, x, theme = 'garden') {
         festival: { wall: 0xf9e7c7, roof: 0x488f80, trim: 0xe2b951, width: 246, top: 441, towers: [-156, -116, 116, 156], domes: [[-85, 426, 72, 70], [85, 426, 72, 70], [0, 387, 125, 126]] },
         boss: { wall: 0xeee5d6, roof: 0x665d94, trim: 0xe5c275, width: 250, top: 434, towers: [-154, -116, 116, 154], domes: [[-88, 421, 80, 76], [88, 421, 80, 76], [0, 380, 136, 138]] }
     };
-    const design = designs[theme] || designs.garden;
+    const design = { ...(designs[theme] || designs.garden), ...style };
     // Her bölüme uygun açık renk vitraylar.
     const finishes = {
         garden: 0xb8e2d5, abyss: 0xb9e6df, courtyard: 0xc0e4ee,

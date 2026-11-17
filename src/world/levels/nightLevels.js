@@ -1,9 +1,9 @@
 // Gece Karanlığı dünyasının 17–19. bölümlerini ve giderek zorlaşan geçitlerini tanımlar.
-function nightChapter(data) {
+export function nightChapter(data, random = Math.random) {
     // Bölüm yüklenirken küçük sapmalar seçilir; yıldız ve devriye aynı basamağı izler.
     const platforms = data.platforms.map(platform => ({ ...platform,
-        x: platform.x + Math.round(Math.random() * 20 - 10),
-        y: platform.y + Math.round(Math.random() * 10 - 5)
+        x: platform.x + Math.round(random() * 20 - 10),
+        y: platform.y + Math.round(random() * 10 - 5)
     }));
     const enemies = data.enemies.map((enemy, index) => {
         const platform = platforms[enemy.platform];
@@ -13,7 +13,8 @@ function nightChapter(data) {
             speed: Math.round(enemy.speed * 0.75),
             period: enemy.period ? Math.round(enemy.period / 0.75) : undefined,
             jump: enemy.jump ? { ...enemy.jump, duration: Math.round(enemy.jump.duration / 0.85), period: Math.round(enemy.jump.period / 0.85) } : undefined,
-            visibility: { visibleMs: 2800, hiddenMs: platform ? 2400 : 1800, fadeMs: 260, offset: index * 670 }
+            visibility: data.vanishAll === false ? enemy.visibility :
+                { visibleMs: 2800, hiddenMs: platform ? 2400 : 1800, fadeMs: 260, offset: index * 670 }
         };
     });
     const fruits = data.fruits.map(item => {
@@ -26,7 +27,7 @@ function nightChapter(data) {
         key: { x: data.width - 420, y: 477 }, exit: { x: data.width - 180, y: 468 },
         belt: { x: 0, width: 1, speed: 0 },
         fountains: [{ id: 'fountain-1', x: 2400 }],
-        ...data, platforms, enemies, fruits: [...fruits, ...scatterFruit(data, platforms)]
+        ...data, platforms, enemies, fruits: [...fruits, ...scatterFruit(data, platforms, random)]
     };
 }
 
@@ -35,11 +36,11 @@ function platformGuard(type, platform, speed) {
     return { type, platform, speed };
 }
 
-function scatterFruit(level, platforms) {
+function scatterFruit(level, platforms, random) {
     const types = ['apple', 'orange', 'grapes', 'pear', 'banana', 'strawberry'];
     const spots = platforms.map(p => ({ x: p.x + p.width / 3, y: p.y - 36 }));
     for (let x = 190; x < level.width - 540; x += 155) {
-        const fruitX = x + Math.round(Math.random() * 40 - 20);
+        const fruitX = x + Math.round(random() * 40 - 20);
         if (level.gaps.some(g => fruitX > g.x - 25 && fruitX < g.x + g.width + 25)) continue;
         if ((level.columns || []).some(c => Math.abs(c.x - fruitX) < c.width / 2 + 35)) continue;
         spots.push({ x: fruitX, y: 484 - (spots.length % 3) * 27 });

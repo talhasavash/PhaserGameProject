@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createGameState, recordFruit, takeKey } from '../src/gameplay/rules.js';
-import { levels } from '../src/world/levels/level.js';
+import { levels, worldForLevel } from '../src/world/levels/level.js';
 import { garden, courtyard } from '../src/world/levels/world1.js';
 
 // Exercise scene transitions without requiring WebGL in Node.
@@ -52,7 +52,7 @@ test('Touching the exit early leaves the game running and explains the mission',
     assert.match(hint, /üç yıldız/);
 });
 
-test('Every mosque celebrates before showing a result; only Continue starts the next level', () => {
+test('Completion waits for Continue, restarts within a world and opens the next world menu at boundaries', () => {
     for (let index = 0; index < levels.length; index++) {
         const ids = ['game-result', 'play-again', 'next-level', 'result-title', 'touch-controls', 'result-verse'];
         const elements = new Map(ids.map(id => [id, { hidden: true, textContent: '', style: {}, focus() { this.focused = true; } }]));
@@ -74,7 +74,8 @@ test('Every mosque celebrates before showing a result; only Continue starts the 
             time: { delayedCall(ms, callback) { assert.equal(ms, 1200); scheduled++; delayed = callback; } },
             tweens: { pauseAll() {}, resumeAll() {} }, announce() {}, updateHud() {},
             showLevelResult() { GameScene.prototype.showLevelResult.call(this); },
-            scene: { restart(data) { calls.push(data); } }, restart() { calls.push('replay'); }
+            scene: { restart(data) { calls.push(data); } }, restart() { calls.push('replay'); },
+            game: { events: { emit(name, levelIndex) { assert.equal(name, 'world-complete'); calls.push({ worldMenu: levelIndex }); } } }
         };
         GameScene.prototype.reachExit.call(scene);
         GameScene.prototype.reachExit.call(scene);
@@ -98,7 +99,9 @@ test('Every mosque celebrates before showing a result; only Continue starts the 
         assert.equal(elements.get('result-title').textContent, final ? 'Oyun tamam!' : 'Bölüm tamam!');
         GameScene.prototype.continueAfterResult.call(scene);
         GameScene.prototype.continueAfterResult.call(scene);
-        assert.deepEqual(calls, final ? ['menu'] : [{ levelIndex: index + 1, score: 120 }]);
+        const nextWorld = worldForLevel(index + 1);
+        const worldFinished = nextWorld && nextWorld.id !== worldForLevel(index).id;
+        assert.deepEqual(calls, worldFinished ? [{ worldMenu: nextWorld.start }] : final ? ['menu'] : [{ levelIndex: index + 1, score: 120 }]);
     }
 });
 test('Respawn restores hearts at the flag and preserves collected fruit and key', () => {

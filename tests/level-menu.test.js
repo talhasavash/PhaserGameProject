@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createWorldMenu, createLevelMenu, refreshLevelLocks, slideWorld } from '../src/ui/levelMenu.js';
-import { levels, worlds } from '../src/world/levels/level.js';
+import { levels, worlds, worldForLevel } from '../src/world/levels/level.js';
 
 function element(tag = 'div') {
     const node = {
@@ -87,7 +87,7 @@ test('World pages show names, preserve locks, and navigate using arrows and dots
         const nextIndex = levels.length;
         levels.push(levels[0]);
         try {
-            selectWorld(2);
+            selectWorld(worldForLevel(nextIndex).id);
             const nextButton = grid.querySelectorAll('button').find(button => Number(button.value) === nextIndex);
             assert.equal(nextButton.disabled, false);
             nextButton.onclick();

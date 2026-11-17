@@ -311,7 +311,12 @@ Hızları önceki gece düzenine göre %25 azaltılmıştır. Bu üç bölümde 
 aralıklı kaybolur; yıldız bekçileri 2,4 saniye görünmez kalarak toplama fırsatı verir.
 Her bölümde en az 20 meyve zemin ve basamaklara farklı yüksekliklerde serpiştirilir.
 Üç caminin cepheleri, kubbeleri ve minare sayıları farklıdır.
-20. bölüm ve sonraki henüz yazılmayan yerler kilitlidir. Gece çizimleri
+20–30, `nightCampaign.js` içinde farklı rota şablonlarından üretilir. Böylece toplam
+30 bölüm oynanabilir; Dünya 2'nin 15 yeri tamamdır. Sisli Patika, Yarasa Köprüleri,
+Unutulmuş Avlu, Ağlı Kuleler, Kayıp Kandiller, Gece Presleri, Karanlık Burçlar,
+Uçurum Nöbeti, Kandil Labirenti, Son Geçit ve Gecenin Efendileri sırasıyla zorlaşır.
+Son bölümde iki dev muhafız vardır; tamamlanınca Dünya 3'ün bölüm menüsüne dönülür.
+31. bölüm ve sonraki henüz yazılmayan yerler kilitlidir. Gece çizimleri
 `src/world/scenery/nightScenery.js`, platformları `src/world/terrain/platforms.js` içindedir.
 Kaynak verileri `world1.js`, `world2.js`, `world3.js` dosyalarında kalır;
 `level.js` bunları birleştirip menüde 15'er yerlik dünyalara böler.
@@ -328,6 +333,9 @@ tercihinde bu animasyonlar kapatılır. Stiller `css/menu.css` içindedir.
 Dünya 2, 15. bölüm tamamlanınca açılır. Diğer dünyalar da aynı sırayı izler;
 bölüm verisi yazılmadan boş yerler oynanamaz. Son hazır bölüm tamamlandığında sonraki
 yerin kilit bilgisi de saklanır; bölüm eklendiğinde bu yer otomatik oynanabilir olur.
+Her dünyanın 15. bölümü tamamlandığında sonuç kartındaki oynat düğmesi yeni dünyanın
+bölüm sayfasını açar; ilk bölüm kullanıcı dokunduğunda başlar. Aynı dünyadaki diğer
+bölümler doğrudan devam eder. Henüz yazılmamış yeni dünya bölümleri kilitli kalır.
 
 Düşman verisindeki `platform: 2`, `platforms` dizisinin üçüncü basamağını seçer;
 düşmanın y konumu bu basamaktan hesaplanır. `minX` ve `maxX` devriyeyi basamağın
@@ -343,6 +351,16 @@ visibility: { visibleMs: 2600, hiddenMs: 1600, fadeMs: 220, offset: 500 }
 `offset` döngünün başlangıcını kaydırır. Düşman kaybolurken devriyesine devam eder;
 solma, görünmezlik ve yeniden belirme sırasında hasar vermez. Tam görünür olunca
 temas hasarı geri açılır. Özellik verilmezse düşman her zaman görünürdür.
+
+Yerdeki veya platformdaki devriyeye durup zıplama davranışı eklemek için:
+
+```js
+hop: { walkMs: 2400, pauseMs: 350, height: 65, duration: 650, offset: 0 }
+```
+
+Bu düşman 2,4 saniye yürür, 350 ms bekler, aynı x konumunda 65 piksel zıplar;
+650 ms sonra aynı basamağa inip devriyesine devam eder. Uçan düşmanlar ve
+büyük muhafızların mevcut `jump` davranışı bundan bağımsızdır.
 Canlar sol üstte, soluk bölüm numarası ortada, dolan üç yıldız ve puan sağ üsttedir.
 Menüde dünya adı ve numarası üstte, bölüm
 numaraları manzara üzerinde büyük yuvarlak düğmelerde gösterilir. Oklar ve alttaki

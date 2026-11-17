@@ -95,23 +95,25 @@ function startGame(character, levelIndex) {
     });
     observer.observe(area);
     game.events.once(Phaser.Core.Events.DESTROY, () => observer.disconnect());
-    menuButton.onclick = async () => {
-        await returnToMenu(game);
+    const openMenu = async levelIndex => {
+        await returnToMenu(game, levelIndex);
         releaseGameOrientation();
     };
+    menuButton.onclick = () => openMenu();
+    game.events.on('world-complete', openMenu);
 }
 
-function returnToMenu(game) {
+function returnToMenu(game, levelIndex) {
     return new Promise(resolve => {
-        const currentIndex = game.scene.getScene(GAME_SCENE_KEY).levelIndex;
+        const selectedIndex = levelIndex ?? game.scene.getScene(GAME_SCENE_KEY).levelIndex;
         closeSettings();
         menuButton.disabled = true;
         game.events.once(Phaser.Core.Events.DESTROY, () => {
             gameStarted = false;
             activeGame = null;
             hideLoading();
-            selectedWorld = worldForLevel(currentIndex).id;
-            createLevelMenu(levelGrid, selectedWorld, currentIndex, startSelectedGame);
+            selectedWorld = worldForLevel(selectedIndex).id;
+            createLevelMenu(levelGrid, selectedWorld, selectedIndex, startSelectedGame);
             refreshLevelLocks(worldTabs, levelGrid, selectedWorld);
             document.body.classList.remove('playing');
             settingsButton.hidden = true;

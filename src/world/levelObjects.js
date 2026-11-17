@@ -29,7 +29,7 @@ export function createLandmarks(scene) {
     const exit = scene.level.exit;
     scene.door = scene.level.exitType === 'gate'
         ? createWorldGate(scene, exit.x, scene.level.theme)
-        : createMosque(scene, exit.x, scene.level.theme);
+        : createMosque(scene, exit.x, scene.level.theme, scene.level.mosqueStyle);
     scene.exitZone = scene.add.zone(exit.x, 480, 68, 80);
     scene.physics.add.existing(scene.exitZone, true);
 }

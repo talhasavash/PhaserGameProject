@@ -65,7 +65,10 @@ export function createPlayer(scene, x, y, character = 'boy') {
 
 function characterPrefix(expression, character = 'boy') {
     let base = 'child';
+
     if (character === 'girl') base = 'girl';
+    if (character === 'ice_girl') base = 'ice_girl';
+
     if (expression === 'normal') return `${base}-`;
     return `${base}-${expression}-`;
 }

@@ -316,7 +316,11 @@ Her bölümde en az 20 meyve zemin ve basamaklara farklı yüksekliklerde serpi�
 Unutulmuş Avlu, Ağlı Kuleler, Kayıp Kandiller, Gece Presleri, Karanlık Burçlar,
 Uçurum Nöbeti, Kandil Labirenti, Son Geçit ve Gecenin Efendileri sırasıyla zorlaşır.
 Son bölümde iki dev muhafız vardır; tamamlanınca Dünya 3'ün bölüm menüsüne dönülür.
-31. bölüm ve sonraki henüz yazılmayan yerler kilitlidir. Gece çizimleri
+31–33, `iceLevels.js` içindeki Buz Gölü, Donmuş Mağara ve Kutup Işıkları bölümleridir;
+toplam 33 bölüm hazırdır. Zemin ve `ice: true` platformlar kaygandır. `iceScenery.js`
+karlı dağ, buz mağarası ve kutup ışığı katmanlarını ve en fazla 65 parçacıklı karı çizer.
+Dünya 3'te kız seçilirse mevcut `ice_girl` çizimleri kullanılır.
+34. bölüm ve sonraki henüz yazılmayan yerler kilitlidir. Gece çizimleri
 `src/world/scenery/nightScenery.js`, platformları `src/world/terrain/platforms.js` içindedir.
 Kaynak verileri `world1.js`, `world2.js`, `world3.js` dosyalarında kalır;
 `level.js` bunları birleştirip menüde 15'er yerlik dünyalara böler.

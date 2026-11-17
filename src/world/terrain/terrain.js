@@ -2,6 +2,14 @@
 import { createPlatformArt } from './platforms.js';
 import { createPitArt } from './pits.js';
 
+// Kayganlık yalnızca ayakların gerçekten bastığı buzlu yüzeyden gelir.
+export function isIcySurface(level, player) {
+    if (!player.body.blocked.down && !player.body.touching.down) return false;
+    const on = surface => player.x >= surface.x && player.x <= surface.x + surface.width &&
+        Math.abs(player.body.bottom - (surface.y ?? level.groundY)) <= 4;
+    return (level.ice || []).some(on) || level.platforms.some(platform => platform.ice && on(platform));
+}
+
 // Zemini sabit Phaser gövdeleriyle kur; çukurlarda fizik gövdesi oluşturma.
 export function createTerrain(scene) {
     scene.solids = scene.physics.add.staticGroup();

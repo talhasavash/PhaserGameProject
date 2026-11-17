@@ -31,7 +31,7 @@ function reachablePlatforms(level) {
 
 test('World 2 is complete through 30, has distinct routes and becomes harder gradually', () => {
     assert.equal(lateNightLevels.length, 11);
-    assert.deepEqual(levels.slice(19), lateNightLevels);
+    assert.deepEqual(levels.slice(19, 30), lateNightLevels);
     assert.ok(levels.slice(15, 30).every((_, i) => worldForLevel(i + 15).id === 2));
     assert.equal(new Set(lateNightLevels.map(level => level.routes.join(','))).size, 11);
     assert.equal(new Set(lateNightLevels.map(level => JSON.stringify(level.mosqueStyle))).size, 11);

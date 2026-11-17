@@ -3,6 +3,9 @@ import { cacheTexture } from '../../graphics/texture.js';
 // Her genişlik/tema bir kez dokuya çevrilir; oyun sırasında şekiller yeniden çizilmez.
 
 export const platformThemes = {
+    glacier: { body: 0x82bfd5, edge: 0xf0fcff, detail: 0xc4eaf4 },
+    iceCave: { body: 0x508fab, edge: 0xc6f2ff, detail: 0x93cedd },
+    aurora: { body: 0x698eb9, edge: 0xd0edf5, detail: 0xb3cbef },
     moonwood: { body: 0x405b67, edge: 0xb0d8ca, detail: 0x89b7b0 },
     nightRuins: { body: 0x66627f, edge: 0xd0bde6, detail: 0xaaa0c4 },
     nightKeep: { body: 0x465978, edge: 0xb9d9e9, detail: 0x839eb9 },
@@ -92,7 +95,7 @@ function drawStep(g, width, theme) {
         g.lineStyle(2, p.edge); g.strokeRoundedRect(x + 3, 3, width - 6, 17, 6);
         g.fillStyle(p.detail);
         for (let xx = x + 9; xx < end - 3; xx += 14) { g.fillRect(xx, 23, 3, 6); g.fillCircle(xx + 1, 11, 1.5); }
-    } else if (theme === 'snow') {
+    } else if (['snow', 'glacier', 'iceCave', 'aurora'].includes(theme)) {
         g.fillPoints([{ x, y: 0 }, { x: end, y: 0 }, { x: end - 6, y: 22 }, { x: x + width / 2, y: 29 }, { x: x + 4, y: 23 }], true);
         g.fillStyle(p.edge); g.fillRoundedRect(x, 0, width, 7, 3);
         g.fillStyle(p.detail);

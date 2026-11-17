@@ -7,7 +7,7 @@ import { bindTouchControls } from './controls.js';
 import { createFireRain, updateFireRain } from './fireRain.js';
 import { unlockNext } from '../data/progress.js';
 import { resetBossRage, createHazards, updateHazards } from './hazards.js';
-import { createTerrain } from '../world/terrain/terrain.js';
+import { createTerrain, isIcySurface } from '../world/terrain/terrain.js';
 import { createHud, centerHud, updateHud } from '../ui/hud.js';
 import { loadGameAssets } from '../data/assets.js';
 import { createColumns, updateColumns } from './columns.js';
@@ -311,8 +311,7 @@ export class GameScene extends Phaser.Scene {
         const belt = (this.level.belts || [this.level.belt]).find(strip =>
             onGround && this.player.x >= strip.x && this.player.x <= strip.x + strip.width);
         const conveyorSpeed = belt ? belt.speed : 0;
-        const onIce = onGround &&
-            (this.level.ice || []).some(ice => this.player.x >= ice.x && this.player.x <= ice.x + ice.width);
+        const onIce = isIcySurface(this.level, this.player);
         if (this.elapsed > this.knockbackUntil && !this.falling) {
             movePlayer(this.player, this.elapsed, delta, conveyorSpeed, onIce ? 0.14 : 1);
         }

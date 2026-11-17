@@ -6,7 +6,7 @@ import { loadGameAssets } from '../src/data/assets.js';
 import { levels } from '../src/world/levels/level.js';
 
 test('Both characters load existing assets and every chapter item and enemy has a texture', () => {
-    for (const character of ['boy', 'girl']) {
+    for (const character of ['boy', 'girl', 'ice_girl']) {
         const images = new Map();
         const sounds = new Set();
         const scene = { load: {
@@ -27,7 +27,7 @@ test('Both characters load existing assets and every chapter item and enemy has 
             if (level.ball) enemies.push(level.ball);
             for (const enemy of enemies) assert.ok(images.has(enemy.texture || enemy.type), enemy.type);
         }
-        const base = character === 'boy' ? 'child' : 'girl';
+        const base = character === 'boy' ? 'child' : character;
         for (const expression of ['', 'sad-', 'happy-']) {
             for (let frame = 0; frame < 6; frame++) assert.ok(images.has(`${base}-${expression}${frame}`));
         }

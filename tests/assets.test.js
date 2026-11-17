@@ -35,3 +35,35 @@ test('Both characters load existing assets and every chapter item and enemy has 
         for (const key of ['jump', 'collect', 'hurt', 'heal', 'key', 'boss-jump', 'boss-land', 'level-complete', 'boss-fire']) assert.ok(sounds.has(key));
     }
 });
+
+test('Chapter loading omits unused images and reuses cached character frames and sounds', () => {
+    const cachedImages = new Set();
+    const cachedSounds = new Set();
+    let queuedImages = [];
+    let queuedSounds = [];
+    const scene = {
+        textures: { exists: key => cachedImages.has(key) },
+        cache: { audio: { exists: key => cachedSounds.has(key) } },
+        load: {
+            svg(key, path) { assert.ok(existsSync(new URL(`../${path}`, import.meta.url))); queuedImages.push(key); },
+            audio(key) { queuedSounds.push(key); }
+        }
+    };
+    loadGameAssets(scene, 'boy', levels[16]);
+    const firstCount = queuedImages.length;
+    assert.ok(firstCount < 40, `Unnecessary images in first chapter load: ${firstCount}`);
+    assert.ok(queuedImages.includes('star') && queuedImages.includes('key'));
+    assert.ok(!queuedImages.includes('penguin') && !queuedImages.includes('ogre-ember-angry'));
+    for (const key of queuedImages) cachedImages.add(key);
+    for (const key of queuedSounds) cachedSounds.add(key);
+    queuedImages = []; queuedSounds = [];
+    loadGameAssets(scene, 'boy', levels[16]);
+    assert.deepEqual(queuedImages, [], 'Restart must not enqueue textures already in Phaser');
+    assert.deepEqual(queuedSounds, []);
+    loadGameAssets(scene, 'boy', levels[10]);
+    assert.ok(queuedImages.includes('ogre-ember') && queuedImages.includes('ogre-ember-angry'));
+    assert.ok(!queuedImages.includes('child-0'), 'Keep character frames on chapter changes');
+    queuedImages = [];
+    loadGameAssets(scene, 'girl', levels.find(level => level.theme === 'interior'));
+    assert.ok(queuedImages.includes('allah-plaque') && queuedImages.includes('girl-0'));
+});

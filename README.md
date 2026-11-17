@@ -319,7 +319,7 @@ Kaynak verileri `world1.js`, `world2.js`, `world3.js` dosyalarında kalır;
 görünür. Oynat düğmesi bölüm menüsünü açar; oyundan dönüş doğrudan bu menüyedir.
 Ana menüde önce dünya, sonra o dünyadaki bölüm seçilir.
 Menü dünyaları sırasıyla Meyve Rüyası, Gece Karanlığı, Buz Dağları, Ateş ve Çukur,
-Kabe'nin Yolları adlarını taşır. Beş ayrı SVG manzarası `assets/images/menu-world1.svg`
+Kabe'nin Yolları adlarını taşır. Beş ayrı SVG manzarası `assets/images/scene/menu-world1.svg`
 ile `menu-world5.svg` arasındadır; bunlar oyun içindeki bölüm temalarından bağımsızdır.
 Ana başlık ve dünya adları Türkçe glifleri doğrulanan yerel Baloo 2 fontunu kullanır (`assets/fonts`, OFL lisansı).
 Yazı tipi yayın kopyasına ve çevrimdışı PWA önbelleğine dahildir. Açılışta başlık

@@ -44,7 +44,8 @@ test('Published modules resolve across folders, share a version, and leave sourc
     assert.ok(html.includes('src/game.js?v=1234567'));
     assert.ok(html.includes('Demo · 1234567'));
     const assets = fs.readFileSync(path.join(output, 'data', 'assets.js'), 'utf8');
-    assert.ok(assets.includes('assets/images/${key}.svg?v=1234567'));
+    assert.ok(assets.includes('assets/images/hero/${key}.svg?v=1234567'));
+    assert.ok(assets.includes('assets/images/${folder}/${key}.svg?v=1234567'));
     assert.ok(assets.includes('assets/audio/${key}.wav?v=1234567'));
     const manifest = JSON.parse(fs.readFileSync(path.join(root, 'dist/manifest.webmanifest'), 'utf8'));
     assert.equal(manifest.start_url, './index.html');
@@ -65,12 +66,12 @@ test('Published modules resolve across folders, share a version, and leave sourc
     assert.equal(fs.existsSync(path.join(output, 'world/background.js')), false);
     assert.equal(fs.existsSync(path.join(output, 'world/scenery/chapterScenery.js')), false);
     assert.ok(precache.includes('./lib/phaser.min.js?v=1234567'));
-    assert.ok(precache.includes('./assets/images/child-0.svg?v=1234567'));
+    assert.ok(precache.includes('./assets/images/hero/child-0.svg?v=1234567'));
     assert.ok(precache.includes('./assets/audio/jump.wav?v=1234567'));
     assert.ok(precache.includes('./assets/fonts/Baloo2.ttf?v=1234567'));
     assert.ok(fs.existsSync(path.join(root, 'dist/assets/fonts/OFL-Baloo2.txt')));
     for (let world = 1; world <= 5; world++) {
-        assert.ok(precache.includes(`./assets/images/menu-world${world}.svg?v=1234567`));
+        assert.ok(precache.includes(`./assets/images/scene/menu-world${world}.svg?v=1234567`));
     }
     for (const file of precache) assert.ok(fs.existsSync(path.join(root, 'dist', file.split('?')[0])), file);
     assert.ok(html.includes('name="game-release"'));

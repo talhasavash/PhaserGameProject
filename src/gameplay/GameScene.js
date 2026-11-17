@@ -46,7 +46,7 @@ export class GameScene extends Phaser.Scene {
     preload() {
         showLoading();
         this.load.on('progress', updateLoading);
-        loadGameAssets(this, this.character);
+        loadGameAssets(this, this.character, this.level);
     }
 
     // Görseller yüklenince Phaser create'i bir kez çağırır: bölümü kur.

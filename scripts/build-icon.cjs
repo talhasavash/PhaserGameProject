@@ -3,7 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const root = path.resolve(__dirname, '..');
 function head(file, start) {
-    const svg = fs.readFileSync(path.join(root, 'assets/images', file), 'utf8');
+    const svg = fs.readFileSync(path.join(root, 'assets/images/hero', file), 'utf8');
     return svg.slice(svg.indexOf(start)).replace(/<\/g>\s*<\/g><\/svg>\s*$/, '');
 }
 const boy = head('child-0.svg', '<ellipse cx="32" cy="22"');

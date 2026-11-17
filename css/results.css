@@ -12,14 +12,14 @@
 .result-card::before {
     content: ''; position: absolute; left: 50%; top: -65px; width: 112px; height: 112px;
     transform: translateX(-50%); border: 4px solid #fff3bd; border-radius: 50%;
-    background: url('../assets/images/star.svg') center / 78px 78px no-repeat, radial-gradient(circle at 35% 25%, #ffeaa0, #e7ad42);
+    background: url('../assets/images/collect/star.svg') center / 78px 78px no-repeat, radial-gradient(circle at 35% 25%, #ffeaa0, #e7ad42);
     box-shadow: 0 4px 0 #a36c31, 0 0 0 3px #b57f35;
 }
 #fall-result .result-card::before {
-    background: url('../assets/images/child-sad-0.svg') center / 64px 80px no-repeat, linear-gradient(#d8ebef, #9cbfc9);
+    background: url('../assets/images/hero/child-sad-0.svg') center / 64px 80px no-repeat, linear-gradient(#d8ebef, #9cbfc9);
     border-color: #edf4df; box-shadow: 0 4px 0 #567888, 0 0 0 3px #567888;
 }
-body[data-character="girl"] #fall-result .result-card::before { background-image: url('../assets/images/girl-sad-0.svg'), linear-gradient(#d8ebef, #9cbfc9); }
+body[data-character="girl"] #fall-result .result-card::before { background-image: url('../assets/images/hero/girl-sad-0.svg'), linear-gradient(#d8ebef, #9cbfc9); }
 .result h2 { margin: 0 0 14px; color: #ca654b; font: 900 clamp(26px, 4vw, 33px)/1.1 'Trebuchet MS', sans-serif; text-shadow: 0 2px 0 #fff9de; }
 .result-verse { margin: 0; padding: 0; border: 0; color: #71573d; font: bold 17px/1.5 'Trebuchet MS', sans-serif; }
 .result button {

@@ -103,6 +103,7 @@ test('World pages slide in opposite directions, block overlapping transitions an
     const previousDocument = globalThis.document;
     const previousWindow = globalThis.window;
     const previousMatchMedia = globalThis.matchMedia;
+    const previousGetComputedStyle = globalThis.getComputedStyle;
     const animations = [];
     const viewport = element();
     let reducedMotion = false;
@@ -118,22 +119,27 @@ test('World pages slide in opposite directions, block overlapping transitions an
         return node;
     }
     const grid = animatedElement();
+    const panel = animatedElement();
     viewport.append(grid);
-    globalThis.document = { createElement: animatedElement };
+    globalThis.document = { createElement: animatedElement, getElementById: () => panel };
+    globalThis.getComputedStyle = () => ({ background: 'old-world-background' });
     globalThis.window = { localStorage: { getItem: () => '1' } };
     globalThis.matchMedia = () => ({ matches: reducedMotion });
     let displayedWorld = 1;
     try {
         const moving = slideWorld(grid, 1, 2, () => { displayedWorld = 2; });
-        assert.equal(displayedWorld, 1, 'Keep the old heading until the slide finishes');
+        assert.equal(displayedWorld, 2, 'Update heading and background as the new buttons start sliding in');
         assert.equal(grid.inert, true);
         assert.equal(viewport.children.length, 2);
         const preview = viewport.children[1];
         assert.equal(preview.inert, true);
         assert.equal(preview.attributes['aria-hidden'], 'true');
         assert.equal(preview.querySelectorAll('button').length, 15);
+        assert.equal(preview.querySelectorAll('button')[0].value, 0, 'The outgoing preview keeps the previous world buttons');
         assert.equal(animations[0].frames[1].transform, 'translateX(-100%)');
         assert.equal(animations[1].frames[0].transform, 'translateX(100%)');
+        assert.equal(panel.children[0].style.background, 'old-world-background');
+        assert.deepEqual(animations[2].frames, [{ opacity: 1 }, { opacity: 0 }]);
         await slideWorld(grid, 1, 3, () => { throw new Error('Cannot start two transitions together'); });
         animations.forEach(animation => animation.finish());
         await moving;
@@ -141,20 +147,22 @@ test('World pages slide in opposite directions, block overlapping transitions an
         assert.equal(grid.inert, false);
         assert.equal(grid.dataset.sliding, undefined);
         assert.equal(viewport.children.length, 1);
+        assert.equal(panel.children.length, 0, 'Remove the old background after fading');
         assert.ok(animations.every(({ animation }) => animation.cancelled));
         const returning = slideWorld(grid, 2, 1, () => { displayedWorld = 1; });
-        assert.equal(animations[2].frames[1].transform, 'translateX(100%)');
-        assert.equal(animations[3].frames[0].transform, 'translateX(-100%)');
-        animations.slice(2).forEach(animation => animation.finish());
+        assert.equal(animations[3].frames[1].transform, 'translateX(100%)');
+        assert.equal(animations[4].frames[0].transform, 'translateX(-100%)');
+        animations.slice(3).forEach(animation => animation.finish());
         await returning;
         reducedMotion = true;
         await slideWorld(grid, 1, 5, () => { displayedWorld = 5; });
         assert.equal(displayedWorld, 5);
-        assert.equal(animations.length, 4, 'Reduced motion changes worlds immediately');
+        assert.equal(animations.length, 6, 'Reduced motion changes worlds immediately');
         assert.equal(viewport.children.length, 1);
     } finally {
         globalThis.document = previousDocument;
         globalThis.window = previousWindow;
         globalThis.matchMedia = previousMatchMedia;
+        globalThis.getComputedStyle = previousGetComputedStyle;
     }
 });

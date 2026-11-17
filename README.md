@@ -364,8 +364,8 @@ büyük muhafızların mevcut `jump` davranışı bundan bağımsızdır.
 Canlar sol üstte, soluk bölüm numarası ortada, dolan üç yıldız ve puan sağ üsttedir.
 Menüde dünya adı ve numarası üstte, bölüm
 numaraları manzara üzerinde büyük yuvarlak düğmelerde gösterilir. Oklar ve alttaki
-noktalar dünya sayfalarını sağa/sola kaydırarak değiştirir. Geçiş bitince başlık ve
-arka plan güncellenir. Azaltılmış hareket tercihinde geçiş anında yapılır.
+noktalar dünya sayfalarını sağa/sola kaydırarak değiştirir. Başlık ve arka plan,
+yeni bölüm düğmelerinin kayması başlarken güncellenir. Azaltılmış hareket tercihinde geçiş anında yapılır.
 Her dünyanın ayrı arka planı vardır.
 
 Başlangıçta yalnızca Dünya 1 / 1 açıktır; her bölüm bitince sonraki açılır. Kilitli

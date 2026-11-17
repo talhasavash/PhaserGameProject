@@ -5,14 +5,15 @@ body:not(.playing) .game-stage { inset: 0; }
 body:not(.playing) .build-version { display: none; }
 .character-select {
     --level-size: clamp(44px, min(16.5dvh, 12vw), 128px);
-    display: block; overflow: hidden; color: #fff7e5;
+    display: block; overflow: hidden; isolation: isolate; color: #fff7e5;
     padding: max(18px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
     background: #a6dcf0 url('../assets/images/scene/menu-world1.svg') center / cover no-repeat;
 }
 .character-select[data-world="2"] { background-color: #18294c; background-image: url('../assets/images/scene/menu-world2.svg'); }
 .character-select[data-world="3"] { background-color: #cbe8f6; background-image: url('../assets/images/scene/menu-world3.svg'); }
 .character-select[data-world="3"] .world-heading span { color: #2a6281; -webkit-text-stroke: 2px #f4fdff; text-shadow: 0 3px 0 #2e678633; }
-.character-form { width: 100%; height: 100%; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; gap: 12px; }
+.world-background-fade { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.character-form { position: relative; z-index: 1; width: 100%; height: 100%; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; gap: 12px; }
 .world-heading { min-height: 88px; padding-top: 12px; align-self: start; }
 .character-form h2 { display: block; max-width: 760px; margin: 0 auto; text-transform: uppercase; font: 800 clamp(30px, 4.8vw, 52px)/1.12 'Garden Bubble', 'Trebuchet MS', sans-serif; }
 .character-form h2 span { color: #fff8de; -webkit-text-stroke: 1.5px #21493e; paint-order: stroke fill; text-shadow: 0 3px 0 #21493e66; }

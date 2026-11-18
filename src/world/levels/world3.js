@@ -1,43 +1,147 @@
-// Dünya 3 bölümlerinin ortam, engel, düşman ve toplanacak nesne verilerini tanımlar.
+// Dünya 3'ün 31–34. bölümlerini; buz yüzeylerini, karlı rotaları ve kutup düşmanlarını tanımlar.
+function iceChapter(data) {
+    const platforms = data.platforms.map(platform => ({ ...platform, ice: true }));
+    const fruits = data.fruits.map(item => item.platform === undefined ? item : {
+        ...item, x: platforms[item.platform].x + platforms[item.platform].width / 2 + 10,
+        y: platforms[item.platform].y - 35
+    });
+    const enemies = data.enemies.map(enemy => {
+        if (enemy.platform === undefined) return enemy;
+        const platform = platforms[enemy.platform];
+        const x = platform.x + platform.width / 2;
+        const radius = Math.min(40, platform.width / 2 - 32);
+        return { ...enemy, x, minX: x - radius, maxX: x + radius };
+    });
+    // Sağlam zeminde aralıklı buz adaları; aralarında kuru ve güvenli durma alanları kalır.
+    const ice = [];
+    let start = 0;
+    for (const gap of [...data.gaps, { x: data.width, width: 0 }]) {
+        for (let x = start + 140; x + 160 < gap.x - 60; x += 480) {
+            ice.push({ x, width: Math.min(250, gap.x - 60 - x) });
+        }
+        start = gap.x + gap.width;
+    }
+    const types = ['apple', 'orange', 'pear', 'grapes', 'banana', 'strawberry'];
+    for (const [index, platform] of platforms.entries()) {
+        fruits.push({ id: `ledge-fruit-${index}`, type: types[index % types.length], x: platform.x + 30, y: platform.y - 36 });
+    }
+    for (let x = 220, index = 0; x < data.width - 550; x += 170, index++) {
+        if (data.gaps.some(gap => x > gap.x - 25 && x < gap.x + gap.width + 25)) continue;
+        fruits.push({ id: `ground-fruit-${index}`, type: types[index % types.length], x, y: 480 - index % 3 * 25 });
+    }
+    return { groundY: 520, spawn: { x: 100, y: 480 }, belt: { x: 0, width: 1, speed: 0 },
+        key: { x: data.width - 420, y: 477 }, exit: { x: data.width - 180, y: 468 },
+        ...data, platforms, fruits, enemies, ice,
+        fireRain: [{ kind: 'snow', period: 10000, speed: 310, offset: 4500 }] };
+}
 
-export const firstJourney = {
-
-    name: 'Yeni Bölüm', theme: 'moonwood', width: 3200, groundY: 520,
-    spawn: {x:100 , y:480},
-    checkpoint: {x:1500 , y:480} ,
-    key: {x: 2700, y: 477},
-    exit: {x: 2950, y: 468},
-
+const frozenLake = iceChapter({
+    name: 'Buz Gölü', theme: 'glacier', width: 4000,
+    checkpoint: { x: 2350, y: 480 }, fountains: [{ id: 'fountain-1', x: 1250 }, { id: 'fountain-2', x: 2500 }],
     platforms: [
-                {x: 300, y: 450, width: 50},
-                {x: 400, y: 350, width: 50},
-                {x: 500, y: 250, width: 50},
-                {x: 600, y: 150, width: 50},
-                {x: 400, y: 430, width: 180}
-                ],
-
-    fruits: [
-                {id:'fruit-1', type:'apple', x: 300, y: 200},
-                {id:'fruit-2', type:'orange', x: 400, y: 200},
-                {id:'fruit-3', type:'grapes', x: 500, y: 200},
-                {id:'star-1',  type:'star', x: 550, y: 400},
-                {id:'star-2',  type:'star', x: 1400, y: 480},
-                {id:'star-3',  type:'star', x: 2450, y: 480}
-            ],
-
-    enemies: [
-                {type:'hedgehog', x: 490, y:411, minX: 453, maxX:545, speed:45},
-                {type:'snail', x: 500, minX: 900, maxX:1200, speed:65},
-                {type:'frog', x: 600, minX: 1000, maxX:1300, speed:65},
-                {type:'bee', x: 2250, y:410, minX: 2150, maxX:2350, speed:80, bob:25}
+        { x: 420, y: 440, width: 120 }, { x: 590, y: 365, width: 170 },
+        { x: 1500, y: 435, width: 160 }, { x: 1760, y: 360, width: 110 },
+        { x: 2630, y: 440, width: 110 }, { x: 2780, y: 360, width: 110 }, { x: 2930, y: 280, width: 170 }
     ],
+    gaps: [{ x: 900, width: 130 }, { x: 2120, width: 140 }, { x: 3240, width: 140 }],
+    columns: [{ x: 1140, width: 76, raisedBottom: 190, openMs: 2400 }, { x: 2550, width: 82, raisedBottom: 220, offset: 1300 }, { x: 3150, width: 76, raisedBottom: 180, offset: 2200 }],
+    fruits: [
+        { id: 'star-1', type: 'star', platform: 1 }, { id: 'star-2', type: 'star', platform: 2 }, { id: 'star-3', type: 'star', platform: 6 },
+        { id: 'lantern-1', type: 'lantern', x: 1300, y: 480 }
+    ],
+    enemies: [
+        { type: 'snowman', x: 1380, minX: 1320, maxX: 1420, speed: 35, snowball: { period: 3100, speed: 210 } },
+        { type: 'penguin', platform: 1, speed: 90 }, { type: 'snow-fox', platform: 2, speed: 105 },
+        { type: 'ice-crab', platform: 6, speed: 100, hop: { walkMs: 2800, pauseMs: 400, height: 45, duration: 700 } },
+        { type: 'frost-bat', x: 1900, y: 390, minX: 1800, maxX: 2010, speed: 105, bob: 25 },
+        { type: 'snow-fox', x: 3460, minX: 3420, maxX: 3500, speed: 110 }
+    ],
+    mosqueStyle: { wall: 0xe1eef2, roof: 0x80b8cd, trim: 0xdcecf0, width: 200, towers: [-122, 122] }
+});
 
+const frozenCave = iceChapter({
+    name: 'Donmuş Mağara', theme: 'iceCave', width: 4700,
+    checkpoint: { x: 2700, y: 480 }, fountains: [{ id: 'fountain-1', x: 2860 }],
+    platforms: [
+        { x: 390, y: 440, width: 110 }, { x: 560, y: 360, width: 110 }, { x: 720, y: 280, width: 170 },
+        { x: 1880, y: 440, width: 150 }, { x: 2400, y: 435, width: 100 },
+        { x: 3280, y: 440, width: 100 }, { x: 3420, y: 360, width: 100 }, { x: 3560, y: 285, width: 170 }
+    ],
+    gaps: [{ x: 1050, width: 140 }, { x: 2180, width: 150 }, { x: 3920, width: 150 }],
+    columns: [{ x: 1260, width: 80, raisedBottom: 180 }, { x: 1710, width: 80, raisedBottom: 210, offset: 1100 }, { x: 3100, width: 86, raisedBottom: 170, openMs: 1800 }],
+    fruits: [
+        { id: 'star-1', type: 'star', platform: 2 }, { id: 'star-2', type: 'star', platform: 3 }, { id: 'star-3', type: 'star', platform: 7 },
+        { id: 'bead-1', type: 'bead', x: 3060, y: 480 }
+    ],
+    enemies: [
+        { type: 'snowman', x: 1560, minX: 1480, maxX: 1600, speed: 40, snowball: { period: 2700, speed: 230 } },
+        { type: 'snowman', x: 4200, minX: 4140, maxX: 4250, speed: 40, snowball: { period: 2900, speed: 220 } },
+        { type: 'ice-crab', platform: 2, speed: 110 },
+        { type: 'penguin', platform: 3, speed: 115, visibility: { visibleMs: 2900, hiddenMs: 2300, offset: 700 } },
+        { type: 'snow-fox', platform: 7, speed: 120, hop: { walkMs: 2600, pauseMs: 400, height: 55, duration: 750 } },
+        { type: 'frost-bat', x: 1450, y: 365, minX: 1320, maxX: 1620, speed: 125, bob: 35 },
+        { type: 'frost-bat', x: 2900, y: 390, minX: 2790, maxX: 3100, speed: 130, bob: 30 }
+    ],
+    mosqueStyle: { wall: 0xc4e0e9, roof: 0x5389ab, trim: 0xd5f2f4, width: 225, towers: [-135],
+        domes: [[-65, 435, 75, 65], [65, 435, 75, 65], [0, 400, 110, 105]] }
+});
 
-    fountains: [{ id: 'fountain-1', x: 2500 }],
-    belt: {x: 2050, width: 250, speed:-120},
-    gaps: [{ x: 1900, width: 100 }],
-    fireRain: [{ period: 10000, offset: 4000, speed: 250 }],
-    ice: [{ x: 1600, width: 180 } ]
-};
+const polarLights = iceChapter({
+    name: 'Kutup Işıkları', theme: 'aurora', width: 5400,
+    checkpoint: { x: 2870, y: 480 }, fountains: [{ id: 'fountain-1', x: 1650 }, { id: 'fountain-2', x: 4390 }],
+    platforms: [
+        { x: 350, y: 440, width: 100 }, { x: 500, y: 360, width: 110 }, { x: 650, y: 280, width: 170 },
+        { x: 1900, y: 440, width: 110 }, { x: 2040, y: 360, width: 100 }, { x: 2180, y: 280, width: 100 }, { x: 2320, y: 205, width: 170 },
+        { x: 3380, y: 435, width: 110 }, { x: 3530, y: 355, width: 170 }, { x: 3810, y: 430, width: 100 }
+    ],
+    gaps: [{ x: 1000, width: 150 }, { x: 1360, width: 150 }, { x: 2670, width: 155 }, { x: 3060, width: 155 }, { x: 4170, width: 160 }],
+    columns: [{ x: 1190, width: 74, raisedBottom: 180, openMs: 1900 }, { x: 2980, width: 78, raisedBottom: 200, offset: 950 }, { x: 3260, width: 78, raisedBottom: 160, offset: 1900 }, { x: 4490, width: 88, raisedBottom: 190, openMs: 1700 }],
+    fruits: [
+        { id: 'star-1', type: 'star', platform: 2 }, { id: 'star-2', type: 'star', platform: 6 }, { id: 'star-3', type: 'star', platform: 8 },
+        { id: 'crescent-1', type: 'crescent', x: 4510, y: 480 }
+    ],
+    enemies: [
+        { type: 'snowman', x: 1610, minX: 1560, maxX: 1650, speed: 45, snowball: { period: 2500, speed: 245 } },
+        { type: 'snowman', x: 4930, minX: 4870, maxX: 4970, speed: 45, snowball: { period: 2600, speed: 235 } },
+        { type: 'snow-fox', platform: 2, speed: 120, hop: { walkMs: 2500, pauseMs: 350, height: 60, duration: 750 } },
+        { type: 'ice-crab', platform: 6, speed: 125, visibility: { visibleMs: 2600, hiddenMs: 2300, offset: 500 } },
+        { type: 'penguin', platform: 8, speed: 130 },
+        { type: 'frost-bat', x: 1750, y: 380, minX: 1610, maxX: 1830, speed: 135, bob: 35 },
+        { type: 'frost-bat', x: 4610, y: 390, minX: 4500, maxX: 4740, speed: 140, bob: 28 },
+        { type: 'snow-fox', x: 4790, minX: 4700, maxX: 4850, speed: 130 }
+    ],
+    mosqueStyle: { wall: 0xdce9f0, roof: 0x587aab, trim: 0xe9d8a6, width: 245, towers: [-148, -113, 113, 148],
+        domes: [[-80, 425, 80, 70], [80, 425, 80, 70], [0, 389, 125, 120]] }
+});
 
-export const worldThreeLevels = [firstJourney];
+const crystalPalace = iceChapter({
+    name: 'Kristal Sarayın Muhafızı', theme: 'crystalPalace', width: 5700,
+    boss: true, frozenItems: true,
+    checkpoint: { x: 4050, y: 480 }, fountains: [{ id: 'fountain-1', x: 1900 }, { id: 'fountain-2', x: 4140 }],
+    platforms: [
+        { x: 390, y: 440, width: 140 }, { x: 580, y: 360, width: 130 }, { x: 760, y: 280, width: 210 },
+        { x: 1670, y: 440, width: 160 }, { x: 2170, y: 435, width: 130 }, { x: 2350, y: 355, width: 130 },
+        { x: 2530, y: 275, width: 220 }, { x: 3420, y: 435, width: 130 }, { x: 3600, y: 355, width: 220 },
+        { x: 4380, y: 435, width: 150 }, { x: 4600, y: 400, width: 140 }
+    ],
+    gaps: [{ x: 1130, width: 150 }, { x: 2870, width: 155 }, { x: 3890, width: 145 }],
+    columns: [{ x: 1430, width: 84, raisedBottom: 180, openMs: 2100 },
+        { x: 3120, width: 80, raisedBottom: 190, offset: 1200 }, { x: 3290, width: 80, raisedBottom: 230, offset: 1900 }],
+    fruits: [
+        { id: 'star-1', type: 'star', platform: 2 }, { id: 'star-2', type: 'star', platform: 6 }, { id: 'star-3', type: 'star', platform: 8 },
+        { id: 'palace-lantern', type: 'lantern', x: 1960, y: 480 },
+        { id: 'palace-crescent', type: 'crescent', x: 4230, y: 480 }, { id: 'palace-bead', type: 'bead', x: 4540, y: 480 }
+    ],
+    enemies: [
+        { type: 'ice-crab', platform: 2, speed: 105 }, { type: 'penguin', platform: 6, speed: 110 },
+        { type: 'snow-fox', platform: 8, speed: 115 },
+        { type: 'snowman', x: 2050, minX: 2000, maxX: 2090, speed: 35, snowball: { period: 3100, speed: 220 } },
+        { type: 'frost-bat', x: 3460, y: 335, minX: 3350, maxX: 3540, speed: 105, bob: 18 },
+        { type: 'frost-warden', x: 4930, y: 325, minX: 4880, maxX: 5010, speed: 35, scale: 1.3, bob: 18,
+            snowball: { kind: 'shard', volley: 3, period: 2900, speed: 230, range: 720 } }
+    ],
+    mosqueStyle: { wall: 0xe3dafa, roof: 0x748ae1, trim: 0x97f2ef, width: 250, towers: [-150, 150],
+        domes: [[-82, 427, 82, 70], [82, 427, 82, 70], [0, 382, 132, 125]] }
+});
+
+export const worldThreeLevels = [frozenLake, frozenCave, polarLights, crystalPalace];

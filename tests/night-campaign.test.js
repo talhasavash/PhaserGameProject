@@ -1,7 +1,7 @@
 // 20–30'un rastgele yollarını, zorluk artışını ve son bölüm muhafızlarını doğrular.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createNightCampaign, lateNightLevels } from '../src/world/levels/nightCampaign.js';
+import { createNightCampaign, lateNightLevels } from '../src/world/levels/world2.js';
 import { levels, worldForLevel } from '../src/world/levels/level.js';
 
 function reachablePlatforms(level) {

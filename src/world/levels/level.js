@@ -2,12 +2,9 @@
 import { worldOneLevels } from './world1.js';
 import { worldTwoLevels } from './world2.js';
 import { worldThreeLevels } from './world3.js';
-import { nightLevels } from './nightLevels.js';
-import { lateNightLevels } from './nightCampaign.js';
-import { iceLevels } from './iceLevels.js';
 
 // Kayıtlar aynı sıralamayı kullanır: eski 0–10 indisleri değişmez.
-export const levels = [...worldOneLevels, ...worldTwoLevels, ...worldThreeLevels, ...nightLevels, ...lateNightLevels, ...iceLevels];
+export const levels = [...worldOneLevels, ...worldTwoLevels, ...worldThreeLevels];
 
 // Dünya 2 ve 3: yıldızın yanındaki bekçiler birlikte kaybolur; toplamak için güvenli süre bırakır.
 for (const level of levels.slice(15, 45)) {

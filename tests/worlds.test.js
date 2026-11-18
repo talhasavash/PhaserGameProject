@@ -2,11 +2,16 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { levels, worlds, worldForLevel, chapterNumber, LEVEL_SLOT_COUNT } from '../src/world/levels/level.js';
-import { bossGate } from '../src/world/levels/world1.js';
+import { bossGate, worldOneLevels } from '../src/world/levels/world1.js';
+import { worldTwoLevels } from '../src/world/levels/world2.js';
+import { worldThreeLevels } from '../src/world/levels/world3.js';
 import { readUnlocked, unlockNext } from '../src/data/progress.js';
 import { columnFrame, columnTiming, prepareColumn, visibleColumn, RAISED_BOTTOM, CLOSED_BOTTOM } from '../src/gameplay/columns.js';
 
 test('Five worlds reserve 15 sequential slots each without changing playable level indexes', () => {
+    assert.deepEqual(levels.slice(0, 15), worldOneLevels);
+    assert.deepEqual(levels.slice(15, 30), worldTwoLevels);
+    assert.deepEqual(levels.slice(30, 45), worldThreeLevels);
     assert.deepEqual(worlds.map(world => [world.id, world.start, world.count]), [[1, 0, 15], [2, 15, 15], [3, 30, 15], [4, 45, 15], [5, 60, 15]]);
     assert.equal(LEVEL_SLOT_COUNT, 75);
     assert.deepEqual(worlds.map(world => world.title), ['Meyve Rüyası', 'Gece Karanlığı', 'Buz Dağları', 'Ateş ve Çukur', "Kabe'nin Yolları"]);

@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { EventEmitter } from 'node:events';
 import { levels, worldForLevel } from '../src/world/levels/level.js';
-import { iceLevels } from '../src/world/levels/iceLevels.js';
+import { worldThreeLevels as iceLevels } from '../src/world/levels/world3.js';
 import { isIcySurface } from '../src/world/terrain/terrain.js';
 import { createScenery } from '../src/world/scenery/background.js';
 

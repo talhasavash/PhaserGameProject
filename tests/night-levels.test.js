@@ -2,8 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { levels, worldForLevel } from '../src/world/levels/level.js';
-import { nightLevels } from '../src/world/levels/nightLevels.js';
-import { firstJourney } from '../src/world/levels/world3.js';
+import { nightLevels, firstJourney } from '../src/world/levels/world2.js';
 import { createScenery } from '../src/world/scenery/background.js';
 import { createMosque } from '../src/world/scenery/background.js';
 import { bossLift } from '../src/gameplay/hazards.js';

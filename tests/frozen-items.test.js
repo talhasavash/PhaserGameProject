@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { touchFrozenItem, updateFrozenItems } from '../src/gameplay/frozenItems.js';
-import { iceLevels } from '../src/world/levels/iceLevels.js';
+import { worldThreeLevels as iceLevels } from '../src/world/levels/world3.js';
 import { snowballFrame } from '../src/gameplay/snowballs.js';
 
 test('Frozen objects thaw once, remain uncollectible during contact, then open after a clear exit', () => {

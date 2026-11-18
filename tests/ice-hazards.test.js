@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { columnCrushes } from '../src/gameplay/columns.js';
 import { createSnowballs, updateSnowballs, snowballFrame } from '../src/gameplay/snowballs.js';
-import { iceLevels } from '../src/world/levels/iceLevels.js';
+import { worldThreeLevels as iceLevels } from '../src/world/levels/world3.js';
 
 test('Descending columns catch swept head contact, but rising columns and side passes do not crush', () => {
     const player = { left: 90, right: 110, top: 470, bottom: 520 };

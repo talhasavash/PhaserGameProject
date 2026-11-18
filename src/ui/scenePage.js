@@ -1,5 +1,5 @@
 // Sahnenin HTML düğmelerini, sonuç kartını ve bölüm yükleme ekranını yönetir.
-import { levels } from '../world/levels/level.js';
+import { levels, worldForLevel } from '../world/levels/level.js';
 import { verses } from '../data/verses.js';
 
 const SCENE_BUTTON_IDS = ['pause-button', 'play-again', 'next-level', 'retry-fall'];
@@ -36,7 +36,8 @@ export function showCompletion(levelIndex) {
     const final = levelIndex === levels.length - 1;
     const title = final ? 'Oyun tamam!' : 'Bölüm tamam!';
     document.getElementById('result-title').textContent = title;
-    document.getElementById('result-verse').textContent = verses[levelIndex].text;
+    const verse = levels[levelIndex]?.verse || worldForLevel(levelIndex)?.verse || verses[levelIndex] || verses[0];
+    document.getElementById('result-verse').textContent = verse.text;
     document.getElementById('next-level').hidden = final;
     document.getElementById('play-again').hidden = !final;
     document.getElementById('game-result').hidden = false;

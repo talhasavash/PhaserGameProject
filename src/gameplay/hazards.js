@@ -1,6 +1,6 @@
 // Düşmanları kurar; devriyeyi, dikey ağ hareketini, görünmezliği ve boss davranışlarını yönetir.
 
-const ENEMY_SCALE = 0.8;
+import { createEnemySprite, defineEnemy } from './enemyTypes.js';
 
 // Düşmanlar Phaser'ın yerçekimsiz hareketli gövdeleridir.
 export function createHazards(scene) {
@@ -13,14 +13,8 @@ export function createHazards(scene) {
 }
 
 function createHazard(scene, data) {
-    // Küçülünce de ayaklar yerde kalsın. Kutuların alt kenarı zeminle aynı hizada.
-    const platform = data.platform === undefined ? null : scene.level.platforms[data.platform];
-    let y = (platform?.y ?? scene.level.groundY) - 24 * ENEMY_SCALE;
-    if (data.type === 'ball' || data.type === 'wheel') y = scene.level.groundY - 22 * ENEMY_SCALE;
-    if (data.y !== undefined) y = data.y;
-    if (data.type === 'ogre') y = scene.level.groundY - 44 * data.scale;
-    const sprite = scene.hazards.create(data.x, y, data.texture || data.type).setDepth(12);
-    sprite.setScale(data.scale || ENEMY_SCALE);
+    data = defineEnemy(data.type, data);
+    const { sprite, y } = createEnemySprite(scene, data);
     sprite.setData('patrol', {
         minX: data.minX,
         maxX: data.maxX,
@@ -41,38 +35,33 @@ function createHazard(scene, data) {
         period: data.period || 2400, offset: data.offset || 0,
         threadTop: data.threadTop ?? 220, visibility: data.visibility
     });
-    if (data.type === 'spider') {
-        const thread = scene.add.line(data.x, 0, 0, data.threadTop ?? 220, 0, y - 12, 0xd0cde0, 0.7).setOrigin(0).setDepth(8);
-        sprite.setData('thread', thread);
-    }
-    if (data.type === 'ogre') {
-        sprite.body.setSize(58, 66).setOffset(19, 28);
-        sprite.setData('shadow', scene.add.ellipse(data.x, 517, 76 * data.scale, 12, 0x332d4b, 0.23).setDepth(8));
-    } else if (data.type === 'frost-warden') {
-        sprite.body.setSize(82, 106).setOffset(39, 35);
-    } else if (data.type === 'snowman') {
-        sprite.body.setSize(42, 64).setOffset(11, 12);
-        // Diğer düşmanların ayak yüksekliğinden bağımsız, uzun SVG'nin ayaklarını zemine oturt.
-        sprite.y = (platform?.y ?? scene.level.groundY) - 36 * sprite.scaleY;
-        sprite.body.reset(sprite.x, sprite.y);
-        sprite.getData('patrol').baseY = sprite.y;
-    } else if (data.type === 'ball' || data.type === 'wheel') {
-        sprite.body.setCircle(22, 4, 4);
-    } else if (data.y !== undefined) {
-        sprite.body.setSize(48, 26).setOffset(14, 16);
-    } else {
-        sprite.body.setSize(53, 27).setOffset(12, 23);
-    }
+    sprite.setData('behaviors', [...defaultBehaviors, ...(data.components || []).map(name => {
+        const behavior = enemyBehaviors.get(name);
+        if (!behavior) throw new Error(`Bilinmeyen davranış: ${name}`);
+        return behavior;
+    })]);
     updateVisibility(scene, sprite, sprite.getData('patrol'));
 }
+
+// Bileşenler aynı update sözleşmesini kullanır; yeni davranış tek kayıtla eklenir.
+/** @type {Map<string, import('../world/model/contracts.js').EnemyBehavior>} */
+export const enemyBehaviors = new Map();
+/** @param {string} name @param {import('../world/model/contracts.js').EnemyBehavior} behavior */
+export function registerEnemyBehavior(name, behavior) {
+    if (enemyBehaviors.has(name) || typeof behavior.update !== 'function') throw new Error('Davranış benzersiz bir ad ve update fonksiyonu gerektirir.');
+    enemyBehaviors.set(name, behavior);
+}
+registerEnemyBehavior('jump', { update(scene, enemy, patrol, delta) { if (patrol.jump) updateGuardJump(scene, enemy, patrol, delta); } });
+registerEnemyBehavior('patrol', { update: updatePatrol });
+registerEnemyBehavior('appearance', { update(scene, enemy, patrol, delta) { updateHazardAppearance(enemy, patrol, delta); } });
+registerEnemyBehavior('visibility', { update: updateVisibility });
+const defaultBehaviors = [...enemyBehaviors.values()];
 
 export function updateHazards(scene, delta) {
     for (const hazard of scene.hazards.getChildren()) {
         const patrol = hazard.getData('patrol');
-        if (patrol.jump) updateGuardJump(scene, hazard, patrol, delta);
-        updatePatrol(scene, hazard, patrol);
-        updateHazardAppearance(hazard, patrol, delta);
-        updateVisibility(scene, hazard, patrol);
+        const behaviors = hazard.getData('behaviors') || defaultBehaviors;
+        for (const behavior of behaviors) behavior.update(scene, hazard, patrol, delta);
     }
 }
 
@@ -166,7 +155,7 @@ function updateGuardJump(scene, hazard, patrol, delta) {
     if (step.sound) playGuardSound(scene, hazard, step.sound);
     // Görsel ve çarpışma gövdesi birlikte taşınır.
     hazard.body.reset(hazard.x, patrol.baseY - step.lift);
-    hazard.getData('shadow').setPosition(hazard.x, 517);
+    hazard.getData('shadow')?.setPosition(hazard.x, 517);
 }
 
 function playGuardSound(scene, hazard, key) {

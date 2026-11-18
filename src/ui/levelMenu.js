@@ -94,6 +94,15 @@ export function refreshLevelLocks(worldTabs, levelGrid, worldId) {
     const selectedIndex = worlds.indexOf(selectedWorld);
     worldTabs.dataset.selected = worldId;
     document.getElementById('character-select').dataset.world = worldId;
+    const panel = document.getElementById('character-select');
+    panel.style.backgroundImage = `url("${selectedWorld.menu?.image || 'assets/images/scene/menu-world1.svg'}")`;
+    panel.style.backgroundColor = selectedWorld.menu?.color || '#a6dcf0';
+    for (const id of ['world-number', 'world-name']) {
+        const style = document.getElementById(id).style;
+        style.color = selectedWorld.menu?.headingColor || '';
+        style.webkitTextStroke = selectedWorld.menu?.headingStroke || '';
+        style.textShadow = selectedWorld.menu?.headingShadow || '';
+    }
     document.getElementById('world-number').textContent = `${worldId}.`;
     document.getElementById('world-name').textContent = " "+selectedWorld.title;
     document.getElementById('previous-world').disabled = selectedIndex === 0;

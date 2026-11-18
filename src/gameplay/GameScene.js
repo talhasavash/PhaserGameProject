@@ -45,9 +45,7 @@ export class GameScene extends Phaser.Scene {
         this.level = levels[this.levelIndex];
         const world = worldForLevel(this.levelIndex);
 
-        this.characterSkin = world.id === 3
-            ? (this.character === 'girl' ? 'ice_girl' : (this.character === 'boy' ? 'ice_boy' : this.character))
-            : this.character;
+        this.characterSkin = this.level.characterSkin || world.characterSkins?.[this.character] || this.character;
     }
 
     // Phaser önce preload'u çağırır: görselleri hazırla.
@@ -274,7 +272,7 @@ export class GameScene extends Phaser.Scene {
             this.game.events.emit('world-complete', nextWorld.start);
             return;
         }
-        if (this.levelIndex === levels.length - 1) {
+        if (!levels[this.levelIndex + 1]) {
             document.getElementById('menu-button').click();
             return;
         }

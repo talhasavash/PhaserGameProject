@@ -1,5 +1,6 @@
 // Karakteri oluşturur; yürüme, hızlanma, zıplama, animasyon ve yüz ifadelerini yönetir.
 // Hızlar piksel/saniye, süreler milisaniye cinsindedir.
+import { characterPrefix } from '../data/characters.js';
 const WALK_SPEED = 265;
 const JUMP_SPEED = 590;
 const GROUND_ACCELERATION = 1500;
@@ -61,17 +62,6 @@ export function createPlayer(scene, x, y, character = 'boy') {
         player.recoveryStars.push(star);
     }
     return player;
-}
-
-function characterPrefix(expression, character = 'boy') {
-    let base = 'child';
-
-    if (character === 'girl') base = 'girl';
-    if (character === 'ice_girl') base = 'ice_girl';
-    if (character === 'ice_boy') base = 'ice_boy';
-
-    if (expression === 'normal') return `${base}-`;
-    return `${base}-${expression}-`;
 }
 
 export function currentExpression(player, time) {

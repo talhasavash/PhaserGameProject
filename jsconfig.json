@@ -4,6 +4,6 @@
     "lib": ["ES2020", "DOM"],
     "checkJs": false
   },
-  "include": ["src/**/*.js"],
+  "include": ["src/**/*.js", "src/**/*.d.ts", "examples/**/*.js"],
   "exclude": ["lib", "node_modules"]
 }

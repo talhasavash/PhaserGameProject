@@ -1,7 +1,9 @@
 // Dünya 1 bölümlerinin ortam, engel, düşman ve toplanacak nesne verilerini tanımlar.
+import { defineLevel } from '../model/definitions.js';
+import { trailLevel as trail, gateLevel as chapter } from '../model/templates.js';
 // Bu dosya sadece bölümün verisidir; hareket veya çarpışma kodu içermez.
 // x sağa, y aşağı doğru artar. Platformların y değeri üst yüzeyleridir.
-export const garden = {
+export const garden = defineLevel({
     name: 'Meyve Bahçesi', theme: 'garden', width: 3840, groundY: 520,
     spawn: { x: 100, y: 480 },
     checkpoint: { x: 1640, y: 480 },
@@ -47,10 +49,10 @@ export const garden = {
         { id: 'fountain-1', x: 1300 },
         { id: 'fountain-2', x: 3070 }
     ]
-};
+});
 
 // Aynı oyun kodu, farklı bölüm verileri. Yüksek platforma alttaki basamaktan çıkılır.
-export const courtyard = {
+export const courtyard = defineLevel({
     name: 'Kandilli Cami Avlusu', theme: 'courtyard', width: 4480, groundY: 520,
     spawn: { x: 100, y: 480 }, checkpoint: { x: 2180, y: 480 },
     key: { x: 3940, y: 477 }, exit: { x: 4240, y: 468 },
@@ -89,10 +91,10 @@ export const courtyard = {
     extraHazards: [{ type: 'ball', x: 3200, minX: 3160, maxX: 3380, speed: 130 }],
     belt: { x: 3040, width: 280, speed: -115 },
     fountains: [{ id: 'fountain-1', x: 1180 }, { id: 'fountain-2', x: 3590 }]
-};
+});
 
 // Çöl yolunda rastgele ateş yağmuru; önce belirgin bir uyarı görünür.
-export const desert = {
+export const desert = defineLevel({
     name: 'Hilalli Çöl Yolu', theme: 'desert', width: 4720, groundY: 520,
     spawn: { x: 100, y: 480 }, checkpoint: { x: 2300, y: 480 },
     key: { x: 4160, y: 477 }, exit: { x: 4460, y: 468 },
@@ -127,9 +129,9 @@ export const desert = {
     belt: { x: 2380, width: 240, speed: -105 },
     fountains: [{ id: 'fountain-1', x: 1230 }, { id: 'fountain-2', x: 3500 }],
     fireRain: [{ period: 9000, offset: 4000, speed: 270 }]
-};
+});
 
-export const moonGarden = {
+export const moonGarden = defineLevel({
     name: 'Yıldızlı Kubbe Bahçesi', theme: 'night', width: 5040, groundY: 520,
     spawn: { x: 100, y: 480 }, checkpoint: { x: 2440, y: 480 },
     key: { x: 4450, y: 477 }, exit: { x: 4770, y: 468 },
@@ -165,19 +167,9 @@ export const moonGarden = {
     belt: { x: 1210, width: 260, speed: -120 },
     fountains: [{ id: 'fountain-1', x: 1500 }, { id: 'fountain-2', x: 3600 }],
     fireRain: [{ period: 8500, offset: 4000, speed: 290 }]
-};
+});
 
-// Ortak bölüm ayarları burada; aşağıda yalnızca farklı konumları yazıyoruz.
-function trail(data) {
-    return {
-        groundY: 520, spawn: { x: 100, y: 480 },
-        checkpoint: { x: data.width / 2, y: 480 },
-        key: { x: data.width - 550, y: 477 }, exit: { x: data.width - 260, y: 468 },
-        belt: { x: 2050, width: 180, speed: -100 },
-        fountains: [{ id: 'fountain-1', x: 1250 }, { id: 'fountain-2', x: data.width - 950 }],
-        ...data
-    };
-}
+// Ortak ayarlar templates.js içindeki trail şablonundan gelir.
 
 export const forest = trail({
     name: 'Arıların Orman Yolu', theme: 'forest', width: 4800,
@@ -398,16 +390,6 @@ export const bossGate = trail({
 });
 
 // Dünya 1: 12–15. bölümler.
-function chapter(data) {
-    return {
-        groundY: 520, spawn: { x: 100, y: 480 }, exitType: 'gate',
-        key: { x: data.width - 520, y: 477 }, exit: { x: data.width - 220, y: 468 },
-        checkpoint: { x: data.width / 2, y: 480 },
-        belt: { x: 0, width: 1, speed: 0 },
-        fountains: [{ id: 'fountain-1', x: 420 }, { id: 'fountain-2', x: data.width - 850 }],
-        ...data
-    };
-}
 
 export const lavaValley = chapter({
     name: 'Lav Vadisi', theme: 'lava', width: 4300, exitLabel: 'ışıklı geçide',

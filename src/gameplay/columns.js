@@ -1,5 +1,6 @@
 // İnip yükselen kolonların çizimini, fizik gövdelerini ve geçiş zamanlamasını yönetir.
 import { cacheTexture } from '../graphics/texture.js';
+import { isIceTheme } from '../world/scenery/themes.js';
 const COLUMN_HEIGHT = 512;
 export const RAISED_BOTTOM = 260;
 export const CLOSED_BOTTOM = 520;
@@ -58,7 +59,7 @@ export function createColumns(scene) {
     if (definitions.length === 0) return;
     const key = `column-${scene.level.theme}`;
     cacheTexture(scene, key, 80, COLUMN_HEIGHT, g => {
-        if (['glacier', 'iceCave', 'aurora', 'crystalPalace'].includes(scene.level.theme)) {
+        if (isIceTheme(scene.level.theme)) {
             g.fillStyle(0x68afca); g.fillRoundedRect(4, 0, 72, COLUMN_HEIGHT, 6);
             g.fillStyle(0xbdebf5); g.fillRect(10, 0, 15, COLUMN_HEIGHT - 12);
             g.fillStyle(0xe7faff, 0.75); g.fillRect(14, 0, 4, COLUMN_HEIGHT - 20);

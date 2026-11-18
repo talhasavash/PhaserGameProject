@@ -1,39 +1,5 @@
 // Dünya 3'ün 31–34. bölümlerini; buz yüzeylerini, karlı rotaları ve kutup düşmanlarını tanımlar.
-function iceChapter(data) {
-    const platforms = data.platforms.map(platform => ({ ...platform, ice: true }));
-    const fruits = data.fruits.map(item => item.platform === undefined ? item : {
-        ...item, x: platforms[item.platform].x + platforms[item.platform].width / 2 + 10,
-        y: platforms[item.platform].y - 35
-    });
-    const enemies = data.enemies.map(enemy => {
-        if (enemy.platform === undefined) return enemy;
-        const platform = platforms[enemy.platform];
-        const x = platform.x + platform.width / 2;
-        const radius = Math.min(40, platform.width / 2 - 32);
-        return { ...enemy, x, minX: x - radius, maxX: x + radius };
-    });
-    // Sağlam zeminde aralıklı buz adaları; aralarında kuru ve güvenli durma alanları kalır.
-    const ice = [];
-    let start = 0;
-    for (const gap of [...data.gaps, { x: data.width, width: 0 }]) {
-        for (let x = start + 140; x + 160 < gap.x - 60; x += 480) {
-            ice.push({ x, width: Math.min(250, gap.x - 60 - x) });
-        }
-        start = gap.x + gap.width;
-    }
-    const types = ['apple', 'orange', 'pear', 'grapes', 'banana', 'strawberry'];
-    for (const [index, platform] of platforms.entries()) {
-        fruits.push({ id: `ledge-fruit-${index}`, type: types[index % types.length], x: platform.x + 30, y: platform.y - 36 });
-    }
-    for (let x = 220, index = 0; x < data.width - 550; x += 170, index++) {
-        if (data.gaps.some(gap => x > gap.x - 25 && x < gap.x + gap.width + 25)) continue;
-        fruits.push({ id: `ground-fruit-${index}`, type: types[index % types.length], x, y: 480 - index % 3 * 25 });
-    }
-    return { groundY: 520, spawn: { x: 100, y: 480 }, belt: { x: 0, width: 1, speed: 0 },
-        key: { x: data.width - 420, y: 477 }, exit: { x: data.width - 180, y: 468 },
-        ...data, platforms, fruits, enemies, ice,
-        fireRain: [{ kind: 'snow', period: 10000, speed: 310, offset: 4500 }] };
-}
+import { iceLevel as iceChapter } from '../model/templates.js';
 
 const frozenLake = iceChapter({
     name: 'Buz Gölü', theme: 'glacier', width: 4000,

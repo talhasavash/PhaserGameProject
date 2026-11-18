@@ -1,16 +1,13 @@
 // Oyunun görsel ve ses dosyalarını listeler; bunları Phaser Loader ile yükler.
 import { FRUIT_TYPES } from '../gameplay/rules.js';
+import { enemyTypes } from '../gameplay/enemyTypes.js';
+import { characterPrefix } from './characters.js';
 
 // Aynı boyutta yüklenen SVG'ler birlikte listelenir. Boyutlar fizik kutusu değildir.
 const IMAGE_GROUPS = [
     { folder: 'collect', width: 40, height: 44, keys: [...FRUIT_TYPES, 'bead'] },
     { folder: 'collect', width: 44, height: 44, keys: ['star'] },
     { folder: 'collect', width: 32, height: 36, keys: ['berry'] },
-    { folder: 'enemy', width: 76, height: 52, keys: ['hedgehog', 'snail', 'bee', 'fox', 'penguin', 'frog', 'turtle', 'bat', 'bird', 'spider', 'salamander', 'robot', 'scarab', 'night-owl', 'shadow-fox', 'moon-scorpion', 'moon-moth', 'cave-crab', 'dusk-wolf', 'snow-fox', 'ice-crab', 'frost-bat'] },
-    { folder: 'enemy', width: 52, height: 52, keys: ['ball', 'wheel'] },
-    { folder: 'enemy', width: 64, height: 80, keys: ['snowman'] },
-    { folder: 'enemy', width: 160, height: 160, keys: ['frost-warden'] },
-    { folder: 'enemy', width: 96, height: 100, keys: ['ogre', 'ogre-moss', 'ogre-stone', 'ogre-ember', 'ogre-ember-angry', 'ogre-flame'] },
     { folder: 'scene', width: 96, height: 76, keys: ['allah-plaque'] },
     { folder: 'collect', width: 64, height: 40, keys: ['key'] },
     { folder: 'collect', width: 36, height: 52, keys: ['mat'] },
@@ -23,10 +20,7 @@ const SOUND_KEYS = ['jump', 'collect', 'hurt', 'heal', 'key', 'boss-jump', 'boss
 export function loadGameAssets(scene, character, level = scene.level) {
     const needed = level ? requiredImages(level) : null;
 
-    let base = 'child';
-    if (character === 'girl') base = 'girl';
-    if (character === 'ice_girl') base = 'ice_girl';
-    if (character === 'ice_boy') base = 'ice_boy';
+    const base = characterPrefix('normal', character).slice(0, -1);
 
     if (!scene.textures?.exists(`${base}-blink`)) {
         scene.load.svg(`${base}-blink`, `assets/images/hero/${base}-blink.svg`, { width: 64, height: 80 });
@@ -41,7 +35,8 @@ export function loadGameAssets(scene, character, level = scene.level) {
             }
         }
     }
-    for (const { folder, width, height, keys } of IMAGE_GROUPS) {
+    const groups = [...IMAGE_GROUPS, ...Array.from(enemyTypes, ([key, { asset }]) => ({ folder: 'enemy', ...asset, keys: [key] }))];
+    for (const { folder, width, height, keys } of groups) {
         for (const key of keys) {
             if ((!needed || needed.has(key)) && !scene.textures?.exists(key)) {
                 scene.load.svg(key, `assets/images/${folder}/${key}.svg`, { width, height });

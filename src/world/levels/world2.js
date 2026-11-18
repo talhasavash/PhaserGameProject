@@ -1,6 +1,9 @@
 // Dünya 2: 16–30. bölümler; ilk yolculuk, gece ormanı ve karanlık geçitler.
+import { defineLevel } from '../model/definitions.js';
+import { nightChapter } from '../model/templates.js';
+export { nightChapter };
 
-export const firstJourney = {
+export const firstJourney = defineLevel({
 
     name: 'Yeni Bölüm', theme: 'moonwood', width: 3200, groundY: 520,
     spawn: {x:100 , y:480},
@@ -32,61 +35,16 @@ export const firstJourney = {
                 {type:'bee', x: 2250, y:410, minX: 2150, maxX:2350, speed:80, bob:25}
     ],
 
-
     fountains: [{ id: 'fountain-1', x: 2500 }],
     belt: {x: 2050, width: 250, speed:-120},
     gaps: [{ x: 1900, width: 100 }],
     fireRain: [{ period: 10000, offset: 4000, speed: 250 }],
     ice: [{ x: 1600, width: 180 } ]
-};
-
-export function nightChapter(data, random = Math.random) {
-    // Bölüm yüklenirken küçük sapmalar seçilir; yıldız ve devriye aynı basamağı izler.
-    const platforms = data.platforms.map(platform => ({ ...platform,
-        x: platform.x + Math.round(random() * 20 - 10),
-        y: platform.y + Math.round(random() * 10 - 5)
-    }));
-    const enemies = data.enemies.map((enemy, index) => {
-        const platform = platforms[enemy.platform];
-        const x = platform ? platform.x + platform.width / 2 : enemy.x;
-        return { ...enemy, x,
-            minX: platform ? x - 40 : enemy.minX, maxX: platform ? x + 40 : enemy.maxX,
-            speed: Math.round(enemy.speed * 0.75),
-            period: enemy.period ? Math.round(enemy.period / 0.75) : undefined,
-            jump: enemy.jump ? { ...enemy.jump, duration: Math.round(enemy.jump.duration / 0.85), period: Math.round(enemy.jump.period / 0.85) } : undefined,
-            visibility: data.vanishAll === false ? enemy.visibility :
-                { visibleMs: 2800, hiddenMs: platform ? 2400 : 1800, fadeMs: 260, offset: index * 670 }
-        };
-    });
-    const fruits = data.fruits.map(item => {
-        const platform = platforms[item.platform];
-        return platform ? { ...item, x: platform.x + platform.width / 2 + 15, y: platform.y - 35 } : item;
-    });
-    return {
-        groundY: 520, spawn: { x: 100, y: 480 },
-        checkpoint: { x: 2550, y: 480 },
-        key: { x: data.width - 420, y: 477 }, exit: { x: data.width - 180, y: 468 },
-        belt: { x: 0, width: 1, speed: 0 },
-        fountains: [{ id: 'fountain-1', x: 2400 }],
-        ...data, platforms, enemies, fruits: [...fruits, ...scatterFruit(data, platforms, random)]
-    };
-}
+});
 
 // Yıldız bekçisi konumunu basamaktan alır; görünmezlik arası yıldızı almak için fırsattır.
 function platformGuard(type, platform, speed) {
     return { type, platform, speed };
-}
-
-function scatterFruit(level, platforms, random) {
-    const types = ['apple', 'orange', 'grapes', 'pear', 'banana', 'strawberry'];
-    const spots = platforms.map(p => ({ x: p.x + p.width / 3, y: p.y - 36 }));
-    for (let x = 190; x < level.width - 540; x += 155) {
-        const fruitX = x + Math.round(random() * 40 - 20);
-        if (level.gaps.some(g => fruitX > g.x - 25 && fruitX < g.x + g.width + 25)) continue;
-        if ((level.columns || []).some(c => Math.abs(c.x - fruitX) < c.width / 2 + 35)) continue;
-        spots.push({ x: fruitX, y: 484 - (spots.length % 3) * 27 });
-    }
-    return spots.map((spot, index) => ({ id: `scattered-${index}`, type: types[index % types.length], ...spot }));
 }
 
 const moonForest = nightChapter({

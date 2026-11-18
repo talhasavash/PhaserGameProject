@@ -553,3 +553,83 @@ node --test tests/*.test.js
 Npm varsa `npm run check` ve `npm test` eşdeğerdir.
 Uzak depo: https://github.com/talhasavash/PhaserGameProject
 Özgün oyun ilk commit'te saklıdır. Eski dosyalara ihtiyaç duyarsak Git geçmişinden alabiliriz.
+
+
+## Yeni dünya ve bölüm ekleme: modüler model
+
+Oyun JavaScript olarak çalışır. TypeScript derleme adımı veya yeni çalışma zamanı bağımlılığı yoktur.
+`src/world/model/contracts.d.ts` dosyası yalnızca IntelliJ için interface sözleşmeleridir;
+normal bölüm yazarken bu dosyayı düzenlemek gerekmez.
+
+- `src/world/levels/world1.js`, `world2.js`, `world3.js`: mevcut bölümlerin yerleşimleri.
+- `src/world/levels/worlds.js`: menü, dünya sırası, ayrılan bölüm sayısı, kıyafet ve menü görseli.
+- `src/world/model/definitions.js`: `defineLevel`, `defineWorld`, `createLevelBuilder`, `stairs`, `stars`.
+- `src/world/model/templates.js`: `trailLevel`, `gateLevel`, `nightChapter`, `iceLevel` ortak şablonları.
+- `src/gameplay/enemyTypes.js`: düşmanın görsel boyutu, fizik gövdesi, varsayılanları ve Factory kaydı.
+- `src/gameplay/hazards.js`: ortak davranışlar ve `registerEnemyBehavior` bileşen kaydı.
+- `src/world/scenery/themes.js`: arka plan ve platform Strategy kaydı.
+
+### Bölüm oluşturma
+
+`examples/new-world.js` kopyalanabilir, test edilen bir örnektir; mevcut oyuna eklenmemiştir.
+Örnek kısa bölüm:
+
+```js
+import { defineLevel, stairs, stars } from '../model/definitions.js';
+import { defineEnemy } from '../../gameplay/enemyTypes.js';
+
+const newLevel = defineLevel({
+    name: 'Yeni Yolculuk', width: 2800, theme: 'moonwood',
+    platforms: stairs({ x: 400, y: 440, count: 3, width: 150 }),
+    fruits: stars([{ x: 470, y: 405 }, { x: 650, y: 325 }, { x: 830, y: 245 }]),
+    enemies: [defineEnemy('snowman', { x: 1650,
+        behaviors: { patrol: { minX: 1500, maxX: 1800, speed: 45 } } })]
+});
+```
+
+Başlangıç, kontrol noktası, anahtar, çıkış, boş engel listeleri ve etkisiz bant otomatik tamamlanır.
+Yazdığın alanlar varsayılanların üzerine geçer; diziler birleştirilmez, değiştirilir.
+`stairs` kullanmak zorunlu değildir; `platforms` ve diğer diziler tek tek de yazılabilir.
+Kardan adamın standart atışını tekrar yazmak gerekmez; tür kaydından gelir.
+Bölümü ilgili `worldOneLevels`, `worldTwoLevels` veya `worldThreeLevels` dizisine eklemek yeterlidir.
+Üç yıldız, koordinatlar, benzersiz nesne id değerleri, tema ve düşman kayıtları açılışta doğrulanır.
+
+### Dünya oluşturma
+
+1. Yeni dünya dosyasında bölümlerini oluştur.
+2. Bölüm dizisini `worlds.js` içine import et ve `worldDefinitions` listesine bir kayıt ekle:
+
+```js
+{
+    id: 6, title: 'Yeni Dünya', count: 15,
+    defaults: { theme: 'moonwood' },
+    menu: { image: 'assets/images/scene/menu-world2.svg', color: '#18294c' },
+    levels: newWorldLevels
+}
+```
+
+Menü sayfası, numaralar, boş/kilitli düğmeler ve dünya sınırları bu kayıttan hesaplanır.
+Mevcut dünya sayılarını ve sırasını değiştirme; kayıtlı ilerlemenin numaraları sabit kalsın.
+Yeni dünyayı sona ekle veya hazır bekleyen Dünya 4/5 kaydının `levels` alanını doldur.
+Hazır olmayan yuvalar oynanabilir olmaz; sonraki dünyaların bölümleri önceki boş yuvalara taşınmaz.
+`characterSkins: { boy: 'ice_boy', girl: 'ice_girl' }` ile dünya kıyafeti seçilebilir.
+Yeni kıyafet için `src/data/characters.js` içindeki `registerCharacterSkin(ad, svgOnAdi)` kullanılır; Loader ve animasyon koduna ayrı ayrı ekleme gerekmez.
+Bölümdeki açık ayarlar dünya varsayılanlarından önceliklidir.
+Yeni bölüm için ayet dizisine satır eklemek zorunlu değildir: bölümün `verse` alanı,
+dünyanın `verse` alanı, eski ayet sırası ve mevcut varsayılan ayet sırasıyla kullanılır.
+
+### Yeni düşman, davranış ve tema
+
+`registerEnemyType(name, { asset, body, defaults, setup })` ile yeni düşman bir kez kaydedilir.
+SVG dosyası `assets/images/enemy/<name>.svg` konumuna konur; Loader bu kayıttan görseli yükler.
+Mevcut `type`, `hop`, `visibility`, `snowball` tanımları da çalışmaya devam eder.
+Yeni davranış `registerEnemyBehavior(name, { update(scene, enemy, patrol, delta) {} })` ile kaydedilir;
+düşmana `components: [name]` eklenince mevcut devriye ve diğer davranışlarla birlikte çalışır.
+Kayıtları ilgili dünya dosyasının başında yap veya o dosyadan bir kayıt modülü import et; böylece dünya kataloğu kurulmadan önce hazır olurlar.
+
+Yeni tema `registerTheme(name, { scenery, platform, drawPlatform, icy })` ile kaydedilir.
+`scenery` arka planı çizer; `platform` renkleri, isteğe bağlı `drawPlatform` özel basamağı tanımlar.
+`icy: true` buzlu kolon/cami görünümünü seçer; kayganlık ayrıca bölümün `ice` ve platformların `ice` alanlarıyla belirlenir.
+Bu yapı yeni SVG'leri klasörden kendiliğinden keşfetmez; yeni tür için kayıt gereklidir.
+
+Kontroller: `node scripts/check.cjs`, `node --test tests/*.test.js`, `node scripts/build-site.cjs`.

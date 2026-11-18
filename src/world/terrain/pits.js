@@ -1,6 +1,7 @@
 // Çukurları karanlık bir boşluk ve doğal zemin kenarlarıyla çizer; fizik boşluğunu terrain.js kurar.
 import { cacheTexture } from '../../graphics/texture.js';
 import { platformThemes } from './platforms.js';
+import { themeStrategies } from '../scenery/themes.js';
 export function createPitArt(scene, gap) {
     const theme = scene.level.theme;
     const height = 600 - scene.level.groundY + 8;
@@ -15,7 +16,8 @@ export function createPitArt(scene, gap) {
             g.fillStyle(0x060d17, (y - 8) / (height - 8) * 0.95);
             g.fillRect(12, y, gap.width, 1);
         }
-        const night = ['moonwood', 'nightRuins', 'nightKeep', 'glacier', 'iceCave', 'aurora', 'crystalPalace'].includes(theme) ? platformThemes[theme] : null;
+        const night = themeStrategies.get(theme)?.platform ||
+            (['moonwood', 'nightRuins', 'nightKeep', 'glacier', 'iceCave', 'aurora', 'crystalPalace'].includes(theme) ? platformThemes[theme] : null);
         const stone = night?.body ?? (theme === 'snow' ? 0x8fabb4 : theme === 'factory' ? 0x526d7b : 0x87644e);
         const edge = night?.edge ?? (theme === 'snow' ? 0xf2f7ee : theme === 'lava' ? 0xf2a361 : theme === 'factory' ? 0xc2ac75 : 0x7dba64);
         // İnce, dik toprak kesitleri; çıkıntılar üzerinde durulacak merdiven oluşturmaz.

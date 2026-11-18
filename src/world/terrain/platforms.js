@@ -28,12 +28,22 @@ export const platformThemes = {
     abyss: { body: 0x726a60, edge: 0xe0c99d, detail: 0x4f5960 }
 };
 
+const platformDrawers = new Map();
+export function registerPlatformTheme(name, palette, draw) {
+    platformThemes[name] = palette;
+    if (draw) platformDrawers.set(name, draw);
+}
+
 export function createPlatformArt(scene, platform, theme) {
     const { x, y, width } = platform;
     const key = `step-${theme}-${width}-${platform.single ? 'single' : 'wide'}`;
     let textureWidth = 64;
     while (textureWidth < width + 12) textureWidth *= 2;
-    cacheTexture(scene, key, textureWidth, 64, g => drawStep(g, width, theme));
+    cacheTexture(scene, key, textureWidth, 64, g => {
+        const draw = platformDrawers.get(theme);
+        if (draw) draw(g, width, platformThemes[theme]);
+        else drawStep(g, width, theme);
+    });
     return scene.add.image(x - 6, y, key).setOrigin(0).setDepth(6);
 }
 

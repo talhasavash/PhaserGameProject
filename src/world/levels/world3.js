@@ -2,7 +2,7 @@
 
 export const firstJourney = {
 
-    name: 'Yeni Bölüm', theme: 'journey', width: 3200, groundY: 520,
+    name: 'Yeni Bölüm', theme: 'moonwood', width: 3200, groundY: 520,
     spawn: {x:100 , y:480},
     checkpoint: {x:1500 , y:480} ,
     key: {x: 2700, y: 477},

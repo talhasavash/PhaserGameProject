@@ -14,11 +14,13 @@ export interface EnemyDefinition extends Partial<Patrol> {
     jump?: { height: number; duration: number; period: number; offset: number };
     breath?: { shots: number[]; speed: number; range: number };
     components?: string[];
-    behaviors?: { patrol?: Partial<Patrol>; hop?: Hop; visibility?: Visibility; shoot?: Shot };
+    behaviors?: { patrol?: Partial<Patrol>; hop?: Hop; visibility?: Visibility; shoot?: Shot;
+        vertical?: { bob?: number; period?: number; offset?: number; threadTop?: number };
+        jump?: EnemyDefinition['jump']; breath?: EnemyDefinition['breath']; rage?: boolean };
 }
 export interface Verse { text: string; reference?: string; source?: string }
 export interface LevelDefinition {
-    id?: string; name: string; theme: string; width: number; groundY: number;
+    id?: string; template?: string; stage?: number; name: string; theme: string; width: number; groundY: number;
     spawn: Point; checkpoint: Point; key: Point; exit: Point;
     platforms: Platform[]; fruits: Collectible[]; enemies: EnemyDefinition[];
     fountains: { id: string; x: number }[]; belt: Strip & { speed: number };
@@ -32,11 +34,16 @@ export interface LevelDefinition {
 }
 export type PlatformCollectible = Omit<Collectible, 'x' | 'y'> & Partial<Point> & { platform: number };
 export type PlatformEnemy = Omit<EnemyDefinition, 'x'> & { x?: number; platform: number };
-export type LevelInput = Pick<LevelDefinition, 'name' | 'width'> &
+export type LevelInput = Pick<LevelDefinition, 'name'> &
     Partial<Omit<LevelDefinition, 'name' | 'width' | 'fruits' | 'enemies' | 'spawn' | 'checkpoint' | 'key' | 'exit'>> & {
-        fruits?: (Collectible | PlatformCollectible)[]; enemies?: (EnemyDefinition | PlatformEnemy)[];
+        width?: number; fruits?: (Collectible | PlatformCollectible)[]; enemies?: (EnemyDefinition | PlatformEnemy)[];
         spawn?: Partial<Point>; checkpoint?: Partial<Point>; key?: Partial<Point>; exit?: Partial<Point>;
     };
+export interface LevelTemplate {
+    parent?: string;
+    defaults?: Partial<LevelInput> | ((input: LevelInput) => Partial<LevelInput>);
+    prepare?(input: LevelInput, random: () => number): LevelInput;
+}
 export interface WorldDefinition {
     id: number; title: string; count: number; levels: LevelDefinition[];
     defaults?: Partial<LevelDefinition>; characterSkins?: Record<string, string>;

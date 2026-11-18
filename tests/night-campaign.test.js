@@ -1,7 +1,8 @@
 // 20–30'un rastgele yollarını, zorluk artışını ve son bölüm muhafızlarını doğrular.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createNightCampaign, lateNightLevels } from '../src/world/levels/world2.js';
+import { lateNightDefinitions, lateNightLevels } from '../src/world/levels/world2.js';
+import { defineLevel } from '../src/world/model/definitions.js';
 import { levels, worldForLevel } from '../src/world/levels/level.js';
 
 function reachablePlatforms(level) {
@@ -56,7 +57,7 @@ test('Randomized night routes keep stars reachable, guards on their ledges and l
         let state = seed + 1;
         const random = seed === 0 ? () => 0 : seed === 1 ? () => 1 :
             () => ((state = state * 16807 % 2147483647) - 1) / 2147483646;
-        for (const level of createNightCampaign(random)) {
+        for (const level of lateNightDefinitions.map(definition => defineLevel(definition, random))) {
             assert.ok(reachablePlatforms(level), `${seed}: ${level.name}`);
             const stars = level.fruits.filter(item => item.type === 'star');
             assert.equal(stars.length, 3);

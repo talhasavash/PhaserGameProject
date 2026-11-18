@@ -1,4 +1,5 @@
 // Builder: ortak varsayılanları uygular; yeni dünya ve bölüm tanımlarını aynı sözleşmede toplar.
+import { levelTemplates } from './templates.js';
 /** @typedef {import('./contracts.js').LevelInput} LevelInput */
 /** @typedef {import('./contracts.js').LevelDefinition} LevelDefinition */
 /** @typedef {import('./contracts.js').WorldInput} WorldInput */
@@ -21,12 +22,25 @@ export function withDefaults(input, defaults) {
 }
 
 /** @param {LevelInput} input @returns {LevelDefinition} */
-export function defineLevel(input) {
-    if (!input.name || !Number.isFinite(input.width) || input.width <= 0) throw new Error('Bölüm adı ve pozitif genişlik gerekli.');
-    const level = withDefaults(input, {
-        theme: 'garden', groundY: 520, spawn: { x: 100, y: 480 },
-        checkpoint: { x: input.width / 2, y: 480 }, key: { x: input.width - 420, y: 477 },
-        exit: { x: input.width - 180, y: 468 }, belt: { x: 0, width: 1, speed: 0 },
+export function defineLevel(input, random = Math.random) {
+    if (levelInputs.has(input)) return input;
+    let data = input;
+    const visited = new Set();
+    let name = input.template || 'standard';
+    while (name) {
+        if (visited.has(name)) throw new Error(`Döngüsel bölüm şablonu: ${name}`);
+        const template = levelTemplates.get(name);
+        if (!template) throw new Error(`Bilinmeyen bölüm şablonu: ${name}`);
+        visited.add(name);
+        data = withDefaults(data, typeof template.defaults === 'function' ? template.defaults(data) : template.defaults || {});
+        if (template.prepare) data = template.prepare(withDefaults(data, { platforms: [], fruits: [], enemies: [], gaps: [] }), random);
+        name = template.parent;
+    }
+    if (!data.name || !Number.isFinite(data.width) || data.width <= 0) throw new Error('Bölüm adı ve pozitif genişlik gerekli.');
+    const level = withDefaults(data, {
+        template: 'standard', theme: 'garden', groundY: 520, spawn: { x: 100, y: 480 },
+        checkpoint: { x: data.width / 2, y: 480 }, key: { x: data.width - 420, y: 477 },
+        exit: { x: data.width - 180, y: 468 }, belt: { x: 0, width: 1, speed: 0 },
         platforms: [], fruits: [], enemies: [], fountains: [], gaps: []
     });
     if (!levelInputs.has(level)) levelInputs.set(level, levelInputs.get(input) || input);

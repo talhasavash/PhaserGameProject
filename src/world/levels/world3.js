@@ -1,9 +1,14 @@
 // Dünya 3'ün 31–34. bölümlerini; buz yüzeylerini, karlı rotaları ve kutup düşmanlarını tanımlar.
-import { iceLevel as iceChapter } from '../model/templates.js';
+import { defineLevel } from '../model/definitions.js';
+import { defineEnemy } from '../../gameplay/enemyTypes.js';
 
-const frozenLake = iceChapter({
-    name: 'Buz Gölü', theme: 'glacier', width: 4000,
-    checkpoint: { x: 2350, y: 480 }, fountains: [{ id: 'fountain-1', x: 1250 }, { id: 'fountain-2', x: 2500 }],
+const frozenLake = defineLevel({
+    template: 'ice',
+    name: 'Buz Gölü',
+    theme: 'glacier',
+    width: 4000,
+    checkpoint: { x: 2350, y: 480 },
+    fountains: [{ id: 'fountain-1', x: 1250 }, { id: 'fountain-2', x: 2500 }],
     platforms: [
         { x: 420, y: 440, width: 120 }, { x: 590, y: 365, width: 170 },
         { x: 1500, y: 435, width: 160 }, { x: 1760, y: 360, width: 110 },
@@ -16,18 +21,22 @@ const frozenLake = iceChapter({
         { id: 'lantern-1', type: 'lantern', x: 1300, y: 480 }
     ],
     enemies: [
-        { type: 'snowman', x: 1380, minX: 1320, maxX: 1420, speed: 35, snowball: { period: 3100, speed: 210 } },
-        { type: 'penguin', platform: 1, speed: 90 }, { type: 'snow-fox', platform: 2, speed: 105 },
-        { type: 'ice-crab', platform: 6, speed: 100, hop: { walkMs: 2800, pauseMs: 400, height: 45, duration: 700 } },
-        { type: 'frost-bat', x: 1900, y: 390, minX: 1800, maxX: 2010, speed: 105, bob: 25 },
-        { type: 'snow-fox', x: 3460, minX: 3420, maxX: 3500, speed: 110 }
+        defineEnemy('snowman', { x: 1380, behaviors: { patrol: { minX: 1320, maxX: 1420, speed: 35 }, shoot: { period: 3100, speed: 210 } } }),
+        defineEnemy('penguin', { platform: 1, behaviors: { patrol: { speed: 90 } } }), defineEnemy('snow-fox', { platform: 2, behaviors: { patrol: { speed: 105 } } }),
+        defineEnemy('ice-crab', { platform: 6, behaviors: { patrol: { speed: 100 }, hop: { walkMs: 2800, pauseMs: 400, height: 45, duration: 700 } } }),
+        defineEnemy('frost-bat', { x: 1900, y: 390, behaviors: { patrol: { minX: 1800, maxX: 2010, speed: 105 }, vertical: { bob: 25 } } }),
+        defineEnemy('snow-fox', { x: 3460, behaviors: { patrol: { minX: 3420, maxX: 3500, speed: 110 } } })
     ],
     mosqueStyle: { wall: 0xe1eef2, roof: 0x80b8cd, trim: 0xdcecf0, width: 200, towers: [-122, 122] }
 });
 
-const frozenCave = iceChapter({
-    name: 'Donmuş Mağara', theme: 'iceCave', width: 4700,
-    checkpoint: { x: 2700, y: 480 }, fountains: [{ id: 'fountain-1', x: 2860 }],
+const frozenCave = defineLevel({
+    template: 'ice',
+    name: 'Donmuş Mağara',
+    theme: 'iceCave',
+    width: 4700,
+    checkpoint: { x: 2700, y: 480 },
+    fountains: [{ id: 'fountain-1', x: 2860 }],
     platforms: [
         { x: 390, y: 440, width: 110 }, { x: 560, y: 360, width: 110 }, { x: 720, y: 280, width: 170 },
         { x: 1880, y: 440, width: 150 }, { x: 2400, y: 435, width: 100 },
@@ -40,21 +49,25 @@ const frozenCave = iceChapter({
         { id: 'bead-1', type: 'bead', x: 3060, y: 480 }
     ],
     enemies: [
-        { type: 'snowman', x: 1560, minX: 1480, maxX: 1600, speed: 40, snowball: { period: 2700, speed: 230 } },
-        { type: 'snowman', x: 4200, minX: 4140, maxX: 4250, speed: 40, snowball: { period: 2900, speed: 220 } },
-        { type: 'ice-crab', platform: 2, speed: 110 },
-        { type: 'penguin', platform: 3, speed: 115, visibility: { visibleMs: 2900, hiddenMs: 2300, offset: 700 } },
-        { type: 'snow-fox', platform: 7, speed: 120, hop: { walkMs: 2600, pauseMs: 400, height: 55, duration: 750 } },
-        { type: 'frost-bat', x: 1450, y: 365, minX: 1320, maxX: 1620, speed: 125, bob: 35 },
-        { type: 'frost-bat', x: 2900, y: 390, minX: 2790, maxX: 3100, speed: 130, bob: 30 }
+        defineEnemy('snowman', { x: 1560, behaviors: { patrol: { minX: 1480, maxX: 1600, speed: 40 }, shoot: { period: 2700, speed: 230 } } }),
+        defineEnemy('snowman', { x: 4200, behaviors: { patrol: { minX: 4140, maxX: 4250, speed: 40 }, shoot: { period: 2900, speed: 220 } } }),
+        defineEnemy('ice-crab', { platform: 2, behaviors: { patrol: { speed: 110 } } }),
+        defineEnemy('penguin', { platform: 3, behaviors: { patrol: { speed: 115 }, visibility: { visibleMs: 2900, hiddenMs: 2300, offset: 700 } } }),
+        defineEnemy('snow-fox', { platform: 7, behaviors: { patrol: { speed: 120 }, hop: { walkMs: 2600, pauseMs: 400, height: 55, duration: 750 } } }),
+        defineEnemy('frost-bat', { x: 1450, y: 365, behaviors: { patrol: { minX: 1320, maxX: 1620, speed: 125 }, vertical: { bob: 35 } } }),
+        defineEnemy('frost-bat', { x: 2900, y: 390, behaviors: { patrol: { minX: 2790, maxX: 3100, speed: 130 }, vertical: { bob: 30 } } })
     ],
     mosqueStyle: { wall: 0xc4e0e9, roof: 0x5389ab, trim: 0xd5f2f4, width: 225, towers: [-135],
         domes: [[-65, 435, 75, 65], [65, 435, 75, 65], [0, 400, 110, 105]] }
 });
 
-const polarLights = iceChapter({
-    name: 'Kutup Işıkları', theme: 'aurora', width: 5400,
-    checkpoint: { x: 2870, y: 480 }, fountains: [{ id: 'fountain-1', x: 1650 }, { id: 'fountain-2', x: 4390 }],
+const polarLights = defineLevel({
+    template: 'ice',
+    name: 'Kutup Işıkları',
+    theme: 'aurora',
+    width: 5400,
+    checkpoint: { x: 2870, y: 480 },
+    fountains: [{ id: 'fountain-1', x: 1650 }, { id: 'fountain-2', x: 4390 }],
     platforms: [
         { x: 350, y: 440, width: 100 }, { x: 500, y: 360, width: 110 }, { x: 650, y: 280, width: 170 },
         { x: 1900, y: 440, width: 110 }, { x: 2040, y: 360, width: 100 }, { x: 2180, y: 280, width: 100 }, { x: 2320, y: 205, width: 170 },
@@ -67,23 +80,28 @@ const polarLights = iceChapter({
         { id: 'crescent-1', type: 'crescent', x: 4510, y: 480 }
     ],
     enemies: [
-        { type: 'snowman', x: 1610, minX: 1560, maxX: 1650, speed: 45, snowball: { period: 2500, speed: 245 } },
-        { type: 'snowman', x: 4930, minX: 4870, maxX: 4970, speed: 45, snowball: { period: 2600, speed: 235 } },
-        { type: 'snow-fox', platform: 2, speed: 120, hop: { walkMs: 2500, pauseMs: 350, height: 60, duration: 750 } },
-        { type: 'ice-crab', platform: 6, speed: 125, visibility: { visibleMs: 2600, hiddenMs: 2300, offset: 500 } },
-        { type: 'penguin', platform: 8, speed: 130 },
-        { type: 'frost-bat', x: 1750, y: 380, minX: 1610, maxX: 1830, speed: 135, bob: 35 },
-        { type: 'frost-bat', x: 4610, y: 390, minX: 4500, maxX: 4740, speed: 140, bob: 28 },
-        { type: 'snow-fox', x: 4790, minX: 4700, maxX: 4850, speed: 130 }
+        defineEnemy('snowman', { x: 1610, behaviors: { patrol: { minX: 1560, maxX: 1650, speed: 45 }, shoot: { period: 2500, speed: 245 } } }),
+        defineEnemy('snowman', { x: 4930, behaviors: { patrol: { minX: 4870, maxX: 4970, speed: 45 }, shoot: { period: 2600, speed: 235 } } }),
+        defineEnemy('snow-fox', { platform: 2, behaviors: { patrol: { speed: 120 }, hop: { walkMs: 2500, pauseMs: 350, height: 60, duration: 750 } } }),
+        defineEnemy('ice-crab', { platform: 6, behaviors: { patrol: { speed: 125 }, visibility: { visibleMs: 2600, hiddenMs: 2300, offset: 500 } } }),
+        defineEnemy('penguin', { platform: 8, behaviors: { patrol: { speed: 130 } } }),
+        defineEnemy('frost-bat', { x: 1750, y: 380, behaviors: { patrol: { minX: 1610, maxX: 1830, speed: 135 }, vertical: { bob: 35 } } }),
+        defineEnemy('frost-bat', { x: 4610, y: 390, behaviors: { patrol: { minX: 4500, maxX: 4740, speed: 140 }, vertical: { bob: 28 } } }),
+        defineEnemy('snow-fox', { x: 4790, behaviors: { patrol: { minX: 4700, maxX: 4850, speed: 130 } } })
     ],
     mosqueStyle: { wall: 0xdce9f0, roof: 0x587aab, trim: 0xe9d8a6, width: 245, towers: [-148, -113, 113, 148],
         domes: [[-80, 425, 80, 70], [80, 425, 80, 70], [0, 389, 125, 120]] }
 });
 
-const crystalPalace = iceChapter({
-    name: 'Kristal Sarayın Muhafızı', theme: 'crystalPalace', width: 5700,
-    boss: true, frozenItems: true,
-    checkpoint: { x: 4050, y: 480 }, fountains: [{ id: 'fountain-1', x: 1900 }, { id: 'fountain-2', x: 4140 }],
+const crystalPalace = defineLevel({
+    template: 'ice',
+    name: 'Kristal Sarayın Muhafızı',
+    theme: 'crystalPalace',
+    width: 5700,
+    boss: true,
+    frozenItems: true,
+    checkpoint: { x: 4050, y: 480 },
+    fountains: [{ id: 'fountain-1', x: 1900 }, { id: 'fountain-2', x: 4140 }],
     platforms: [
         { x: 390, y: 440, width: 140 }, { x: 580, y: 360, width: 130 }, { x: 760, y: 280, width: 210 },
         { x: 1670, y: 440, width: 160 }, { x: 2170, y: 435, width: 130 }, { x: 2350, y: 355, width: 130 },
@@ -99,12 +117,11 @@ const crystalPalace = iceChapter({
         { id: 'palace-crescent', type: 'crescent', x: 4230, y: 480 }, { id: 'palace-bead', type: 'bead', x: 4540, y: 480 }
     ],
     enemies: [
-        { type: 'ice-crab', platform: 2, speed: 105 }, { type: 'penguin', platform: 6, speed: 110 },
-        { type: 'snow-fox', platform: 8, speed: 115 },
-        { type: 'snowman', x: 2050, minX: 2000, maxX: 2090, speed: 35, snowball: { period: 3100, speed: 220 } },
-        { type: 'frost-bat', x: 3460, y: 335, minX: 3350, maxX: 3540, speed: 105, bob: 18 },
-        { type: 'frost-warden', x: 4930, y: 325, minX: 4880, maxX: 5010, speed: 35, scale: 1.3, bob: 18,
-            snowball: { kind: 'shard', volley: 3, period: 2900, speed: 230, range: 720 } }
+        defineEnemy('ice-crab', { platform: 2, behaviors: { patrol: { speed: 105 } } }), defineEnemy('penguin', { platform: 6, behaviors: { patrol: { speed: 110 } } }),
+        defineEnemy('snow-fox', { platform: 8, behaviors: { patrol: { speed: 115 } } }),
+        defineEnemy('snowman', { x: 2050, behaviors: { patrol: { minX: 2000, maxX: 2090, speed: 35 }, shoot: { period: 3100, speed: 220 } } }),
+        defineEnemy('frost-bat', { x: 3460, y: 335, behaviors: { patrol: { minX: 3350, maxX: 3540, speed: 105 }, vertical: { bob: 18 } } }),
+        defineEnemy('frost-warden', { x: 4930, y: 325, scale: 1.3, behaviors: { patrol: { minX: 4880, maxX: 5010, speed: 35 }, shoot: { kind: 'shard', volley: 3, period: 2900, speed: 230, range: 720 }, vertical: { bob: 18 } } })
     ],
     mosqueStyle: { wall: 0xe3dafa, roof: 0x748ae1, trim: 0x97f2ef, width: 250, towers: [-150, 150],
         domes: [[-82, 427, 82, 70], [82, 427, 82, 70], [0, 382, 132, 125]] }

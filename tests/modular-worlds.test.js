@@ -10,10 +10,33 @@ import { createScenery } from '../src/world/scenery/background.js';
 import { createPlatformArt, platformThemes } from '../src/world/terrain/platforms.js';
 import { loadGameAssets } from '../src/data/assets.js';
 import { exampleWorld } from '../examples/new-world.js';
+import { levelTemplates, registerLevelTemplate } from '../src/world/model/templates.js';
 import { registerCharacterSkin, characterSkins, characterPrefix } from '../src/data/characters.js';
 
 const draft = overrides => ({ name: 'Örnek Bölüm', width: 2800,
     fruits: stars([{ x: 300, y: 480 }, { x: 700, y: 480 }, { x: 1100, y: 480 }]), ...overrides });
+
+test('The unified Builder applies inherited templates once and keeps their defaults ahead of base defaults', () => {
+    let calls = 0;
+    registerLevelTemplate('test-night', { parent: 'night', defaults: { theme: 'moonwood', width: 4000 } });
+    try {
+        const level = defineLevel({ name: 'Gece Örneği', template: 'test-night',
+            platforms: [{ x: 400, y: 430, width: 170 }],
+            fruits: stars([{ x: 700, y: 480 }, { x: 900, y: 480 }, { x: 1100, y: 480 }])
+        }, () => { calls++; return 0.5; });
+        assert.equal(level.theme, 'moonwood');
+        assert.equal(level.width, 4000);
+        assert.deepEqual(level.fountains, [{ id: 'fountain-1', x: 2400 }]);
+        const count = calls;
+        assert.ok(count > 0);
+        assert.equal(defineLevel(level), level);
+        defineWorld({ id: 9, title: 'Deneme', levels: [level] });
+        assert.equal(calls, count, 'Catalog and world registration must not scatter or shift objects twice');
+        assert.throws(() => defineLevel(draft({ template: 'unknown-template' })), /Bilinmeyen/);
+        registerLevelTemplate('test-cycle', { parent: 'test-cycle' });
+        assert.throws(() => defineLevel(draft({ template: 'test-cycle' })), /Döngüsel/);
+    } finally { levelTemplates.delete('test-night'); levelTemplates.delete('test-cycle'); }
+});
 
 test('New world costumes share one prefix registration for loading and all expression frames', () => {
     registerCharacterSkin('test-outfit', 'test_hero');

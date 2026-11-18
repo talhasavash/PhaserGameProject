@@ -316,7 +316,7 @@ Her bölümde en az 20 meyve zemin ve basamaklara farklı yüksekliklerde serpi�
 Unutulmuş Avlu, Ağlı Kuleler, Kayıp Kandiller, Gece Presleri, Karanlık Burçlar,
 Uçurum Nöbeti, Kandil Labirenti, Son Geçit ve Gecenin Efendileri sırasıyla zorlaşır.
 Son bölümde iki dev muhafız vardır; tamamlanınca Dünya 3'ün bölüm menüsüne dönülür.
-31–33, `iceLevels.js` içindeki Buz Gölü, Donmuş Mağara ve Kutup Işıkları bölümleridir;
+31–34, `world3.js` içindeki Buz Gölü, Donmuş Mağara ve Kutup Işıkları bölümleridir;
 toplam 33 bölüm hazırdır. Zemin ve `ice: true` platformlar kaygandır. `iceScenery.js`
 karlı dağ, buz mağarası ve kutup ışığı katmanlarını ve en fazla 65 parçacıklı karı çizer.
 Dünya 3'te kız seçilirse mevcut `ice_girl` çizimleri kullanılır.
@@ -564,7 +564,7 @@ normal bölüm yazarken bu dosyayı düzenlemek gerekmez.
 - `src/world/levels/world1.js`, `world2.js`, `world3.js`: mevcut bölümlerin yerleşimleri.
 - `src/world/levels/worlds.js`: menü, dünya sırası, ayrılan bölüm sayısı, kıyafet ve menü görseli.
 - `src/world/model/definitions.js`: `defineLevel`, `defineWorld`, `createLevelBuilder`, `stairs`, `stars`.
-- `src/world/model/templates.js`: `trailLevel`, `gateLevel`, `nightChapter`, `iceLevel` ortak şablonları.
+- `src/world/model/templates.js`: `standard`, `trail`, `gate`, `night`, `night-campaign`, `ice` ortak şablonları.
 - `src/gameplay/enemyTypes.js`: düşmanın görsel boyutu, fizik gövdesi, varsayılanları ve Factory kaydı.
 - `src/gameplay/hazards.js`: ortak davranışlar ve `registerEnemyBehavior` bileşen kaydı.
 - `src/world/scenery/themes.js`: arka plan ve platform Strategy kaydı.
@@ -579,7 +579,7 @@ import { defineLevel, stairs, stars } from '../model/definitions.js';
 import { defineEnemy } from '../../gameplay/enemyTypes.js';
 
 const newLevel = defineLevel({
-    name: 'Yeni Yolculuk', width: 2800, theme: 'moonwood',
+    template: 'standard', name: 'Yeni Yolculuk', width: 2800, theme: 'moonwood',
     platforms: stairs({ x: 400, y: 440, count: 3, width: 150 }),
     fruits: stars([{ x: 470, y: 405 }, { x: 650, y: 325 }, { x: 830, y: 245 }]),
     enemies: [defineEnemy('snowman', { x: 1650,
@@ -633,3 +633,34 @@ Yeni tema `registerTheme(name, { scenery, platform, drawPlatform, icy })` ile ka
 Bu yapı yeni SVG'leri klasörden kendiliğinden keşfetmez; yeni tür için kayıt gereklidir.
 
 Kontroller: `node scripts/check.cjs`, `node --test tests/*.test.js`, `node scripts/build-site.cjs`.
+
+
+### Bütün bölümlerde tek tanım biçimi
+
+Mevcut 34 bölüm de `defineLevel({ template: ... })` kullanır.
+`trail`, `chapter`, `nightChapter` ve `iceChapter` gibi ayrı bölüm kurma fonksiyonları kaldırılmıştır.
+Ortak ayarlar `templates.js` içinde, gece rotası hesapları `nightPattern.js` içindedir.
+Dünya dosyaları yalnızca bölüm verilerini ve listelerini içerir; ortak algoritmaları tekrar yazmaz.
+
+```js
+const level = defineLevel({
+    template: 'ice',
+    name: 'Yeni Buz Yolu',
+    width: 4000,
+    theme: 'glacier',
+    platforms: [...],
+    fruits: [...],
+    enemies: [defineEnemy('penguin', {
+        x: 1200,
+        behaviors: { patrol: { minX: 1100, maxX: 1400, speed: 80 } }
+    })]
+});
+```
+
+`ice` şablonu buzlu platformları, aralıklı buz zeminini, kar topu yağışını ve ek meyveleri kurar.
+`night` şablonu geceye özel yerleşim sapmalarını ve meyve dağılımını uygular.
+`night-campaign` şablonu `stage` ve `routes` verilerinden daha kapsamlı bir gece rotası üretir.
+Yeni bir şablon `registerLevelTemplate(ad, { defaults, prepare, parent })` ile eklenebilir;
+`defineLevel` bütün şablonlar için aynı giriş noktasıdır.
+Düşmanlarda devriye, dikey hareket, zıplama, görünmezlik ve atış ayarları `behaviors` altında yazılır.
+Çalışma sırasında motorun kullandığı düz alanlara dönüşümü `defineEnemy` yapar.

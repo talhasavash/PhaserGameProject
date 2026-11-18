@@ -1,23 +1,30 @@
-// Ortak bölüm şablonları: mevcut gece/buz yerleşimini korur, yeni bölümlerde tekrarları azaltır.
-import { defineLevel, createLevelBuilder, withDefaults } from './definitions.js';
+// Ortak bölüm şablonları: her bölüm defineLevel ve template alanıyla aynı yoldan kurulur.
+import { createNightLayout } from './nightPattern.js';
 
-export const trailLevel = createLevelBuilder(data => ({
-        checkpoint: { x: data.width / 2, y: 480 },
+/** @type {Map<string, import('./contracts.js').LevelTemplate>} */
+export const levelTemplates = new Map([
+    ['standard', {}],
+    ['trail', { defaults: data => ({
         key: { x: data.width - 550, y: 477 }, exit: { x: data.width - 260, y: 468 },
         belt: { x: 2050, width: 180, speed: -100 },
         fountains: [{ id: 'fountain-1', x: 1250 }, { id: 'fountain-2', x: data.width - 950 }]
-    }));
-
-export const gateLevel = createLevelBuilder(data => ({
+    }) }],
+    ['gate', { defaults: data => ({
         exitType: 'gate',
         key: { x: data.width - 520, y: 477 }, exit: { x: data.width - 220, y: 468 },
-        checkpoint: { x: data.width / 2, y: 480 },
         fountains: [{ id: 'fountain-1', x: 420 }, { id: 'fountain-2', x: data.width - 850 }]
-    }));
+    }) }],
+    ['night', { defaults: { checkpoint: { x: 2550, y: 480 }, fountains: [{ id: 'fountain-1', x: 2400 }] }, prepare: prepareNight }],
+    ['ice', { defaults: { fireRain: [{ kind: 'snow', period: 10000, speed: 310, offset: 4500 }] }, prepare: prepareIce }],
+    ['night-campaign', { parent: 'night', defaults: data => ({ width: 5000 + data.stage * 120 }), prepare: createNightLayout }]
+]);
 
-/** @param {import('./contracts.js').LevelInput} data */
-export function nightChapter(data, random = Math.random) {
-    data = withDefaults(data, { platforms: [], fruits: [], enemies: [], gaps: [] });
+export function registerLevelTemplate(name, template) {
+    if (!name || levelTemplates.has(name)) throw new Error('Bölüm şablonunun adı benzersiz olmalı.');
+    levelTemplates.set(name, template);
+}
+
+function prepareNight(data, random = Math.random) {
     // Bölüm yüklenirken küçük sapmalar seçilir; yıldız ve devriye aynı basamağı izler.
     const platforms = data.platforms.map(platform => ({ ...platform,
         x: platform.x + Math.round(random() * 20 - 10),
@@ -39,11 +46,9 @@ export function nightChapter(data, random = Math.random) {
         const platform = platforms[item.platform];
         return platform ? { ...item, x: platform.x + platform.width / 2 + 15, y: platform.y - 35 } : item;
     });
-    return defineLevel({
-        checkpoint: { x: 2550, y: 480 },
-        fountains: [{ id: 'fountain-1', x: 2400 }],
+    return {
         ...data, platforms, enemies, fruits: [...fruits, ...scatterFruit(data, platforms, random)]
-    });
+    };
 }
 
 function scatterFruit(level, platforms, random) {
@@ -58,9 +63,7 @@ function scatterFruit(level, platforms, random) {
     return spots.map((spot, index) => ({ id: `scattered-${index}`, type: types[index % types.length], ...spot }));
 }
 
-/** @param {import('./contracts.js').LevelInput} data */
-export function iceLevel(data) {
-    data = withDefaults(data, { platforms: [], fruits: [], enemies: [], gaps: [] });
+function prepareIce(data) {
     const platforms = data.platforms.map(platform => ({ ...platform, ice: true }));
     const fruits = data.fruits.map(item => item.platform === undefined ? item : {
         ...item, x: platforms[item.platform].x + platforms[item.platform].width / 2 + 10,
@@ -90,7 +93,6 @@ export function iceLevel(data) {
         if (data.gaps.some(gap => x > gap.x - 25 && x < gap.x + gap.width + 25)) continue;
         fruits.push({ id: `ground-fruit-${index}`, type: types[index % types.length], x, y: 480 - index % 3 * 25 });
     }
-    return defineLevel({
-        ...data, platforms, fruits, enemies, ice,
-        fireRain: [{ kind: 'snow', period: 10000, speed: 310, offset: 4500 }] });
+    return {
+        ...data, platforms, fruits, enemies, ice };
 }

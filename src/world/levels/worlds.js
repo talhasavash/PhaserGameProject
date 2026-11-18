@@ -1,4 +1,5 @@
 // Yeni dünya bu listeye eklenir; menü, bölüm numaraları, kıyafet ve kilit sınırları buradan oluşur.
+import { defineWorld } from '../model/definitions.js';
 import { worldOneLevels } from './world1.js';
 import { worldTwoLevels } from './world2.js';
 import { worldThreeLevels } from './world3.js';
@@ -15,4 +16,4 @@ export const worldDefinitions = [
             headingColor: '#2a6281', headingStroke: '2px #f4fdff', headingShadow: '0 3px 0 #2e678633' } },
     { id: 4, title: 'Ateş ve Çukur', menu: { image: 'assets/images/scene/menu-world4.svg', color: '#49657c' } },
     { id: 5, title: "Kabe'nin Yolları", menu: { image: 'assets/images/scene/menu-world5.svg', color: '#18294c' } }
-];
+].map(definition => defineWorld(definition));

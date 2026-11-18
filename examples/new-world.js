@@ -3,6 +3,7 @@ import { defineLevel, defineWorld, stairs, stars } from '../src/world/model/defi
 import { defineEnemy } from '../src/gameplay/enemyTypes.js';
 
 const firstLevel = defineLevel({
+    template: 'standard',
     name: 'Yeni Yolculuk', width: 2800,
     platforms: stairs({ x: 400, y: 440, count: 3, width: 150 }),
     fruits: stars([{ x: 470, y: 405 }, { x: 650, y: 325 }, { x: 830, y: 245 }]),

@@ -32,8 +32,12 @@ export function defineEnemy(type, options) {
     const x = data.x;
     return { minX: x, maxX: x, speed: 0, ...enemyTypes.get(type)?.defaults, ...data, type,
         ...behaviors.patrol,
+        ...behaviors.vertical,
         ...(behaviors.hop ? { hop: behaviors.hop } : {}),
         ...(behaviors.visibility ? { visibility: behaviors.visibility } : {}),
+        ...(behaviors.jump ? { jump: behaviors.jump } : {}),
+        ...(behaviors.breath ? { breath: behaviors.breath } : {}),
+        ...(behaviors.rage !== undefined ? { rage: behaviors.rage } : {}),
         ...(behaviors.shoot ? { snowball: behaviors.shoot } : {}) };
 }
 

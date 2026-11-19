@@ -5,6 +5,7 @@ import { existsSync } from 'node:fs';
 import { createMusicPlayer, bindMusicLifecycle } from '../src/audio/music.js';
 import { worlds } from '../src/world/levels/level.js';
 import { menuMusic } from '../src/data/music.js';
+import { bindMusicButtons } from '../src/ui/musicButton.js';
 
 function fixture(play = () => Promise.resolve()) {
     const audio = { paused: true, currentTime: 0, plays: 0, loads: 0, pauses: 0,
@@ -102,4 +103,62 @@ test('Tab hiding pauses music and lifecycle cleanup removes listeners', () => {
     const plays = audio.plays;
     doc.dispatchEvent(new Event('pointerdown')); win.dispatchEvent(new Event('pageshow'));
     assert.equal(audio.plays, plays);
+});
+
+test('Disabled music keeps its position and stays off across worlds, gestures and background changes', () => {
+    const { player, audio } = fixture();
+    player.setTrack(menuMusic); player.unlock();
+    audio.currentTime = 18;
+    player.setEnabled(false);
+    assert.equal(audio.paused, true);
+    assert.equal(audio.currentTime, 18);
+    player.unlock(); player.pause('background'); player.resume('background');
+    assert.equal(audio.paused, true);
+    player.setEnabled(true);
+    assert.equal(audio.paused, false);
+    assert.equal(audio.currentTime, 18);
+    player.setEnabled(false); player.setTrack(worlds[2].music); player.unlock();
+    assert.equal(audio.paused, true);
+    player.setEnabled(true);
+    assert.equal(audio.src, worlds[2].music.src);
+    assert.equal(audio.paused, false);
+});
+
+function buttonFixture() {
+    const buttons = Array.from({ length: 2 }, () => {
+        const button = new EventTarget();
+        button.attributes = {};
+        button.setAttribute = (name, value) => { button.attributes[name] = value; };
+        return button;
+    });
+    return { buttons, root: { querySelectorAll: () => buttons } };
+}
+
+test('Both music buttons reflect the saved preference and persist changes for the next launch', () => {
+    const { player, audio } = fixture();
+    const { root, buttons } = buttonFixture();
+    const saved = new Map([['meyve-oyunu-music-enabled', 'false']]);
+    const storage = { getItem: key => saved.get(key), setItem: (key, value) => saved.set(key, value) };
+    bindMusicButtons(player, root, () => storage);
+    player.setTrack(menuMusic); player.unlock();
+    assert.equal(audio.plays, 0);
+    assert.ok(buttons.every(button => button.attributes['aria-pressed'] === 'false'));
+    buttons[0].dispatchEvent(new Event('click'));
+    assert.equal(audio.paused, false);
+    assert.equal(saved.get('meyve-oyunu-music-enabled'), 'true');
+    assert.ok(buttons.every(button => button.attributes['aria-label'] === 'Müziği kapat'));
+    buttons[1].dispatchEvent(new Event('click'));
+    assert.equal(audio.paused, true);
+    assert.ok(buttons.every(button => button.attributes['aria-label'] === 'Müziği aç'));
+    const next = fixture();
+    bindMusicButtons(next.player, buttonFixture().root, () => storage);
+    assert.equal(next.player.enabled, false);
+});
+
+test('Unavailable localStorage does not prevent music toggling', () => {
+    const { player } = fixture();
+    const { root, buttons } = buttonFixture();
+    bindMusicButtons(player, root, () => { throw new Error('Storage blocked'); });
+    buttons[0].dispatchEvent(new Event('click'));
+    assert.equal(player.enabled, false);
 });

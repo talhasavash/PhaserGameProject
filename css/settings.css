@@ -20,3 +20,16 @@
 #settings-button svg { width: 100%; height: 100%; }
 
 .game-toolbar { height: calc(56px + env(safe-area-inset-top)); }
+
+/* Ana menüde küçük; mola menüsünde diğer eylemlerle aynı düğme boyutunu kullanır. */
+.game-toolbar #music-menu-button {
+    display: grid; place-items: center; flex: none; align-self: center;
+    width: 46px; height: 46px; min-height: 46px; padding: 10px;
+    border: 2px solid #fff4d5; border-radius: 50%; color: #fff8df;
+    background: radial-gradient(circle at 30% 20%, #83c7a6, #42886f 55%, #285e50);
+    box-shadow: 0 3px 0 #153e35, inset 0 2px 0 #ffffff55;
+}
+.music-toggle svg { width: 100%; height: 100%; }
+.music-toggle[aria-pressed='true'] .music-slash { display: none; }
+.music-toggle[aria-pressed='false'] { opacity: 0.75; }
+body.playing #music-menu-button { display: none; }

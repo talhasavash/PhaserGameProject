@@ -676,3 +676,5 @@ Dünya 3, `assets/audio/music/world3.mp3` dosyasını kullanır.
 parça baştan yüklenmez; yükleme, mola, çukura düşme ve bölüm sonu ekranlarında da çalmaya devam eder.
 Ana menüye dönünce dünya parçası durur ve menü parçası başlar. Uygulama arka plana alınınca
 müzik duraklar. Tarayıcı izni nedeniyle ilk açılışta müzik ilk dokunuş veya tuşla başlayabilir.
+Ana menü ve mola menüsündeki nota düğmesi yalnızca müziği açıp kapatır; oyun efektleri etkilenmez.
+Seçim `meyve-oyunu-music-enabled` anahtarıyla localStorage'da saklanır.

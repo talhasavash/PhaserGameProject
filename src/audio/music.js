@@ -3,10 +3,11 @@ export function createMusicPlayer(createAudio = () => document.getElementById('b
     let audio = null;
     let track = null;
     let unlocked = false;
+    let enabled = true;
     const pauses = new Set();
 
     function playIfAllowed() {
-        if (!audio || !track || !unlocked || pauses.size || !audio.paused) return;
+        if (!audio || !track || !enabled || !unlocked || pauses.size || !audio.paused) return;
         // Eski bir play isteği, parça değişince AbortError ile sonlanabilir; oyunu etkilemez.
         const playing = audio.play();
         playing?.catch(error => {
@@ -15,6 +16,12 @@ export function createMusicPlayer(createAudio = () => document.getElementById('b
     }
 
     return {
+        get enabled() { return enabled; },
+        setEnabled(value) {
+            enabled = Boolean(value);
+            if (enabled) playIfAllowed();
+            else audio?.pause();
+        },
         setTrack(next) {
             if (track?.src === next?.src) {
                 if (audio && next) audio.volume = Math.max(0, Math.min(1, next.volume ?? 0.15));

@@ -7,6 +7,7 @@ import { createWorldMenu, createLevelMenu, refreshLevelLocks, slideWorld } from 
 import { showLoading, hideLoading } from './ui/scenePage.js';
 import { backgroundMusic, bindMusicLifecycle } from './audio/music.js';
 import { menuMusic } from './data/music.js';
+import { bindMusicButtons } from './ui/musicButton.js';
 
 // Önce HTML formundan karakter seçilir; ardından Phaser başlatılır.
 // "import", başka bir dosyanın dışarı açtığı (export) kodu kullanmamızı sağlar.
@@ -147,6 +148,7 @@ function returnToMenu(game, levelIndex) {
 }
 
 setupPwa();
+bindMusicButtons(backgroundMusic);
 backgroundMusic.setTrack(menuMusic);
 bindMusicLifecycle();
 bindButtonFeedback();

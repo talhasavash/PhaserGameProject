@@ -673,6 +673,6 @@ dünya parçaları `src/world/levels/worlds.js` içindeki `music: { src, volume 
 Dünya 3, `assets/audio/music/world3.mp3` dosyasını kullanır.
 
 `src/audio/music.js` tek bir ses elemanını yönetir. Aynı dünyanın bölümleri arasında
-parça baştan yüklenmez; mola, çukura düşme ve bölüm sonu ekranlarında da çalmaya devam eder.
+parça baştan yüklenmez; yükleme, mola, çukura düşme ve bölüm sonu ekranlarında da çalmaya devam eder.
 Ana menüye dönünce dünya parçası durur ve menü parçası başlar. Uygulama arka plana alınınca
 müzik duraklar. Tarayıcı izni nedeniyle ilk açılışta müzik ilk dokunuş veya tuşla başlayabilir.

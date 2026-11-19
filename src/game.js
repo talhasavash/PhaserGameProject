@@ -52,7 +52,6 @@ function startSelectedGame(levelIndex) {
     // Await etmeden, doğrudan dokunuş sırasında başlat: tarayıcı bu etkileşimi ister.
     void enterGameDisplay();
     gameStarted = true;
-    backgroundMusic.pause('loading');
     showLoading();
     closeSettings();
     document.body.classList.add('playing');
@@ -119,7 +118,6 @@ function startGame(character, levelIndex) {
 
 function returnToMenu(game, levelIndex) {
     return new Promise(resolve => {
-        backgroundMusic.pause('loading');
         const selectedIndex = levelIndex ?? game.scene.getScene(GAME_SCENE_KEY).levelIndex;
         closeSettings();
         menuButton.disabled = true;
@@ -142,7 +140,6 @@ function returnToMenu(game, levelIndex) {
             menuButton.disabled = false;
             document.getElementById('character-title').focus();
             backgroundMusic.setTrack(menuMusic);
-            backgroundMusic.resume('loading');
             resolve();
         });
         game.destroy(true);

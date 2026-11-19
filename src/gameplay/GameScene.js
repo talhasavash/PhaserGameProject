@@ -51,7 +51,6 @@ export class GameScene extends Phaser.Scene {
 
     // Phaser önce preload'u çağırır: görselleri hazırla.
     preload() {
-        backgroundMusic.pause('loading');
         backgroundMusic.setTrack(worldForLevel(this.levelIndex).music);
         showLoading();
         this.load.on('progress', updateLoading);
@@ -94,7 +93,6 @@ export class GameScene extends Phaser.Scene {
         this.announce(`Dünya ${worldForLevel(this.levelIndex).id} · ${chapterNumber(this.levelIndex)}. bölüm: ${this.level.name}. Üç yıldızı bul, anahtarı al ve ${this.level.exitLabel || 'camiye'} ulaş.`);
         this.updateHud();
         finishLoading(this);
-        backgroundMusic.resume('loading');
     }
 
     resetLevelState() {
@@ -127,7 +125,6 @@ export class GameScene extends Phaser.Scene {
     }
 
     shutdownScene() {
-        backgroundMusic.pause('loading');
         this.load.off('progress', updateLoading);
         this.game.events.off('postrender', hideLoading);
         // Bölüm değişimi ve ana menüye dönüş aynı temizliği kullanır.

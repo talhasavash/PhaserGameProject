@@ -1,4 +1,4 @@
-// Tek müzik örneğini, dünya geçişlerini, yükleme ve arka plan duraklamalarını doğrular.
+// Tek müzik örneğini, kesintisiz bölüm geçişlerini ve arka plan duraklamalarını doğrular.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
@@ -32,33 +32,31 @@ test('Music waits for interaction and the same world keeps one track and its pos
     assert.equal(audio.plays, 0);
     player.unlock();
     assert.equal(audio.plays, 1);
-    player.pause('loading');
     player.setTrack(worlds[0].music);
-    assert.equal(audio.paused, true);
-    player.resume('loading');
+    assert.equal(audio.paused, false);
     audio.currentTime = 42;
     const loads = audio.loads;
-    player.pause('loading');
+    const pauses = audio.pauses;
     player.setTrack({ ...worlds[0].music });
-    player.resume('loading');
+    assert.equal(audio.paused, false);
+    assert.equal(audio.pauses, pauses);
     assert.equal(audio.currentTime, 42);
     assert.equal(audio.loads, loads);
     assert.equal(audio.loop, true);
     assert.equal(created(), 1);
 });
 
-test('Pause reasons combine: returning to foreground waits for loading to finish', () => {
+test('Only returning to the foreground resumes music after a track change in the background', () => {
     const { player, audio } = fixture();
     player.setTrack(worlds[1].music); player.unlock();
-    player.pause('loading'); player.pause('background'); player.resume('background');
+    player.pause('background');
     assert.equal(audio.paused, true);
-    player.resume('loading');
-    assert.equal(audio.paused, false);
-    player.pause('loading'); player.pause('background');
-    player.setTrack(menuMusic);
     player.resume('background');
+    assert.equal(audio.paused, false);
+    player.pause('background');
+    player.setTrack(menuMusic);
     assert.equal(audio.paused, true);
-    player.resume('loading');
+    player.resume('background');
     assert.equal(audio.paused, false);
     assert.equal(audio.src, menuMusic.src);
 });
@@ -72,7 +70,7 @@ test('Changing worlds replaces the source; a world without music stops and relea
     player.setTrack(undefined);
     assert.equal(audio.src, ''); assert.equal(audio.paused, true);
     const plays = audio.plays;
-    player.resume('loading'); player.unlock();
+    player.unlock();
     assert.equal(audio.plays, plays);
     player.destroy();
     assert.equal(audio.paused, true);

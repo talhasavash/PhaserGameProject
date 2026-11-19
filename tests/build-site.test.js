@@ -68,6 +68,11 @@ test('Published modules resolve across folders, share a version, and leave sourc
     assert.ok(precache.includes('./lib/phaser.min.js?v=1234567'));
     assert.ok(precache.includes('./assets/images/hero/child-0.svg?v=1234567'));
     assert.ok(precache.includes('./assets/audio/jump.wav?v=1234567'));
+    for (const name of ['menu.mpeg', 'world1.mpeg', 'world2.mpeg', 'world3.mp3', 'world4.mpeg', 'world5.aac']) {
+        assert.ok(precache.includes(`./assets/audio/music/${name}`));
+        assert.ok(precache.includes(`./assets/audio/music/${name}?v=1234567`));
+    }
+    assert.ok(fs.readFileSync(path.join(output, 'world/levels/worlds.js'), 'utf8').includes('assets/audio/music/world5.aac?v=1234567'));
     assert.ok(precache.includes('./assets/fonts/Baloo2.ttf?v=1234567'));
     assert.ok(fs.existsSync(path.join(root, 'dist/assets/fonts/OFL-Baloo2.txt')));
     for (let world = 1; world <= 5; world++) {

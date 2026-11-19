@@ -33,7 +33,7 @@ function versionModules(directory) {
         } else if (entry.name.endsWith('.js')) {
             let code = fs.readFileSync(target, 'utf8');
             code = code.replace(/(from ['"]\.\.?\/[^'"?]+)(['"])/g, `$1${suffix}$2`);
-            code = code.replace(/(assets\/(?:images|audio)\/[^'"`]+\.(?:svg|wav))(['"`])/g, `$1${suffix}$2`);
+            code = code.replace(/(assets\/(?:images|audio)\/[^'"`]+\.(?:svg|wav|mp3|mpeg|aac))(['"`])/g, `$1${suffix}$2`);
             fs.writeFileSync(target, code);
         }
     }
@@ -46,7 +46,7 @@ function publicFiles(directory) {
     return fs.readdirSync(directory, { withFileTypes: true }).flatMap(entry => {
         const target = path.join(directory, entry.name);
         if (entry.isDirectory()) return publicFiles(target);
-        if (!/\.(js|css|svg|wav|png|ttf|html|webmanifest)$/.test(entry.name) || entry.name === 'sw.js') return [];
+        if (!/\.(js|css|svg|wav|mp3|mpeg|aac|png|ttf|html|webmanifest)$/.test(entry.name) || entry.name === 'sw.js') return [];
         return ['./' + path.relative(output, target).replaceAll(path.sep, '/')];
     });
 }

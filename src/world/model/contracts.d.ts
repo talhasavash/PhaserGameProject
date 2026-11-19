@@ -19,6 +19,7 @@ export interface EnemyDefinition extends Partial<Patrol> {
         jump?: EnemyDefinition['jump']; breath?: EnemyDefinition['breath']; rage?: boolean };
 }
 export interface Verse { text: string; reference?: string; source?: string }
+export interface MusicTrack { src: string; volume?: number }
 export interface LevelDefinition {
     id?: string; template?: string; stage?: number; name: string; theme: string; width: number; groundY: number;
     spawn: Point; checkpoint: Point; key: Point; exit: Point;
@@ -48,6 +49,7 @@ export interface WorldDefinition {
     id: number; title: string; count: number; levels: LevelDefinition[];
     defaults?: Partial<LevelDefinition>; characterSkins?: Record<string, string>;
     starGuardsPause?: boolean; verse?: Verse;
+    music?: MusicTrack;
     menu?: { image?: string; color?: string; headingColor?: string; headingStroke?: string; headingShadow?: string };
 }
 export type WorldInput = Omit<WorldDefinition, 'count' | 'levels'> & { count?: number; levels?: LevelInput[] };

@@ -5,6 +5,8 @@ import { levels, worldForLevel } from './world/levels/level.js';
 import { unlockedLevels } from './data/progress.js';
 import { createWorldMenu, createLevelMenu, refreshLevelLocks, slideWorld } from './ui/levelMenu.js';
 import { showLoading, hideLoading } from './ui/scenePage.js';
+import { backgroundMusic, bindMusicLifecycle } from './audio/music.js';
+import { menuMusic } from './data/music.js';
 
 // Önce HTML formundan karakter seçilir; ardından Phaser başlatılır.
 // "import", başka bir dosyanın dışarı açtığı (export) kodu kullanmamızı sağlar.
@@ -50,6 +52,7 @@ function startSelectedGame(levelIndex) {
     // Await etmeden, doğrudan dokunuş sırasında başlat: tarayıcı bu etkileşimi ister.
     void enterGameDisplay();
     gameStarted = true;
+    backgroundMusic.pause('loading');
     showLoading();
     closeSettings();
     document.body.classList.add('playing');
@@ -116,6 +119,7 @@ function startGame(character, levelIndex) {
 
 function returnToMenu(game, levelIndex) {
     return new Promise(resolve => {
+        backgroundMusic.pause('loading');
         const selectedIndex = levelIndex ?? game.scene.getScene(GAME_SCENE_KEY).levelIndex;
         closeSettings();
         menuButton.disabled = true;
@@ -137,6 +141,8 @@ function returnToMenu(game, levelIndex) {
             menuButton.hidden = true;
             menuButton.disabled = false;
             document.getElementById('character-title').focus();
+            backgroundMusic.setTrack(menuMusic);
+            backgroundMusic.resume('loading');
             resolve();
         });
         game.destroy(true);
@@ -144,6 +150,8 @@ function returnToMenu(game, levelIndex) {
 }
 
 setupPwa();
+backgroundMusic.setTrack(menuMusic);
+bindMusicLifecycle();
 bindButtonFeedback();
 bindDisplayRecovery(() => gameStarted);
 createWorldMenu(worldTabs, selectWorld);

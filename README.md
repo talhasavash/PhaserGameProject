@@ -664,3 +664,15 @@ Yeni bir şablon `registerLevelTemplate(ad, { defaults, prepare, parent })` ile 
 `defineLevel` bütün şablonlar için aynı giriş noktasıdır.
 Düşmanlarda devriye, dikey hareket, zıplama, görünmezlik ve atış ayarları `behaviors` altında yazılır.
 Çalışma sırasında motorun kullandığı düz alanlara dönüşümü `defineEnemy` yapar.
+
+### Menü ve dünya müzikleri
+
+Müzik dosyaları `assets/audio/music/` içindedir. Menü parçası `src/data/music.js`,
+dünya parçaları `src/world/levels/worlds.js` içindeki `music: { src, volume }` alanından seçilir.
+`volume` 0–1 arasındadır; mevcut ses seviyesi `0.12` olarak ayarlanmıştır.
+Dünya 3, `assets/audio/music/world3.mp3` dosyasını kullanır.
+
+`src/audio/music.js` tek bir ses elemanını yönetir. Aynı dünyanın bölümleri arasında
+parça baştan yüklenmez; mola, çukura düşme ve bölüm sonu ekranlarında da çalmaya devam eder.
+Ana menüye dönünce dünya parçası durur ve menü parçası başlar. Uygulama arka plana alınınca
+müzik duraklar. Tarayıcı izni nedeniyle ilk açılışta müzik ilk dokunuş veya tuşla başlayabilir.

@@ -17,6 +17,7 @@ import { createGuardianFire, updateGuardianFire, resetGuardianFire } from './gua
 import { createSnowballs, updateSnowballs } from './snowballs.js';
 import { createFeedback, animateCollection, updateIceSparks } from './feedback.js';
 import { touchFrozenItem, updateFrozenItems } from './frozenItems.js';
+import { backgroundMusic } from '../audio/music.js';
 
 export const GAME_SCENE_KEY = 'Garden';
 const ITEM_MESSAGES = {
@@ -50,6 +51,8 @@ export class GameScene extends Phaser.Scene {
 
     // Phaser önce preload'u çağırır: görselleri hazırla.
     preload() {
+        backgroundMusic.pause('loading');
+        backgroundMusic.setTrack(worldForLevel(this.levelIndex).music);
         showLoading();
         this.load.on('progress', updateLoading);
         loadGameAssets(this, this.characterSkin, this.level);
@@ -91,6 +94,7 @@ export class GameScene extends Phaser.Scene {
         this.announce(`Dünya ${worldForLevel(this.levelIndex).id} · ${chapterNumber(this.levelIndex)}. bölüm: ${this.level.name}. Üç yıldızı bul, anahtarı al ve ${this.level.exitLabel || 'camiye'} ulaş.`);
         this.updateHud();
         finishLoading(this);
+        backgroundMusic.resume('loading');
     }
 
     resetLevelState() {
@@ -123,6 +127,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     shutdownScene() {
+        backgroundMusic.pause('loading');
         this.load.off('progress', updateLoading);
         this.game.events.off('postrender', hideLoading);
         // Bölüm değişimi ve ana menüye dönüş aynı temizliği kullanır.

@@ -13,6 +13,8 @@ const contentTypes = {
     '.png': 'image/png',
     '.svg': 'image/svg+xml',
     '.mp3': 'audio/mpeg',
+    '.mpeg': 'audio/mpeg',
+    '.aac': 'audio/aac',
     '.wav': 'audio/wav',
     '.ttf': 'font/ttf',
     '.webmanifest': 'application/manifest+json'

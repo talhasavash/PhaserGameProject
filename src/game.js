@@ -8,6 +8,7 @@ import { showLoading, hideLoading } from './ui/scenePage.js';
 import { backgroundMusic, bindMusicLifecycle } from './audio/music.js';
 import { menuMusic } from './data/music.js';
 import { bindMusicButtons } from './ui/musicButton.js';
+import { bindWelcomeMenu } from './ui/welcome.js';
 
 // Önce HTML formundan karakter seçilir; ardından Phaser başlatılır.
 // "import", başka bir dosyanın dışarı açtığı (export) kodu kullanmamızı sağlar.
@@ -159,14 +160,11 @@ refreshLevelLocks(worldTabs, levelGrid, selectedWorld);
 characterForm.reset();
 characterForm.addEventListener('submit', event => event.preventDefault());
 // Karşılama yalnızca açılışta görünür; oyundan dönüş doğrudan bölüm menüsünedir.
-document.getElementById('welcome-play').onclick = () => {
-    void enterGameDisplay();
-    document.getElementById('welcome-screen').hidden = true;
-    document.getElementById('character-select').hidden = false;
-    document.getElementById('character-title').focus();
-};
 settingsButton.onclick = toggleSettings;
 document.getElementById('settings-close').onclick = closeSettings;
 document.addEventListener('keydown', event => {
     if (event.key === 'Escape' && !settingsPanel.hidden) closeSettings();
 });
+
+// Bütün başlangıç bağlantıları hazır olduğunda Play açılır ve ilk yükleme kapanır.
+bindWelcomeMenu({ enterDisplay: enterGameDisplay, showLoading, hideLoading });

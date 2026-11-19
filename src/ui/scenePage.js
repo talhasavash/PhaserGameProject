@@ -45,9 +45,10 @@ export function showCompletion(levelIndex) {
     return title;
 }
 
-export function showLoading() {
+export function showLoading(progress = 0) {
     document.getElementById('game-loading').hidden = false;
-    updateLoading(0);
+    if (progress === null) document.getElementById('loading-progress').removeAttribute('value');
+    else updateLoading(progress);
 }
 
 export function updateLoading(progress) {

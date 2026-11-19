@@ -53,7 +53,7 @@
             <section id="welcome-screen" class="welcome-screen" aria-labelledby="welcome-title">
                 <h1 id="welcome-title"><span class="welcome-word">MEYVE</span> <span class="welcome-word">BAHÇESİ</span></h1>
                 <img class="welcome-child welcome-boy" src="assets/images/hero/child-0.svg" alt="" width="64" height="80">
-                <button id="welcome-play" type="button" aria-label="Bölümleri aç"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M22 13L50 32L22 51Z" fill="currentColor" stroke="currentColor" stroke-width="6" stroke-linejoin="round"/></svg></button>
+                <button id="welcome-play" type="button" aria-label="Bölümleri aç" disabled><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M22 13L50 32L22 51Z" fill="currentColor" stroke="currentColor" stroke-width="6" stroke-linejoin="round"/></svg></button>
                 <img class="welcome-child welcome-girl" src="assets/images/hero/girl-0.svg" alt="" width="64" height="80">
             </section>
             <section id="character-select" class="character-select" aria-labelledby="character-title" hidden>
@@ -100,11 +100,11 @@
                 </div>
             </section>
         </div>
-        <section id="game-loading" class="game-loading" role="status" aria-live="polite" hidden>
+        <section id="game-loading" class="game-loading" role="status" aria-live="polite">
             <div class="loading-card">
                 <img src="assets/icons/icon-192.png" width="96" height="96" alt="">
                 <p>Yükleniyor…</p>
-                <progress id="loading-progress" max="1" value="0" aria-label="Bölüm yükleniyor"></progress>
+                <progress id="loading-progress" max="1" aria-label="Oyun yükleniyor"></progress>
             </div>
         </section>
         <div id="touch-controls" class="touch-controls" aria-label="Hareket düğmeleri" hidden>

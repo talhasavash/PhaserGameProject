@@ -11,13 +11,13 @@ const IMAGE_GROUPS = [
     { folder: 'collect', width: 40, height: 44, keys: [...FRUIT_TYPES, 'bead'] },
     { folder: 'collect', width: 44, height: 44, keys: ['star'] },
     { folder: 'collect', width: 32, height: 36, keys: ['berry'] },
-    { folder: 'scene', src: 'assets/images/scene/plaque.svg', width: 96, height: 76, keys: ['allah-plaque'] },
+    { folder: 'scene', src: 'assets/images/scene/plaque.svg', width: 96, height: 76, keys: ['Allah-plaque'] },
     { folder: 'collect', width: 64, height: 40, keys: ['key'] },
     { folder: 'collect', width: 36, height: 52, keys: ['mat'] },
     { folder: 'collect', width: 40, height: 52, keys: ['lantern'] },
     { folder: 'collect', width: 44, height: 46, keys: ['crescent'] }
 ] as const satisfies readonly ImageGroup[];
-export type BuiltInCollectibleName = Exclude<typeof IMAGE_GROUPS[number]['keys'][number], 'key' | 'allah-plaque'>;
+export type BuiltInCollectibleName = Exclude<typeof IMAGE_GROUPS[number]['keys'][number], 'key' | 'Allah-plaque'>;
 const SOUND_KEYS = ['jump', 'collect', 'hurt', 'heal', 'key', 'boss-jump', 'boss-land', 'level-complete', 'boss-fire'];
 
 // Phaser Loader yüklemeyi yönetir; GameScene.preload yalnızca bu fonksiyonu çağırır.
@@ -68,6 +68,6 @@ function requiredImages(level) {
         keys.add(enemy.texture || enemy.type);
         if (enemy.rage) { keys.add('ogre-ember'); keys.add('ogre-ember-angry'); }
     }
-    if (level.theme === 'interior') keys.add('allah-plaque');
+    if (level.theme === 'interior') keys.add('Allah-plaque');
     return keys;
 }

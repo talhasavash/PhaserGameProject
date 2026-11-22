@@ -66,5 +66,5 @@ test('Chapter loading omits unused images and reuses cached character frames and
     assert.ok(!queuedImages.includes('child-0'), 'Keep character frames on chapter changes');
     queuedImages = [];
     loadGameAssets(scene, 'girl', levels.find(level => level.theme === 'interior'));
-    assert.ok(queuedImages.includes('allah-plaque') && queuedImages.includes('girl-0'));
+    assert.ok(queuedImages.includes('Allah-plaque') && queuedImages.includes('girl-0'));
 });

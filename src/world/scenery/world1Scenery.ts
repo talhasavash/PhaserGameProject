@@ -205,7 +205,7 @@ function createLandscapeScenery(scene, width, theme) {
     scene.add.tileSprite(0, 0, width + 512, 512, `${theme}-near`).setOrigin(0).setScrollFactor(0.82).setDepth(-20);
     if (theme === 'interior') {
         for (let x = 226; x < width + 512; x += 512) {
-            scene.add.image(x, 323, 'allah-plaque').setScrollFactor(0.82).setDepth(-19);
+            scene.add.image(x, 323, 'Allah-plaque').setScrollFactor(0.82).setDepth(-19);
         }
     }
     scene.add.rectangle(width / 2, 560, width, 80, p.earth).setDepth(-5);

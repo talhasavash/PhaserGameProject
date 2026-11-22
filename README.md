@@ -496,7 +496,8 @@ iniş sesleri yalnızca geçiş anında çalar; uzak muhafızlar duyulmaz.
 `build-sounds.cjs --boss-only` bu iki WAV'ı üretir.
 
 6. bölümün son yapısında ahşap pencere bölmeleri yerine taş kemerli açık renkli
-vitraylar vardır. Lafzatullah görseli `allah-plaque.svg` içinde standart Arapça
+vitraylar vardır. Lafzatullah görseli `assets/images/scene/plaque.svg` dosyasındadır;
+oyunda `Allah-plaque` doku anahtarıyla kullanılır. Standart Arapça
 Allah ligatürüyle (U+FDF2) oluşturulur ve arka planda aynı doku tekrar kullanılır.
 
 Ateş olan bölümlerde aynı anda en çok bir top bulunur. Her top bittikten sonra

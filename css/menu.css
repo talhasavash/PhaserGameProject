@@ -28,9 +28,10 @@ body:not(.playing) .build-version { display: none; }
 .level-option[aria-current="true"] .level-card strong { color: #fff8e7; background: radial-gradient(circle at 32% 22%, #ffc2ae, #ef7070 55%, #c63d52); box-shadow: 0 5px 0 #8c3041, 0 0 0 5px #ffe69180, inset 0 3px 1px #ffffff70; transform: translateY(-2px); }
 .level-option.locked { opacity: 1; }
 .level-option.locked .level-card strong::after { content: none; }
-.level-lock { position: absolute; right: 3%; bottom: 3%; width: 29%; height: 29%; border-radius: 50%; background: #f5d887; box-shadow: 0 2px 0 #7b643d; }
-.level-lock::before { content: ''; position: absolute; left: 28%; top: 15%; width: 44%; height: 47%; border: 2px solid #53666a; border-radius: 45% 45% 0 0; }
-.level-lock::after { content: ''; position: absolute; left: 21%; top: 43%; width: 58%; height: 43%; border-radius: 2px; background: #53666a; }
+/* Tamamlanan bölümün sarı yıldızından ayrılan beyaz asma kilit silueti. */
+.level-lock { position: absolute; right: 3%; bottom: 3%; width: clamp(19px, calc(var(--level-size) * .34), 40px); height: clamp(23px, calc(var(--level-size) * .40), 47px); background: transparent; }
+.level-lock::before { content: ''; position: absolute; left: 23%; top: 0; width: 54%; height: 62%; border: clamp(3px, calc(var(--level-size) * .035), 4px) solid #fff; border-radius: 50% 50% 0 0; box-shadow: 0 0 0 1px #6b293d; }
+.level-lock::after { content: ''; position: absolute; left: 3%; top: 38%; width: 94%; height: 62%; border: 1px solid #6b293d; border-radius: 4px; background: radial-gradient(circle at 50% 43%, #6b293d 0 2px, transparent 2.5px), #fff; box-shadow: 0 2px 0 #6b293d; }
 .level-option:not(.locked) .level-lock { display: none; }
 .level-option:not(:disabled):active .level-card strong { transform: translateY(4px); box-shadow: 0 2px 0 #752535, inset 0 2px 3px #65273855; }
 @media (prefers-reduced-motion: reduce) { .level-option .level-card strong { transition: none; } }

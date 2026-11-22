@@ -69,12 +69,18 @@ test('World pages show names, preserve locks, and navigate using arrows and dots
         assert.equal(tabs.querySelectorAll('button')[0].attributes['aria-pressed'], 'true');
         // Eski kayıt yüksek olsa da henüz yazılmayan bölümler açılamaz.
         saved = '75';
-        selectWorld(3);
-        const draftButton = grid.querySelectorAll('button').find(button => Number(button.value) === 34);
-        assert.equal(draftButton.disabled, true, 'The chapter 35 test area stays locked even with maximum saved progress');
-        assert.match(draftButton.attributes['aria-label'], /Hazırlanıyor/);
-        draftButton.onclick();
-        assert.deepEqual(started, [0, 15], 'The test area cannot be started from the menu');
+        // Gerçek bölümün yayın durumundan bağımsız olarak taslak kilidini doğrula.
+        const draftIndex = levels.length - 1;
+        const publishedLevel = levels[draftIndex];
+        levels[draftIndex] = { ...publishedLevel, draft: true };
+        try {
+            selectWorld(worldForLevel(draftIndex).id);
+            const draftButton = grid.querySelectorAll('button').find(button => Number(button.value) === draftIndex);
+            assert.equal(draftButton.disabled, true, 'Draft chapters stay locked even with maximum saved progress');
+            assert.match(draftButton.attributes['aria-label'], /Hazırlanıyor/);
+            draftButton.onclick();
+            assert.deepEqual(started, [0, 15], 'Draft chapters cannot start scenes');
+        } finally { levels[draftIndex] = publishedLevel; }
         for (const world of worlds) {
             selectWorld(world.id);
             const buttons = grid.querySelectorAll('button');

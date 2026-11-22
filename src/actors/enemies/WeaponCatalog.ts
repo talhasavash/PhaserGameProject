@@ -69,6 +69,73 @@ function aimedLaunch(scene, enemy, config, index) {
 }
 
 const builtInWeapons = {
+    'ice-axe': {
+        texture: 'ice-axe', scale: 0.8, radius: 16, offset: 8, warningTint: 0xb9f5ff,
+        defaults: {speed: 170, period: 4300, range: 620},
+        prepare(scene) {
+            // Buz baltasının şekli: sap, iki kristal ağız ve beyaz yansımalar.
+            cacheTexture(scene, 'ice-axe', 48, 48, g => {
+                g.fillStyle(0x527fa8); g.fillRoundedRect(21, 12, 6, 34, 2);
+                g.fillStyle(0x69bfdf);
+                g.fillTriangle(4, 5, 24, 16, 4, 31);
+                g.fillTriangle(44, 5, 24, 16, 44, 31);
+                g.fillStyle(0xd6faff);
+                g.fillTriangle(4, 5, 24, 16, 8, 18);
+                g.fillTriangle(44, 5, 24, 16, 40, 18);
+                g.lineStyle(2, 0xffffff); g.lineBetween(6, 8, 6, 25); g.lineBetween(42, 8, 42, 25);
+                g.fillStyle(0xf0ffff); g.fillCircle(24, 17, 4);
+            });
+        },
+        launch: aimedLaunch,
+        frame(elapsed, shot) {
+            const age = Math.max(0, elapsed - shot.startAt) / 1000;
+            return {...straightFrame(elapsed, shot), rotation: shot.angle + age * 8};
+        }
+    },
+    'snow-disc': {
+        texture: 'snow-disc', scale: 0.65, radius: 14, offset: 6, warningTint: 0xb6ffff,
+        defaults: {speed: 190, period: 3600, range: 480},
+        prepare(scene) {
+            cacheTexture(scene, 'snow-disc', 40, 40, g => {
+                g.fillStyle(0x457fa9); g.fillCircle(20, 20, 18);
+                g.fillStyle(0xb9f4ff); g.fillCircle(20, 20, 14);
+                g.lineStyle(3, 0xffffff);
+                for (let i = 0; i < 3; i++) {
+                    const a = i * Math.PI / 3;
+                    g.lineBetween(20 - Math.cos(a) * 12, 20 - Math.sin(a) * 12,
+                        20 + Math.cos(a) * 12, 20 + Math.sin(a) * 12);
+                }
+            });
+        },
+        launch(scene, enemy, config) {
+            return {x: enemy.x, y: enemy.y, direction: scene.player.x < enemy.x ? -1 : 1, speed: config.speed};
+        },
+        frame(elapsed, shot) {
+            const age = Math.max(0, elapsed - shot.startAt) / 1000;
+            // Önce uzaklaşır, sonra aynı noktaya döner; yeniden atıştan önce kaybolur.
+            const distance = shot.speed * (age <= 1.1 ? age : 2.2 - age);
+            return {x: shot.x + shot.direction * distance, y: shot.y, rotation: age * 7, done: age >= 2.2};
+        }
+    },
+    'frost-wave': {
+        texture: 'frost-wave', scale: 0.7, radius: 10, offset: 6, warningTint: 0xded1ff,
+        defaults: {speed: 180, period: 3400, range: 520},
+        prepare(scene) {
+            cacheTexture(scene, 'frost-wave', 32, 32, g => {
+                g.fillStyle(0x827ed7); g.fillCircle(16, 16, 15);
+                g.fillStyle(0xd7faff); g.fillCircle(16, 16, 10);
+                g.fillStyle(0xffffff); g.fillCircle(12, 12, 4);
+            });
+        },
+        launch(scene, enemy, config) {
+            return {x: enemy.x, y: enemy.y, direction: scene.player.x < enemy.x ? -1 : 1, speed: config.speed};
+        },
+        frame(elapsed, shot) {
+            const age = Math.max(0, elapsed - shot.startAt) / 1000;
+            return {x: shot.x + shot.direction * shot.speed * age,
+                y: shot.y + Math.sin(age * 5) * 26, done: age >= 3};
+        }
+    },
     snowball: {
         texture: 'snowball', scale: 0.48, radius: 21, offset: 3, prepare: createSnowballTexture,
         launch(scene, enemy, config) {

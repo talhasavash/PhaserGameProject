@@ -111,6 +111,32 @@ test('World pages show names, preserve locks, and navigate using arrows and dots
     }
 });
 
+test('A tapped chapter finishes its press animation before starting and ignores repeated taps', async () => {
+    const previousDocument = globalThis.document;
+    const previousWindow = globalThis.window;
+    globalThis.document = { createElement: element };
+    globalThis.window = { localStorage: { getItem: () => '1' } };
+    try {
+        const grid = element();
+        const started = [];
+        createLevelMenu(grid, 1, undefined, index => started.push(index));
+        const button = grid.querySelectorAll('button')[0];
+        let finish;
+        const finished = new Promise(resolve => { finish = resolve; });
+        button.getAnimations = () => [{ playState: 'running', finished }];
+        button.onclick();
+        button.onclick();
+        assert.deepEqual(started, []);
+        finish();
+        await finished;
+        await new Promise(resolve => setImmediate(resolve));
+        assert.deepEqual(started, [0]);
+    } finally {
+        globalThis.document = previousDocument;
+        globalThis.window = previousWindow;
+    }
+});
+
 test('World pages slide in opposite directions, block overlapping transitions and release temporary content', async () => {
     const previousDocument = globalThis.document;
     const previousWindow = globalThis.window;

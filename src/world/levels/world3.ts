@@ -1,7 +1,8 @@
-// Dünya 3'ün 31–35. bölümlerini; buz yüzeylerini, karlı rotaları ve kutup düşmanlarını tanımlar.
+// Dünya 3'ün 31–45. bölümlerini birleştirir; ilk beş buz bölümü burada tanımlıdır.
 
 import {defineLevel} from '../model/definitions.js';
 import {defineEnemy} from '../../actors/enemies/EnemyCatalog.js';
+import {iceExpeditionLevels} from './world3Expedition.js';
 import { platform, item, outfits, gap, iceArea, column, scenery, weather, rain, movement, behavior, weapon, scenario } from '../model/levelParts.js';
 
 const frozenLake = defineLevel({
@@ -302,4 +303,4 @@ const tmpLevel = defineLevel({
 
 });
 
-export const worldThreeLevels = [frozenLake, frozenCave, polarLights, crystalPalace,tmpLevel];
+export const worldThreeLevels = [frozenLake, frozenCave, polarLights, crystalPalace, tmpLevel, ...iceExpeditionLevels];

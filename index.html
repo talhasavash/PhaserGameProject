@@ -33,6 +33,7 @@
             <div id="settings-panel" class="settings-panel" role="dialog" aria-modal="true" aria-label="Oyun menüsü" hidden>
                 <div class="settings-card">
                 <button id="settings-close" type="button" aria-label="Menüyü kapat"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M7 7L25 25M25 7L7 25" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/></svg></button>
+                <h2 id="pause-chapter" class="pause-chapter"></h2>
                 <div class="pause-actions">
                     <button class="music-toggle" data-music-toggle type="button" aria-label="Müziği kapat" aria-pressed="true">
                         <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M12 23V8L26 5V20M12 12L26 9" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><ellipse cx="8" cy="24" rx="5" ry="4" fill="currentColor"/><ellipse cx="22" cy="21" rx="5" ry="4" fill="currentColor"/><path class="music-slash" d="M5 4L28 28" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
@@ -42,6 +43,9 @@
                     </button>
                     <button id="pause-button" type="button" aria-label="Devam et" hidden disabled>
                         <svg viewBox="0 0 64 64" aria-hidden="true"><path fill="currentColor" d="M19 10 Q17 8 17 14 V50 Q17 56 23 53 L51 36 Q57 32 51 28 L23 11 Q21 10 19 10Z"/></svg>
+                    </button>
+                    <button id="restart-level" type="button" aria-label="Bölümü yeniden başlat" disabled>
+                        <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M49 25A19 19 0 1 0 50 40M49 10V25H34" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     </button>
                 </div>
                 </div>

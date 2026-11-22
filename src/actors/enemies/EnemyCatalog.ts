@@ -59,6 +59,22 @@ for (const name of rollingEnemies) registerEnemyType(name, {
     groundOffset: 22
 });
 const specialEnemies = {
+    'snow-hare': {
+        asset: {width: 80, height: 64}, groundOffset: 30,
+        body: {width: 49, height: 37, x: 15, y: 22}
+    },
+    'ice-owl': {
+        asset: {width: 88, height: 64}, groundOffset: 30,
+        body: {width: 50, height: 39, x: 19, y: 13}
+    },
+    'ice-sentinel': {
+        asset: {width: 80, height: 96}, groundOffset: 46,
+        body: {width: 45, height: 73, x: 18, y: 17}
+    },
+    'glacier-mammoth': {
+        asset: {width: 180, height: 160}, groundOffset: 80,
+        body: {width: 126, height: 126, x: 27, y: 26}, defaults: {scale: 1.25}
+    },
     snowman: {
         asset: {width: 64, height: 80}, groundOffset: 36,
         body: {width: 42, height: 64, x: 11, y: 12}, defaults: {snowball: {period: 3100, speed: 210}}

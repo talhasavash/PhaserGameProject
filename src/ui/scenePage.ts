@@ -1,10 +1,10 @@
 // Sahnenin HTML düğmelerini, sonuç kartını ve bölüm yükleme ekranını yönetir.
 
 import { element } from './dom.js';
-import { levels, worldForLevel, isPlayableLevel } from '../world/levels/level.js';
+import { levels, worldForLevel, isPlayableLevel, chapterNumber } from '../world/levels/level.js';
 import { verses } from '../data/verses.js';
 
-const SCENE_BUTTON_IDS = ['pause-button', 'play-again', 'next-level', 'retry-fall'];
+const SCENE_BUTTON_IDS = ['pause-button', 'restart-level', 'play-again', 'next-level', 'retry-fall'];
 
 // HTML düğmeleri sahneye bağlanır, bölüm kapanınca aynı listeden temizlenir.
 export function prepareScenePage() {
@@ -22,6 +22,9 @@ export function bindSceneButtons(scene) {
     result.hidden = true;
     element<HTMLButtonElement>('pause-button').setAttribute('aria-label', 'Devam et');
     element<HTMLButtonElement>('pause-button').disabled = false;
+    element('pause-chapter').textContent = `Bölüm ${chapterNumber(scene.levelIndex)}`;
+    element<HTMLButtonElement>('restart-level').disabled = false;
+    element<HTMLButtonElement>('restart-level').onclick = () => scene.restart();
     element('toolbar-status').textContent = `${scene.level.name} seni bekliyor`;
     element<HTMLButtonElement>('pause-button').onclick = () => element<HTMLButtonElement>('settings-button').click();
     element<HTMLButtonElement>('play-again').onclick = () => scene.continueAfterResult();

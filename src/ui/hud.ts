@@ -1,6 +1,4 @@
-// Canları solda, soluk bölüm numarasını ortada, yıldızları ve puanı sağda gösterir.
-
-import { chapterNumber } from '../world/levels/level.js';
+// Canları solda, yıldızları ve puanı sağda gösterir; bölüm numarası mola menüsündedir.
 
 const HEART_COUNT = 3;
 const starPoints = Array.from({ length: 10 }, (_, i) => {
@@ -30,30 +28,23 @@ export function createHud(scene) {
         color: '#fff9e9', stroke: '#254d46', strokeThickness: 3
     }).setResolution(2).setOrigin(1, 0);
     scene.hud.add(scene.scoreText);
-    scene.chapterHud = scene.add.container(0, 0);
-    scene.chapterHud.add(scene.add.text(0, 0, `Bölüm ${chapterNumber(scene.levelIndex)}`, {
-        fontFamily: 'Trebuchet MS, sans-serif', fontSize: '18px', fontStyle: 'bold',
-        color: '#fff9e9', stroke: '#254d46', strokeThickness: 1
-    }).setResolution(2).setOrigin(0.5, 0).setAlpha(0.65));
     scene.starHud = scene.add.container(0, 8);
     scene.starIcons = Array.from({ length: 3 }, (_, i) => {
         const star = scene.add.graphics({ x: i * 21, y: 0 }).setScale(0.8);
         scene.starHud.add(star);
         return star;
     });
-    scene.hud.add([scene.chapterHud, scene.starHud]);
+    scene.hud.add(scene.starHud);
     if (scene.level?.theme === 'crystalPalace') {
         scene.scoreText.setStyle({ color: '#c9ffff', stroke: '#51417b' });
-        scene.chapterHud.list[0].setStyle({ color: '#e6cbff', stroke: '#49376e' });
     }
 }
 
 export function centerHud(scene) {
-    // Canlar küçük telefonlarda da okunur; puan, mola düğmesinin solunda kalır.
+    // Canlar solda, puan sağ kenarda; orta alan saydam mola düğmesine ayrılır.
     const hudScale = Math.min(1.1, scene.scale.width / 680);
     scene.hud.setScale(hudScale).setPosition(14 * hudScale, 12 * hudScale);
-    scene.scoreText.setX(scene.scale.width / hudScale - 88);
-    scene.chapterHud.setX(scene.scale.width / hudScale / 2 - 14);
+    scene.scoreText.setX(scene.scale.width / hudScale - 28);
     scene.starHud.setX(scene.scoreText.x - Math.max(50, scene.scoreText.width) - 78);
     // Zemini aynı yerde tut: zıplarken ekran yukarı-aşağı sallanmasın.
     scene.cameras.main.scrollY = Math.max(0, 600 - scene.scale.height);

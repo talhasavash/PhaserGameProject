@@ -27,6 +27,7 @@ export function createLevelMenu(levelGrid, worldId, preferredIndex?: number, sta
     levelGrid.replaceChildren();
     levelGrid.dataset.world = world.id;
     levelGrid.style.setProperty('--level-columns', String(Math.min(5, world.count)));
+    let starting = false;
     for (let localIndex = 0; localIndex < world.count; localIndex++) {
         const index = world.start + localIndex;
         const level = levels[index];
@@ -37,12 +38,27 @@ export function createLevelMenu(levelGrid, worldId, preferredIndex?: number, sta
         button.value = String(index);
         button.disabled = !isPlayableLevel(index);
         button.setAttribute('aria-current', String(index === (preferredIndex ?? world.start)));
-        button.onclick = () => { if (!button.disabled) startLevel(index); };
+        button.onclick = () => {
+            if (button.disabled || starting) return;
+            starting = true;
+            // Hızlı dokunuşta menü hemen kapanıp basma animasyonunu gizlemesin.
+            const feedback = button.getAnimations?.().filter(animation => animation.playState === 'running') || [];
+            const start = () => {
+                if (button.isConnected !== false && !button.disabled) startLevel(index);
+                else starting = false;
+            };
+            if (feedback.length) Promise.all(feedback.map(animation => animation.finished.catch(() => {}))).then(start);
+            else start();
+        };
         if (level?.boss) button.classList.add('boss-level');
         const card = document.createElement('span');
         card.className = 'level-card';
         const number = document.createElement('strong');
         number.textContent = String(chapterNumber(index));
+        const lock = document.createElement('span');
+        lock.className = 'level-lock';
+        lock.setAttribute('aria-hidden', 'true');
+        number.append(lock);
         card.append(number);
         button.append(card);
         levelGrid.append(button);

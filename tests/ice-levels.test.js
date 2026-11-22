@@ -7,11 +7,11 @@ import { worldThreeLevels as iceLevels } from '../.build/src/world/levels/world3
 import { isIcySurface } from '../.build/src/world/terrain/terrain.js';
 import { createScenery } from '../.build/src/world/scenery/background.js';
 
-test('World 3 starts at 31 with five icy chapters and clear ground around gaps', () => {
-    assert.equal(levels.length, 35);
-    assert.equal(iceLevels.length, 5);
+test('World 3 fills chapters 31–45 and preserves the original ice layouts', () => {
+    assert.equal(levels.length, 45);
+    assert.equal(iceLevels.length, 15);
     assert.deepEqual(levels.slice(30), iceLevels);
-    assert.deepEqual(iceLevels.map(level => level.theme), ['glacier', 'iceCave', 'aurora', 'crystalPalace', 'glacier']);
+    assert.deepEqual(iceLevels.slice(0, 5).map(level => level.theme), ['glacier', 'iceCave', 'aurora', 'crystalPalace', 'glacier']);
     for (const [index, level] of iceLevels.slice(0, 4).entries()) {
         assert.equal(worldForLevel(index + 30).id, 3);
         assert.ok(level.platforms.every(platform => platform.ice));

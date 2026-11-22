@@ -8,33 +8,36 @@ import { execFileSync } from 'node:child_process';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 
-function javascriptFiles(directory) {
+function javascriptFiles(directory, extension = '.js') {
     return fs.readdirSync(directory, { withFileTypes: true }).flatMap(entry => {
         const target = path.join(directory, entry.name);
-        return entry.isDirectory() ? javascriptFiles(target) : entry.name.endsWith('.js') ? [target] : [];
+        return entry.isDirectory() ? javascriptFiles(target, extension) : entry.name.endsWith(extension) ? [target] : [];
     });
 }
 
 test('Published modules resolve across folders, share a version, and leave source files unchanged', () => {
-    const sources = javascriptFiles(path.join(root, 'src'));
+    const sources = javascriptFiles(path.join(root, 'src'), '.ts');
     const originals = new Map(sources.map(file => [file, fs.readFileSync(file, 'utf8')]));
     const output = path.join(root, 'dist', 'src');
     fs.mkdirSync(output, { recursive: true });
     const obsolete = path.join(output, 'obsolete-build-test.js');
     fs.writeFileSync(obsolete, '// Simulate a file left over from the old layout.');
+    const obsoleteCompiled = path.join(root, '.build', 'src', 'obsolete-build-test.js');
+    fs.writeFileSync(obsoleteCompiled, '// Simulate a deleted TypeScript source.');
 
     execFileSync(process.execPath, [path.join(root, 'scripts', 'build-site.cjs')], {
         env: { ...process.env, GITHUB_SHA: '1234567890abcdef' }
     });
 
     assert.equal(fs.existsSync(obsolete), false);
-    assert.deepEqual(fs.readdirSync(output).filter(name => name.endsWith('.js')), ['game.js']);
+    assert.equal(fs.existsSync(obsoleteCompiled), false);
+    assert.deepEqual(fs.readdirSync(output).filter(name => name.endsWith('.js')), ['extensions.js', 'game.js']);
     assert.equal(javascriptFiles(output).length, sources.length);
     for (const source of sources) {
         assert.equal(fs.readFileSync(source, 'utf8'), originals.get(source));
-        const published = path.join(output, path.relative(path.join(root, 'src'), source));
+        const published = path.join(output, path.relative(path.join(root, 'src'), source).replace(/\.ts$/, '.js'));
         const code = fs.readFileSync(published, 'utf8');
-        for (const match of code.matchAll(/from ['"](\.\.?\/[^'"]+)['"]/g)) {
+        for (const match of code.matchAll(/\b(?:from|import)\s*['"](\.\.?\/[^'"]+)['"]/g)) {
             const [relative, query] = match[1].split('?');
             assert.equal(new URLSearchParams(query).get('v'), '1234567', published);
             assert.ok(fs.existsSync(path.resolve(path.dirname(published), relative)), match[1]);
@@ -44,7 +47,7 @@ test('Published modules resolve across folders, share a version, and leave sourc
     assert.ok(html.includes('src/game.js?v=1234567'));
     assert.ok(html.includes('Demo · 1234567'));
     const assets = fs.readFileSync(path.join(output, 'data', 'assets.js'), 'utf8');
-    assert.ok(assets.includes('assets/images/hero/${key}.svg?v=1234567'));
+    assert.ok(assets.includes('assets/images/${heroFolder}/${key}.svg?v=1234567'));
     assert.ok(assets.includes('assets/images/${folder}/${key}.svg?v=1234567'));
     assert.ok(assets.includes('assets/audio/${key}.wav?v=1234567'));
     const manifest = JSON.parse(fs.readFileSync(path.join(root, 'dist/manifest.webmanifest'), 'utf8'));

@@ -2,10 +2,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
-import { createMusicPlayer, bindMusicLifecycle } from '../src/audio/music.js';
-import { worlds } from '../src/world/levels/level.js';
-import { menuMusic } from '../src/data/music.js';
-import { bindMusicButtons } from '../src/ui/musicButton.js';
+import { createMusicPlayer, bindMusicLifecycle } from '../.build/src/audio/music.js';
+import { worlds } from '../.build/src/world/levels/level.js';
+import { menuMusic } from '../.build/src/data/music.js';
+import { bindMusicButtons } from '../.build/src/ui/musicButton.js';
 
 function fixture(play = () => Promise.resolve()) {
     const audio = { paused: true, currentTime: 0, plays: 0, loads: 0, pauses: 0,

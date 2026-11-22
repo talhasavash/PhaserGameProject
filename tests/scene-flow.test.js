@@ -1,13 +1,13 @@
 // Bölüm kurulumunu, sahne geçişlerini ve oyun akışındaki bağlantıları doğrular.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createGameState, recordFruit, takeKey } from '../src/gameplay/rules.js';
-import { levels, worldForLevel } from '../src/world/levels/level.js';
-import { garden, courtyard } from '../src/world/levels/world1.js';
+import { createGameState, recordFruit, takeKey } from '../.build/src/game/rules.js';
+import { levels, worldForLevel, isPlayableLevel } from '../.build/src/world/levels/level.js';
+import { garden, courtyard } from '../.build/src/world/levels/world1.js';
 
 // Exercise scene transitions without requiring WebGL in Node.
 globalThis.Phaser = { Scene: class {} };
-const { GameScene } = await import('../src/gameplay/GameScene.js');
+const { GameScene } = await import('../.build/src/game/GameScene.js');
 
 test('Selecting a numbered level starts that scene directly', () => {
     const scene = new GameScene('boy', 1);
@@ -92,7 +92,7 @@ test('Completion waits for Continue, restarts within a world and opens the next 
         assert.equal(elements.get('game-result').hidden, false);
         scene.showLevelResult();
         assert.equal(sounds.filter(key => key === 'level-complete').length, 1, 'A repeated result callback cannot replay the reward sound');
-        const final = index === levels.length - 1;
+        const final = !isPlayableLevel(index + 1);
         assert.equal(elements.get('next-level').hidden, final);
         assert.equal(elements.get('play-again').hidden, !final);
         assert.equal(elements.get(final ? 'play-again' : 'next-level').focused, true);
@@ -104,15 +104,20 @@ test('Completion waits for Continue, restarts within a world and opens the next 
         assert.deepEqual(calls, worldFinished ? [{ worldMenu: nextWorld.start }] : final ? ['menu'] : [{ levelIndex: index + 1, score: 120 }]);
     }
 });
-test('Respawn restores hearts at the flag and preserves collected fruit and key', () => {
+test('Respawn restores hearts and the original weapon while preserving collected fruit and key', () => {
     const run = createGameState();
     for (let i = 0; i < 3; i++) recordFruit(run, `star-${i}`, 'star');
     takeKey(run);
     run.checkpointActive = true;
     run.hearts = 0;
     let position;
+    let clearedShot = false;
+    const patrol = { weapon: { type: 'snowball' } };
+    const guard = { getData: key => key === 'patrol' ? patrol : key === 'initial-weapon' ? { weapon: { type: 'bullet' } } : undefined,
+        setData() {} };
     const scene = {
-        gameState: run, elapsed: 9000, level: garden, hazards: { getChildren: () => [] },
+        gameState: run, elapsed: 9000, level: garden, hazards: { getChildren: () => [guard] },
+        weaponUsers: [guard], weaponShots: [{ plan: {}, sprite: { disableBody() { clearedShot = true; } } }],
         player: { movement: {}, anims: { stop() {} }, setTexture() {}, setVelocity() {}, setRotation() {}, setPosition() {}, body: { reset(x, y) { position = { x, y }; } } },
         cameras: { main: { flash() {} } }, announce() {}, updateHud() {}
     };
@@ -123,6 +128,9 @@ test('Respawn restores hearts at the flag and preserves collected fruit and key'
     assert.equal(run.score, 120);
     assert.equal(run.hasKey, true);
     assert.ok(scene.hurtUntil > scene.elapsed);
+    assert.equal(patrol.weapon.type, 'bullet');
+    assert.equal(scene.weaponShots[0].plan, null);
+    assert.equal(clearedShot, true);
 });
 
 test('Second level resets its mission and hearts, preserves character, sound setting and total score', () => {

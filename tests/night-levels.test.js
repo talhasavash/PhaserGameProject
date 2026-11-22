@@ -1,11 +1,11 @@
 // Yeni gece bölümlerinin sırasını, güvenli bekleme yerlerini ve çizim maliyetini doğrular.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { levels, worldForLevel } from '../src/world/levels/level.js';
-import { nightLevels, firstJourney } from '../src/world/levels/world2.js';
-import { createScenery } from '../src/world/scenery/background.js';
-import { createMosque } from '../src/world/scenery/background.js';
-import { bossLift } from '../src/gameplay/hazards.js';
+import { levels, worldForLevel } from '../.build/src/world/levels/level.js';
+import { nightLevels, firstJourney } from '../.build/src/world/levels/world2.js';
+import { createScenery } from '../.build/src/world/scenery/background.js';
+import { createMosque } from '../.build/src/world/scenery/background.js';
+import { bossLift } from '../.build/src/actors/enemies/EnemyController.js';
 
 test('The first night chapters preserve their original indexes', () => {
     assert.equal(levels[15], firstJourney);

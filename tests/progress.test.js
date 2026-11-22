@@ -1,7 +1,7 @@
 // Bölüm kilitlerinin açılmasını, saklanmasını ve geçersiz kayıtların ele alınmasını doğrular.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readUnlocked, unlockedLevels, unlockNext } from '../src/data/progress.js';
+import { readUnlocked, unlockedLevels, unlockNext } from '../.build/src/data/progress.js';
 
 test('Missing, invalid or inaccessible saved progress starts with just chapter one', () => {
     for (const value of [null, '0', '-1', 'abc', '2.5']) {

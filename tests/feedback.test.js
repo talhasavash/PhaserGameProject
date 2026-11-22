@@ -1,9 +1,9 @@
 // Toplama animasyonunun tek seferlik temasını ve yalnızca buzda çıkan parçacıkları doğrular.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { animateCollection, updateIceSparks } from '../src/gameplay/feedback.js';
-import { levels } from '../src/world/levels/level.js';
-import { hazardVisibility } from '../src/gameplay/hazards.js';
+import { animateCollection, updateIceSparks } from '../.build/src/effects/GameEffects.js';
+import { levels } from '../.build/src/world/levels/level.js';
+import { hazardVisibility } from '../.build/src/actors/enemies/EnemyController.js';
 
 test('World 2 and 3 star guards share a long, fully non-collidable collection window', () => {
     let checked = 0;

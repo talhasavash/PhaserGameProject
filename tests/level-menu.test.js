@@ -1,8 +1,8 @@
 // Dünya sayfalarının gezinmesini, başlıklarını ve kilitli bölüm seçiminin engellenmesini doğrular.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createWorldMenu, createLevelMenu, refreshLevelLocks, slideWorld } from '../src/ui/levelMenu.js';
-import { levels, worlds, worldForLevel } from '../src/world/levels/level.js';
+import { createWorldMenu, createLevelMenu, refreshLevelLocks, slideWorld } from '../.build/src/ui/levelMenu.js';
+import { levels, worlds, worldForLevel } from '../.build/src/world/levels/level.js';
 
 function element(tag = 'div') {
     const node = {
@@ -45,7 +45,7 @@ test('World pages show names, preserve locks, and navigate using arrows and dots
         assert.deepEqual(started, [0]);
         nodes.get('next-world').onclick();
         assert.equal(selected, 2);
-        assert.equal(grid.children[0].children[0].children[0].textContent, 16);
+        assert.equal(grid.children[0].children[0].children[0].textContent, '16');
         assert.equal(nodes.get('world-name').textContent.trim(), 'Gece Karanlığı');
         assert.equal(nodes.get('world-number').textContent, '2.');
         assert.ok(grid.querySelectorAll('button').every(button => button.disabled && button.attributes['aria-current'] === 'false'));
@@ -69,6 +69,12 @@ test('World pages show names, preserve locks, and navigate using arrows and dots
         assert.equal(tabs.querySelectorAll('button')[0].attributes['aria-pressed'], 'true');
         // Eski kayıt yüksek olsa da henüz yazılmayan bölümler açılamaz.
         saved = '75';
+        selectWorld(3);
+        const draftButton = grid.querySelectorAll('button').find(button => Number(button.value) === 34);
+        assert.equal(draftButton.disabled, true, 'The chapter 35 test area stays locked even with maximum saved progress');
+        assert.match(draftButton.attributes['aria-label'], /Hazırlanıyor/);
+        draftButton.onclick();
+        assert.deepEqual(started, [0, 15], 'The test area cannot be started from the menu');
         for (const world of worlds) {
             selectWorld(world.id);
             const buttons = grid.querySelectorAll('button');
@@ -135,7 +141,7 @@ test('World pages slide in opposite directions, block overlapping transitions an
         assert.equal(preview.inert, true);
         assert.equal(preview.attributes['aria-hidden'], 'true');
         assert.equal(preview.querySelectorAll('button').length, 15);
-        assert.equal(preview.querySelectorAll('button')[0].value, 0, 'The outgoing preview keeps the previous world buttons');
+        assert.equal(preview.querySelectorAll('button')[0].value, '0', 'The outgoing preview keeps the previous world buttons');
         assert.equal(animations[0].frames[1].transform, 'translateX(-100%)');
         assert.equal(animations[1].frames[0].transform, 'translateX(100%)');
         assert.equal(panel.children[0].style.background, 'old-world-background');

@@ -1,8 +1,8 @@
 // Bölüme özel platform çizimlerini ve doku tekrar kullanımını doğrular.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createPlatformArt, platformThemes } from '../src/world/terrain/platforms.js';
-import { levels } from '../src/world/levels/level.js';
+import { createPlatformArt, platformThemes } from '../.build/src/world/terrain/platforms.js';
+import { levels } from '../.build/src/world/levels/level.js';
 
 test('Every chapter has a platform skin, and cached steps use one small image per platform', () => {
     const textures = new Map();

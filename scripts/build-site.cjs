@@ -2,6 +2,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const root = path.resolve(__dirname, '..');
+require('./compile.cjs').compileProject();
 const output = path.join(root, 'dist');
 const version = (process.env.GITHUB_SHA || 'local').slice(0, 7);
 const suffix = `?v=${version}`;
@@ -13,9 +14,10 @@ if (path.dirname(output) !== root || path.dirname(sourceOutput) !== output) {
 }
 fs.rmSync(sourceOutput, { recursive: true, force: true });
 
-for (const directory of ['css', 'src', 'lib', 'assets/images', 'assets/audio', 'assets/icons', 'assets/fonts']) {
+for (const directory of ['css', 'lib', 'assets/images', 'assets/audio', 'assets/icons', 'assets/fonts']) {
     fs.cpSync(path.join(root, directory), path.join(output, directory), { recursive: true });
 }
+fs.cpSync(path.join(root, '.build/src'), sourceOutput, { recursive: true });
 
 let html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 html = html.replace('<head>', `<head>\n    <meta name="game-release" content="${version}">`);
@@ -32,7 +34,7 @@ function versionModules(directory) {
             versionModules(target);
         } else if (entry.name.endsWith('.js')) {
             let code = fs.readFileSync(target, 'utf8');
-            code = code.replace(/(from ['"]\.\.?\/[^'"?]+)(['"])/g, `$1${suffix}$2`);
+            code = code.replace(/(\b(?:from|import)\s*['"]\.\.?\/[^'"?]+)(['"])/g, `$1${suffix}$2`);
             code = code.replace(/(assets\/(?:images|audio)\/[^'"`]+\.(?:svg|wav|mp3|mpeg|aac))(['"`])/g, `$1${suffix}$2`);
             fs.writeFileSync(target, code);
         }

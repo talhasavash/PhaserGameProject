@@ -1,7 +1,7 @@
 // Düşman hareketlerinin ve boss güncellemelerinin beklenen şekilde çalıştığını doğrular.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { updateHazards, hazardVisibility, createHazards, patrolHop } from '../src/gameplay/hazards.js';
+import { updateHazards, hazardVisibility, createHazards, patrolHop } from '../.build/src/actors/enemies/EnemyController.js';
 
 function hazardForTest(overrides = {}) {
     const patrol = { type: 'fox', minX: 100, maxX: 200, speed: 80, direction: 1, baseX: 150, baseY: 480, period: 2400, offset: 0, threadTop: 220, ...overrides };

@@ -13,6 +13,7 @@ Desktop.ini
 # Dependencies, generated output, and local configuration
 node_modules/
 dist/
+.build/
 coverage/
 *.log
 .env

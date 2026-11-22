@@ -1,9 +1,9 @@
 // Final canavarının ateş zamanlamasını, atış hareketini ve altından geçiş koşullarını doğrular.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { brokenPass as level } from '../src/world/levels/world1.js';
-import { bossLift } from '../src/gameplay/hazards.js';
-import { breathMoment, breathWarning, guardianShotFrame, updateGuardianFire, resetGuardianFire } from '../src/gameplay/guardianFire.js';
+import { brokenPass as level } from '../.build/src/world/levels/world1.js';
+import { bossLift } from '../.build/src/actors/enemies/EnemyController.js';
+import { breathMoment, breathWarning, guardianShotFrame, updateGuardianFire, resetGuardianFire } from '../.build/src/actors/enemies/WeaponController.js';
 
 const boss = level.enemies.find(enemy => enemy.breath);
 

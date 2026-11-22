@@ -1,7 +1,7 @@
 // Bölüm değişince HTML düğmelerinin eski sahne bağlantılarının temizlendiğini doğrular.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { bindSceneButtons, clearSceneButtons } from '../src/ui/scenePage.js';
+import { bindSceneButtons, clearSceneButtons } from '../.build/src/ui/scenePage.js';
 
 test('Scene buttons release old callbacks before binding the next chapter', () => {
     const ids = ['game-result', 'pause-button', 'settings-button', 'toolbar-status', 'play-again', 'next-level', 'retry-fall'];

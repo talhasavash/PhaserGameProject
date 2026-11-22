@@ -1,9 +1,9 @@
 # Meyve Oyunu 2026
 
-8–10 yaş için **JavaScript + Phaser** ile geliştirilen bir platform oyunu.
+8–10 yaş için **TypeScript + Phaser** ile geliştirilen bir platform oyunu.
 Amaç hem oyunu geliştirmek hem de kodunu adım adım anlayarak öğrenmek.
 Bu bir öğrenme ve deneme projesidir; senaryo zamanla değişebilir. Yeni özelliklerde
-çocukların kullanımı, okunabilir JavaScript ve bilgisayar/telefon/tablet desteği birlikte düşünülür.
+çocukların kullanımı, okunabilir TypeScript ve bilgisayar/telefon/tablet desteği birlikte düşünülür.
 Mobil desteği korumak için klavye ve dokunmatik giriş aynı hareket koduna bağlanır.
 
 ## İnternetten oyna
@@ -27,7 +27,7 @@ oyun oranı korunur, görüntü esnetilmez. Yatay mobilde oyun bütün ekranı k
 düğmeler karakterin altında kalan toprak alanındadır. Dikey telefonda görüntü oranı korunur.
 Yatay telefonda 600 yerine 320 dünya birimi yükseklik gösterilir; üst/alt şeritler de
 kaldırıldığı için karakter ve nesneler daha büyük görünür. Tablet görünümü 480 birimdir.
-Bu değerler `src/ui/browser.js` içindedir. Kamera zemine göre sabittir; zıplarken dikey kaymaz.
+Bu değerler `src/ui/browser.ts` içindedir. Kamera zemine göre sabittir; zıplarken dikey kaymaz.
 Bölüm numarası/can/yıldız/anahtar/puan bilgileri ince bir üst satırdadır.
 Üst satır ekran genişliğinin yaklaşık %52'sini kaplar; arka planı %20 opaktır.
 Zıplama, toplama, çarpma, can yenileme ve anahtar alma kısa ses efektleri kullanır.
@@ -40,10 +40,10 @@ Tam ekranda destekleyen telefonlarda yatay yön istenir. Fiziksel cihaz kontrol�
 Hem dokunmatik hem klavye zıplamasında erken bırakmak kısa, basılı tutmak yüksek zıplama yapar.
 Çok kısa dokunuşlar saklanır; mobilde ilk 70 ms yükseliş korunur, sonra bırakma algılanır.
 
-## JavaScript mi, Phaser mı?
+## TypeScript mi, Phaser mı?
 
-JavaScript programlama dilimizdir. Phaser, JavaScript ile kullandığımız oyun kütüphanesidir.
-İkisini birlikte kullanıyoruz.
+Oyun kodunu TypeScript ile yazıyoruz. TypeScript, JavaScript üzerine tip ve interface desteği ekler.
+Derlemeden çıkan JavaScript tarayıcıda Phaser ile çalışır; fizik ve çizimi yine Phaser yönetir.
 
 Kullanılan Phaser sürümü **4.2.1**. Kütüphane `lib/phaser.min.js` içinde yerel olarak tutulur;
 oyun açılırken CDN'den indirilmez. Dosya, [resmî sürüm sayfasında](https://phaser.io/download/release/v4.2.1)
@@ -60,73 +60,99 @@ Geçiş rehberi: https://github.com/phaserjs/phaser/blob/v4.2.1/changelog/v4/4.0
 | Sprite ve görselleri ekrana çizmek | Phaser |
 | Yerçekimi ve çarpışma hesapları | Phaser Arcade Physics |
 | Klavyeyi okumak, animasyon ve kamera takibi | Phaser |
-| Kaç elma toplanacağı, kaç puan kazanılacağı | Bizim JavaScript kodumuz |
-| Anahtarın ne zaman çıkacağı, bölümün ne zaman biteceği | Bizim JavaScript kodumuz |
+| Kaç elma toplanacağı, kaç puan kazanılacağı | Bizim TypeScript kodumuz |
+| Anahtarın ne zaman çıkacağı, bölümün ne zaman biteceği | Bizim TypeScript kodumuz |
 | Yerel sunucudan dosyaları tarayıcıya sunmak | Node.js; oyun motoru değildir |
 
 Örneğin `player.setVelocityX(235)` dediğimizde sağa hareket etme isteğini biz belirleriz;
 fizik gövdesini zamana göre hareket ettiren Phaser'dır.
 
+
+## TypeScript dalında çalışma
+
+Bu geçiş `codex/typescript-migration` dalındadır. Yayın iş akışı yalnızca `main` push'unda çalışır.
+Phaser sürümü ve oyun tasarımları bu geçişte değiştirilmez.
+
+İlk kurulum: `npm ci`. Çalıştırma: `npm start` veya mevcut IntelliJ **Meyve Oyunu** Run ayarı.
+Açık olan eski sunucuyu bir kez durdurup yeniden başlat. Sunucu başlarken TypeScript'i derler;
+`.ts` kaydedilince yeniden derler. Sonucu görmek için tarayıcıyı yenile.
+IntelliJ'de TypeScript paketini projenin `node_modules/typescript` klasöründen seçebilirsin.
+HTML'yi doğrudan dosya olarak açmak yerine bu sunucuyu kullan.
+
+- `npm run typecheck`: TypeScript kontrolü, çıktı üretmez.
+- `npm test`: önce derler, ardından mevcut oyun testlerini derlenmiş JS üzerinde çalıştırır.
+- `npm run build`: önce derler, ardından `dist` yayın kopyasını ve PWA önbelleğini hazırlar.
+- `npm run check`: TypeScript ve geliştirme betiklerinin sözdizimini kontrol eder.
+
+Kaynak dosyalar `.ts` olsa da importlarda `.js` yazılır: derlenmiş tarayıcı dosyasının uzantısı budur.
+Derleyici bu importu yazarken ilgili `.ts` kaynağını bulur. `.build` ve `dist` elle düzenlenmez.
+GitHub Actions `npm ci → check → test → build → Pages` sırasını kullanır.
+
+Okuma sırası: `game.ts → game/GameScene.ts → game/LevelRuntime.ts`.
+Bölüm yazmak için `world/levels/world3.ts` ve `world/model/contracts.ts` yeterli başlangıçtır.
+Bir düşman eklemek için `actors/enemies/EnemyCatalog.ts`; yeni silah için `WeaponCatalog.ts` okunur.
+Kayıt (Factory), tema seçimi (Strategy) ve bölüm oluşturucuları (Builder) ayrı sorumluluklardır.
+Her yeni silah veya davranış için yeni bir dosya zorunlu değildir; ilgili kataloğa kayıt eklenebilir.
+
+Bölüm tanımlarında stil, tema, düşman, silah, meyve, kıyafet, hava durumu ve şablon
+alanlarının hazır değerleri kendi kataloglarından türetilir. Tırnakların içindeyken
+kod tamamlama ile bu isimleri seçebilirsin; ayrı bir isim listesini güncellemek gerekmez.
+`SuggestedName` özel eklenti isimlerini de kabul eder. Bu nedenle bir yazım hatası
+her zaman TypeScript hatası oluşturmaz; bilinmeyen kayıtlar mevcut açılış kontrollerinde
+yakalanır. Çalışma zamanında `register...` ile eklenen özel adlar otomatik öneri listesine
+kendiliğinden eklenmez; öneriler kaynakta tanımlı hazır katalogları kapsar.
+
+Tip geçişinin kapsamı: bölüm/dünya girişleri, kayıt sözleşmeleri, oyuncu ve sahnenin temel alanları
+somut tiplerle kontrol edilir. `strict` açıktır; eski çizim ve eklenti yardımcılarını adım adım tiplemek
+ için `noImplicitAny: false` tutulur. Bazı motor sınırlarında `any` vardır; tüm kodun tamamen
+katı biçimde tiplendiği varsayılmamalıdır. Bunları geliştirmek yeni bölüm yazmayı engellemez.
+
 ## Proje yapısı
 
 ```text
 PhaserGameProject/
-├── index.html             Sayfa; Phaser'ı ve src/game.js dosyasını yükler
-├── css/style.css          Sayfanın görünümü
+├── index.html               Phaser ve derlenmiş src/game.js dosyasını yükler
+├── tsconfig.json            TypeScript derleme ve tip kontrolü ayarları
 ├── src/
-│   ├── game.js                 Giriş noktası, menü, ekran ve fizik ayarları
-│   ├── gameplay/               Oyun davranışları
-│   │   ├── GameScene.js         Phaser sahnesi; kurulum ve bölüm akışı
-│   │   ├── player.js            Karakter, hızlanma, zıplama ve animasyon
-│   │   ├── controls.js          Mobil çoklu dokunma
-│   │   ├── rules.js             Puan, can ve görev kuralları
-│   │   ├── hazards.js           Düşman hareketleri, boss zıplaması ve öfkesi
-│   │   ├── fireRain.js          Gökyüzünden düşen seyrek ateş topları
-│   │   ├── guardianFire.js      Final muhafızının ağızdan ateş atışı
-│   │   └── columns.js           İnip yükselen katı kolonlar ve zamanlama
-│   ├── world/                  Bölümler ve ortam
-│   │   ├── levelObjects.js      Toplanacak nesneler, çıkış ve can alanlarını kurma
-│   │   ├── levels/              Bölüm verileri ve dünya sıralaması
-│   │   │   ├── level.js         Dünya listelerini birleştirme ve bölüm sıralaması
-│   │   │   ├── world1.js        Dünya 1 bölüm verileri
-│   │   │   ├── world2.js        Dünya 2 bölüm verileri
-│   │   │   └── world3.js        Dünya 3 bölüm verileri
-│   │   ├── scenery/             Arka plan ve dekor çizimleri
-│   │   │   ├── background.js    Tema seçimi, ortak cami ve abdest alanı
-│   │   │   ├── world1Scenery.js Dünya 1'in tüm arka plan çizimleri
-│   │   │   ├── world2Scenery.js Dünya 2 ortamları ve çıkış geçitleri
-│   │   │   └── world3Scenery.js Dünya 3 için palet ve çizim başlangıcı
-│   │   └── terrain/             Zemin ve basamaklar
-│   │       ├── terrain.js       Zemin, çukur, buz ve platform gövdeleri
-│   │       ├── pits.js          Açık uçurum çizimleri
-│   │       └── platforms.js     Bölüme özel basamak çizimleri
-│   ├── graphics/
-│   │   └── texture.js           Ortak parametrik doku üretimi ve önbelleği
-│   ├── ui/
-│   │   ├── levelMenu.js         Dünya/bölüm seçenekleri ve kilitlerin görünümü
-│   │   ├── scenePage.js         HTML düğmeleri, sonuç ve yükleme ekranı
-│   │   ├── hud.js               Can, görev ve puan
-│   │   └── browser.js           Ekran ölçüleri, tam ekran, yön ve PWA
-│   └── data/
-│       ├── assets.js            Phaser Loader görsel ve ses listeleri
-│       ├── progress.js          Tarayıcıda bölüm ilerlemesini saklama
-│       └── verses.js            Sonuç kartlarındaki ayet verileri
-├── assets/
-│   ├── images/            Oyunun kullandığı SVG görseller
-│   └── legacy/            Özgün projeden korunan, şu an yüklenmeyen görsel ve sesler
-├── lib/phaser.min.js       Kütüphane; bu dosyayı düzenlemiyoruz
-├── scripts/               Yerel sunucu, kontrol ve görsel üretim araçları
-├── tests/                 Oyun kurallarını kontrol eden testler
-└── .run/                  IntelliJ Run ayarı
+│   ├── game.ts              Menüden Phaser oyununu başlatır
+│   ├── game/                Bölümün yaşam döngüsü ve oyun kuralları
+│   │   ├── GameScene.ts      init → preload → create → update
+│   │   ├── LevelRuntime.ts   Ortamı kurar; her karede sistemleri çalıştırır
+│   │   ├── LevelScenarios.ts Bölüme özel alanlar, olaylar ve eylemler
+│   │   └── rules.ts          Can, puan, yıldız ve anahtar kuralları
+│   ├── actors/
+│   │   ├── player/           PlayerController.ts ve TouchControls.ts
+│   │   └── enemies/          EnemyCatalog/Controller, WeaponCatalog/Controller
+│   ├── world/
+│   │   ├── levels/           world1/2/3.ts; worlds.ts; level.ts
+│   │   ├── model/            contracts.ts; oluşturucular ve ortak şablonlar
+│   │   ├── hazards/          EnvironmentalHazards.ts: kolonlar ve yağış tehlikeleri
+│   │   ├── objects/          LevelObjects.ts: toplama, buz, çıkış ve can nesneleri
+│   │   ├── scenery/          Tema, arka plan çizimleri ve hava durumu
+│   │   └── terrain/          Zemin, çukur ve platform çizimleri
+│   ├── effects/              GameEffects.ts: toplama ve buz parçacıkları
+│   ├── audio/                music.ts: tek arka plan müzik oynatıcısı
+│   ├── data/                 Görsel/ses kayıtları, kıyafetler, ilerleme, ayetler
+│   ├── ui/                   Menü, HUD, sonuç, yükleme ve mobil tarayıcı
+│   ├── graphics/             Ortak doku oluşturma/önbellek yardımcısı
+│   ├── extensions.ts         Özel eklentilerin tek giriş noktası
+│   └── extensions/api.ts     Eklentilere açık kayıt fonksiyonları
+├── examples/                 TypeScript dünya, bölüm ve eklenti örnekleri
+├── assets/                   SVG, müzik, efekt, ikon ve yazı tipleri
+├── lib/phaser.min.js          Değiştirmediğimiz Phaser 4.2.1 çalışma zamanı
+├── scripts/                  Derleyici, yerel sunucu, yayın ve üretim araçları
+├── tests/                    Derlenmiş oyunu test eden JavaScript testleri
+├── .build/                   Yerel üretilen JS ve kaynak haritaları; Git'e eklenmez
+└── dist/                     GitHub Pages yayın çıktısı; Git'e eklenmez
 ```
 
-`src` tarayıcıda çalışan oyun kodudur. `scripts` geliştirme araçlarıdır; `tests` doğrulama kodudur.
-Bu nedenle bütün JavaScript dosyalarının aynı klasörde olması gerekmez.
+`src` TypeScript kaynak kodudur; tarayıcı derlenmiş JavaScript çıktısını çalıştırır. `scripts` geliştirme araçlarıdır; `tests` doğrulama kodudur.
+Modüller tek tek özellik adına değil, birlikte değişen sorumluluklara göre gruplanır.
 `.idea` ve `.git` IDE'nin ve Git'in yönetim klasörleridir; oyun kaynak kodu değildir.
 
 Önceki `archive/game.js` bağımsız bir canvas denemesiydi; Phaser oyununun giriş dosyası değildi.
 `archive/anim.js` de yüklenmeyen bir örnekti. Arşiv klasörü kaldırıldı. İkisi de önceki Git
-commit'lerinde korunur. **Şimdiki `src/game.js` yeni ve aktif giriş dosyamızdır.**
+commit'lerinde korunur. **Şimdiki `src/game.ts` yeni ve aktif giriş dosyamızdır.**
 Eski görsel ve sesler silinmedi; `assets/legacy` içinde korundu. Oyun bu klasörü yüklemez.
 
 ## Kodu hangi sırayla okuyalım?
@@ -137,19 +163,19 @@ sırayı izle; çağrılan her yardımcı fonksiyonun içine hemen girmek gerekm
 | Sıra | Dosya | Önce neye bakmalı? |
 | --- | --- | --- |
 | 1 | `index.html` | Oyun alanı, menü ve iki script etiketi |
-| 2 | `src/game.js` | `startSelectedGame` ve `startGame`; seçimin Phaser'a aktarılması |
-| 3 | `src/gameplay/GameScene.js` | Yalnızca `init`, `preload`, `create`, `update`; ana akış |
-| 4 | `src/data/assets.js` | Görsel/ses anahtarları ve Phaser Loader |
-| 5 | `src/world/levels/level.js`, `src/world/terrain/terrain.js`, `src/world/levelObjects.js` | Bölüm verilerinin zemine, nesnelere ve temas bölgelerine dönüşmesi |
-| 6 | `src/gameplay/player.js`, `controls.js` | Girdi, hızlanma, zıplama ve animasyon; ardından mobil parmak takibi |
-| 7 | `src/gameplay/rules.js` | Puan, yıldız, anahtar ve can; sonra GameScene'deki temas metotlarına dön |
-| 8 | `src/ui/hud.js`, `browser.js`, `scenePage.js` | Oyun göstergeleri, mobil ölçüler, HTML düğmeleri ve sonuç kartı |
-| 9 | `src/gameplay/hazards.js`, `fireRain.js`, `guardianFire.js` | Devriye, boss öfkesi/zıplaması ve ateş zamanlaması |
-| 10 | `src/world/scenery/background.js`, `world1Scenery.js`, `world2Scenery.js`, `world3Scenery.js`, `src/world/terrain/platforms.js`, `src/graphics/texture.js` | Ortam seçimi, dünyaya özel çizimler ve ortak doku önbelleği |
-| 11 | `src/ui/levelMenu.js`, `src/data/progress.js`, `verses.js` | Bölüm seçimi, kilitler, localStorage ve sonuç metinleri |
+| 2 | `src/game.ts` | `startSelectedGame` ve `startGame`; seçimin Phaser'a aktarılması |
+| 3 | `src/game/GameScene.ts` | Yalnızca `init`, `preload`, `create`, `update`; ana akış |
+| 4 | `src/data/assets.ts` | Görsel/ses anahtarları ve Phaser Loader |
+| 5 | `src/world/levels/level.ts`, `src/world/terrain/terrain.ts`, `src/world/objects/LevelObjects.ts` | Bölüm verilerinin zemine, nesnelere ve temas bölgelerine dönüşmesi |
+| 6 | `src/actors/player/PlayerController.ts`, `TouchControls.ts` | Girdi, hızlanma, zıplama ve animasyon; ardından mobil parmak takibi |
+| 7 | `src/game/rules.ts` | Puan, yıldız, anahtar ve can; sonra GameScene'deki temas metotlarına dön |
+| 8 | `src/ui/hud.ts`, `browser.ts`, `scenePage.ts` | Oyun göstergeleri, mobil ölçüler, HTML düğmeleri ve sonuç kartı |
+| 9 | `src/actors/enemies/EnemyController.ts`, `EnvironmentalHazards.ts`, `WeaponController.ts` | Devriye, boss öfkesi/zıplaması ve ateş zamanlaması |
+| 10 | `src/world/scenery/background.ts`, `world1Scenery.ts`, `world2Scenery.ts`, `world3Scenery.ts`, `src/world/terrain/platforms.ts`, `src/graphics/texture.ts` | Ortam seçimi, dünyaya özel çizimler ve ortak doku önbelleği |
+| 11 | `src/ui/levelMenu.ts`, `src/data/progress.ts`, `verses.ts` | Bölüm seçimi, kilitler, localStorage ve sonuç metinleri |
 
-İlk küçük deneme: `src/world/levels/world3.js` içindeki bir meyvenin `x` konumunu değiştir.
-Ardından `gameplay/player.js` içindeki `WALK_SPEED` değerini küçük miktarda değiştir.
+İlk küçük deneme: `src/world/levels/world3.ts` içindeki bir meyvenin `x` konumunu değiştir.
+Ardından `actors/player/PlayerController.ts` içindeki `WALK_SPEED` değerini küçük miktarda değiştir.
 Son olarak bir yıldızın `collectFruit → recordFruit → updateHud` yolunu takip et.
 `lib/phaser.min.js` kütüphanenin sıkıştırılmış dosyasıdır; öğrenmek için onu okumuyoruz.
 
@@ -160,15 +186,15 @@ tarayıcıda çalışır; her hareket için sunucuya istek gönderilmez.
 
 ```mermaid
 flowchart TD
-    A["Node.js sunucusu / GitHub Pages"] --> B["index.html: Phaser ve src/game.js yüklenir"]
+    A["Node.js sunucusu / GitHub Pages"] --> B["index.html: Phaser ve derlenmiş src/game.js yüklenir"]
     B --> C["game.js: karakter ve bölüm seçimi"]
     D["world/levels/level.js + data/progress.js: bölümler ve kilitler"] --> C
     C --> E["new Phaser.Game + ui/browser.js: ekran ve fizik"]
-    E --> F["gameplay/GameScene.js: init → preload"]
+    E --> F["game/GameScene.ts: init → preload"]
     F --> G["data/assets.js: görsel ve ses yükle"]
     G --> H["GameScene.create: bölümü kur"]
     H --> I["world/: zemin, platform ve arka plan"]
-    H --> J["gameplay/: karakter ve tehlikeler"]
+    H --> J["actors/: oyuncu, düşmanlar ve silahlar"]
     H --> K["ui/hud.js: puan ve görev çubuğu"]
     I --> L["GameScene.update: her karede oyun mantığı"]
     J --> L
@@ -195,7 +221,7 @@ update()   → Her karede tuşları ve oyun durumunu kontrol et.
 
 `GameScene extends Phaser.Scene`, Phaser'ın standart ekran yapısını kullanır.
 `this`, çalışan oyun ekranını temsil eder. Kendi karakter veya oyun durumu sınıfımız yok;
-`player.js` ve `rules.js` normal fonksiyonlarla çalışır.
+`PlayerController.ts` ve `rules.ts` normal fonksiyonlarla çalışır.
 `import` başka dosyadan kod alır; `export` o kodu diğer dosyalara açar.
 
 Örnek Phaser komutları:
@@ -209,7 +235,7 @@ this.cameras.main.startFollow(player);       // Kamera karakteri izlesin.
 
 Kodda basit değişken, nesne, dizi, `if` ve döngülerle ilerliyoruz.
 Hareket kodundaki kısa zaman toleransları, kenardan geç basılan veya yere inmeden önce
-basılan zıplamaların algılanması içindir. Hız ve süre sabitleri `player.js` başındadır.
+basılan zıplamaların algılanması içindir. Hız ve süre sabitleri `PlayerController.ts` başındadır.
 `movePlayer` sırasıyla girdiyi okur, yatay hızı, zıplamayı, animasyonu ve gövde eğimini günceller.
 Görsel üretim aracı `scripts/build-art.cjs`, yalnızca SVG dosyalarını yeniden üretir;
 oyun kodunu öğrenmek için bu araçtan başlamak gerekmez.
@@ -221,7 +247,7 @@ sürüm bilgisini ve kaynak dosyaların değişmediğini kontrol eder.
 
 ## Kodun görevleri ve Phaser kullanımı
 
-Dosyalar gameplay, world, ui ve data klasörlerinde görevlerine göre gruplanır. Yeni sınıf,
+Dosyalar game, actors, world, ui ve data klasörlerinde görevlerine göre gruplanır. Yeni sınıf,
 bağımlılık veya karmaşık bir katman sistemi eklenmedi. Bölüm tanımları `world1.js`,
 `world2.js` ve `world3.js` içinde veri olarak kalır; `level.js` bu listeleri birleştirir.
 Yeni bölüm eklemek için ana oyun döngüsü değiştirilmez.
@@ -238,8 +264,8 @@ nesnesini temizler. Her nesnenin kendi çizim tarifi ilgili dosyada kalır.
 - `GameScene.update` → karakter, kamera, düşmanlar, bant, kontrol noktası ve ilerlemeyi günceller.
 - `levelObjects.js` → bölüm verilerinden Phaser görsellerini ve fizik temas bölgelerini oluşturur; toplama ve kazanma kararları `GameScene` içinde kalır.
 - `levelMenu.js` → HTML dünya/bölüm seçeneklerini kurar; seçili dünya ve oyunu başlatma akışı `game.js` içinde kalır.
-- `scenePage.js` → sahnenin HTML düğmelerini bağlar, sahne kapanınca bağlantıları temizler ve sonuç kartını gösterir.
-- `hazards.js` → devriye, zıplama, öfke ve ses görevleri ayrı kısa fonksiyonlardır.
+- `scenePage.ts` → sahnenin HTML düğmelerini bağlar, sahne kapanınca bağlantıları temizler ve sonuç kartını gösterir.
+- `EnemyController.ts` → devriye, zıplama, öfke ve ses görevleri ayrı kısa fonksiyonlardır.
 - `hud.js` → Phaser Container, Text ve Graphics kullanır. `terrain.js` sabit fizik gruplarını kurar.
 
 Phaser'ın Arcade Physics, animasyon, kamera, tween, ses ve zamanlayıcı sistemlerini
@@ -251,8 +277,8 @@ Yeni bölümün çıkışı `exitType: 'gate'` ile geçit olarak seçilir; diğe
 kullanır. Böylece çıkış türü, bölümde kolon olup olmamasından bağımsızdır.
 
 Zıplama toleransı, kısa/uzun zıplama, buzda fren ve son basılan yönün önceliği
-oyuna özel küçük JavaScript fonksiyonlarıdır. Bunları fizik motoruna bırakmak aynı
-hareket hissini sağlamaz. `rules.js` puan/görev kurallarını, `progress.js` tarayıcı
+oyuna özel küçük TypeScript fonksiyonlarıdır. Bunları fizik motoruna bırakmak aynı
+hareket hissini sağlamaz. `rules.ts` puan/görev kurallarını, `progress.js` tarayıcı
 kaydını yönetir; bu işler için Phaser'a bağımlılık gerekmez. HTML menüler ve mobil
 butonlar tarayıcı olaylarını kullanır; çoklu dokunma testleri korunur.
 
@@ -273,7 +299,7 @@ Terminalden de çalışır:
 node scripts/serve.cjs
 ```
 
-Node.js 18 veya üzeri gerekir. Ek bağımlılık kurulumu gerekmez. Npm varsa `npm start` kullanılabilir.
+Node.js 18 veya üzeri gerekir. İlk kurulumda `npm ci`, ardından `npm start` çalıştırılır. Node.js 24 önerilir.
 HTML, CSS ve oyun kodu değişince dosyayı kaydet, tarayıcıyı yenile. Sunucuyu yeniden başlatmak gerekmez.
 Sunucu kodu değişirse sunucuyu yeniden başlat. Aynı portta ikinci bir sunucu çalıştırma.
 HTTP kullan; HTML dosyasını çift tıklayarak açma (oyun ES modülleri kullanır).
@@ -287,11 +313,11 @@ HTTP kullan; HTML dosyasını çift tıklayarak açma (oyun ES modülleri kullan
 - Bayrak kontrol noktasını etkinleştirir ve canları doldurur.
 - Can bitince geri dönülür; toplananlar korunur. R veya sayfa yenileme bütün bölümü sıfırlar.
 - İki yön tuşu birlikte basılıysa son basılan yön önceliklidir; havada da yön değiştirilebilir.
-- Tuş bırakılınca karakter süzülerek yavaşlar. Hızlanma, fren ve dönüş değerleri `player.js` başındadır.
+- Tuş bırakılınca karakter süzülerek yavaşlar. Hızlanma, fren ve dönüş değerleri `PlayerController.ts` başındadır.
 - Abdest alanları eksikse bir can doldurur; her biri bölümde bir kez kullanılabilir. Canlar doluysa hak harcanmaz.
 - Can kazanıldığında 2,2 saniye gülümseme ve karakteri takip eden yıldız parıltıları görünür.
 - Çarpınca yüz 1,5 saniye üzgün olur. İfadeler yürüme ve zıplama sırasında da devam eder.
-- Boyut ayarları: `player.js` içindeki `PLAYER_SCALE` ve `GameScene.js` içindeki `COLLECTIBLE_SCALE` ve `hazards.js` içindeki `ENEMY_SCALE`.
+- Boyut ayarları: `PlayerController.ts` içindeki `PLAYER_SCALE` ve `GameScene.js` içindeki `COLLECTIBLE_SCALE` ve `EnemyController.ts` içindeki `ENEMY_SCALE`.
 - Dururken sallanma yoktur. Zıplama pozundaki kaldırılmış kol iki karakterde de başın yanında açıkça görünür.
 - Bant sola taşır; bu bir buz sürtünmesi değildir.
 
@@ -321,7 +347,7 @@ toplam 33 bölüm hazırdır. Zemin ve `ice: true` platformlar kaygandır. `iceS
 karlı dağ, buz mağarası ve kutup ışığı katmanlarını ve en fazla 65 parçacıklı karı çizer.
 Dünya 3'te kız seçilirse mevcut `ice_girl` çizimleri kullanılır.
 34. bölüm ve sonraki henüz yazılmayan yerler kilitlidir. Gece çizimleri
-`src/world/scenery/nightScenery.js`, platformları `src/world/terrain/platforms.js` içindedir.
+`src/world/scenery/nightScenery.ts`, platformları `src/world/terrain/platforms.ts` içindedir.
 Kaynak verileri `world1.js`, `world2.js`, `world3.js` dosyalarında kalır;
 `level.js` bunları birleştirip menüde 15'er yerlik dünyalara böler.
 İlk açılışta oyun adı, iki çocuk ve tek oynat düğmesi
@@ -430,7 +456,7 @@ Kart kendiliğinden kapanmaz; oynat düğmesi veya Enter ile ilerlenir. Dünya 1
 sonunda da aynı düğmeyle yeni dünya başlar; aynı sahne yeni dünyanın verileriyle kurulur.
 Son bölümde oynat düğmesi veya Enter bölüm seçimine döndürür, 1. bölümü
 kendiliğinden başlatmaz. Açılan bölümler korunur. Kaynak ve sure/ayet numaraları denetlenebilmesi için
-`src/data/verses.js` içinde saklanır; Diyanet meallerinden kısa alıntılar kullanılır.
+`src/data/verses.ts` içinde saklanır; Diyanet meallerinden kısa alıntılar kullanılır.
 Üç nokta ayetin yalnızca bir kısmının alındığını gösterir.
 
 `GameScene` bütün bölümlerde aynıdır. Phaser `init(data)` ile bölüm numarası ve
@@ -486,7 +512,7 @@ bölümünde 12 boşluk bulunur; aralarında en az 150 birim sağlam zemin vard�
 
 Finalde iki gözlü dev muhafız, yerdeyken iki aralıklı ateş atar; sonra yüksekten
 zıplayarak altından koşulabilecek bir aralık bırakır. Son ateş geçmeden zıplamaz.
-`guardianFire.js` üç yeniden kullanılan ateş gövdesini, ağız parlamasını ve atış
+`WeaponController.ts` üç yeniden kullanılan ateş gövdesini, ağız parlamasını ve atış
 saatini yönetir; yeni bir gölge veya zemin uyarısı çizmez. Can bitip geri dönülünce
 ateşler ve muhafızın saati sıfırlanır. `ogre-flame.svg` yeni muhafızın çizimidir;
 `node scripts/build-sounds.cjs --guardian-only` ateş sesini yeniden üretir.
@@ -517,7 +543,7 @@ tarayıcılarda menü dahil tam ekran açılır. Manifestte ekran yönü
 `any` olarak ayarlanır; açılışta zorunlu döndürme yapılmaz.
 Bölüm dairesine dokunulduğunda tam ekran ve mobilde yatay yön istenir; bu istekler uygulama
 açılışında yapılmaz. İzin verilmezse oyun normal ekran boyutunda devam eder.
-`src/ui/browser.js` bölüm seçimi sırasındaki ekran isteğini yönetir. Ana menüye dönüşte
+`src/ui/browser.ts` bölüm seçimi sırasındaki ekran isteğini yönetir. Ana menüye dönüşte
 yalnızca yön kilidi bırakılır, tam ekran korunur. Uygulamayı kapatmak
 için telefonun kendi gezinme ve son uygulamalar kontrolleri kullanılır.
 Kurulu uygulama zaten `display-mode: fullscreen` ile açılmışsa bölüm seçimi ikinci bir
@@ -528,8 +554,8 @@ bırakmışsa ilk normal dokunuşta yeniden istenir; oyun yeniden yüklenmez.
 Başlangıç adresi doğrudan `./index.html` dosyasıdır; uygulama kimliği `./` olarak
 korunur. Sayfa isteği dört saniyede sonuçlanmazsa kayıtlı açılış sayfası kullanılır.
 Önbelleğe yazılamaması, başarılı bir çevrimiçi açılışı engellemez.
-`src/ui/browser.js` service worker kaydını yönetir.
-`src/ui/scenePage.js` bölüm yükleme ekranını yönetir: Phaser Loader ilerlemesini
+`src/ui/browser.ts` service worker kaydını yönetir.
+`src/ui/scenePage.ts` bölüm yükleme ekranını yönetir: Phaser Loader ilerlemesini
 çubuğa aktarır ve ilk `postrender` olayından sonra ekranı kaldırır. Böylece dosyalar
 yüklense bile bölüm çizilmeden açık renkli boş canvas gösterilmez.
 
@@ -547,7 +573,7 @@ Geliştirmede (`npm start`) service worker kaydedilmez; böylece kod değişikli
 
 ```sh
 node scripts/check.cjs
-node --test tests/*.test.js
+npm test
 ```
 
 Npm varsa `npm run check` ve `npm test` eşdeğerdir.
@@ -557,26 +583,26 @@ Uzak depo: https://github.com/talhasavash/PhaserGameProject
 
 ## Yeni dünya ve bölüm ekleme: modüler model
 
-Oyun JavaScript olarak çalışır. TypeScript derleme adımı veya yeni çalışma zamanı bağımlılığı yoktur.
-`src/world/model/contracts.d.ts` dosyası yalnızca IntelliJ için interface sözleşmeleridir;
-normal bölüm yazarken bu dosyayı düzenlemek gerekmez.
+TypeScript kaynakları `.build` içine JavaScript olarak derlenir. `src/world/model/contracts.ts`
+dosyasındaki interface sözleşmeleri hem IntelliJ hem derleyici tarafından kontrol edilir.
+Interface çalışma zamanında nesne oluşturmaz; normal bölüm yazarken sözleşmeyi değiştirmek gerekmez.
 
-- `src/world/levels/world1.js`, `world2.js`, `world3.js`: mevcut bölümlerin yerleşimleri.
-- `src/world/levels/worlds.js`: menü, dünya sırası, ayrılan bölüm sayısı, kıyafet ve menü görseli.
-- `src/world/model/definitions.js`: `defineLevel`, `defineWorld`, `createLevelBuilder`, `stairs`, `stars`.
-- `src/world/model/templates.js`: `standard`, `trail`, `gate`, `night`, `night-campaign`, `ice` ortak şablonları.
-- `src/gameplay/enemyTypes.js`: düşmanın görsel boyutu, fizik gövdesi, varsayılanları ve Factory kaydı.
-- `src/gameplay/hazards.js`: ortak davranışlar ve `registerEnemyBehavior` bileşen kaydı.
-- `src/world/scenery/themes.js`: arka plan ve platform Strategy kaydı.
+- `src/world/levels/world1.ts`, `world2.js`, `world3.js`: mevcut bölümlerin yerleşimleri.
+- `src/world/levels/worlds.ts`: menü, dünya sırası, ayrılan bölüm sayısı, kıyafet ve menü görseli.
+- `src/world/model/definitions.ts`: `defineLevel`, `defineWorld`, `createLevelBuilder`, `stairs`, `stars`.
+- `src/world/model/templates.ts`: `standard`, `trail`, `gate`, `night`, `night-campaign`, `ice` ortak şablonları.
+- `src/actors/enemies/EnemyCatalog.ts`: düşmanın görsel boyutu, fizik gövdesi, varsayılanları ve Factory kaydı.
+- `src/actors/enemies/EnemyCatalog.ts`: davranış kayıtları; `EnemyController.ts` bu davranışları çalıştırır.
+- `src/world/scenery/themes.ts`: arka plan ve platform Strategy kaydı.
 
 ### Bölüm oluşturma
 
-`examples/new-world.js` kopyalanabilir, test edilen bir örnektir; mevcut oyuna eklenmemiştir.
+`examples/new-world.ts` kopyalanabilir, test edilen bir örnektir; mevcut oyuna eklenmemiştir.
 Örnek kısa bölüm:
 
 ```js
 import { defineLevel, stairs, stars } from '../model/definitions.js';
-import { defineEnemy } from '../../gameplay/enemyTypes.js';
+import { defineEnemy } from '../../actors/enemies/EnemyCatalog.js';
 
 const newLevel = defineLevel({
     template: 'standard', name: 'Yeni Yolculuk', width: 2800, theme: 'moonwood',
@@ -593,6 +619,64 @@ Yazdığın alanlar varsayılanların üzerine geçer; diziler birleştirilmez, 
 Kardan adamın standart atışını tekrar yazmak gerekmez; tür kaydından gelir.
 Bölümü ilgili `worldOneLevels`, `worldTwoLevels` veya `worldThreeLevels` dizisine eklemek yeterlidir.
 Üç yıldız, koordinatlar, benzersiz nesne id değerleri, tema ve düşman kayıtları açılışta doğrulanır.
+`draft: true` olan bölüm kaynak kodda korunur, menüde gri/kilitli kalır ve önceki bölümden
+oynanmaya geçilmez. 35. bölüm öğrenme alanı olduğu için bu durumdadır; hazır olduğunda
+`draft` alanı kaldırılarak veya `false` yapılarak normal bölüm akışına alınabilir.
+
+### Bölüm parçalarını kısa çağrılarla oluşturma
+
+`src/world/model/levelParts.ts`, tekrar eden veri tanımlarını tek yerde toplar. Bunlar
+Phaser nesnesi değil, `defineLevel` içinde kullanılacak yeni ve bağımsız nesneler üretir:
+
+```ts
+import { platform, item, outfits, gap, iceArea, column } from '../model/levelParts.js';
+
+const example = defineLevel({
+    name: 'Kısa tanımlar', width: 4000, player: outfits.winter(),
+    platforms: [platform.icy(250, 430, 160), platform.solid(500, 350, 180, { style: 'garden' })],
+    fruits: [item.onPlatform('star', 0), item.onPlatform('star', 1), item.at('star', 3200, 480), item.at('bead', 400, 480)],
+    ice: [iceArea(1000, 300)], gaps: [gap(2200, 140, { style: 'lava' })],
+    columns: [column(2700, 80, { openMs: 2200, style: 'factory' })]
+});
+```
+
+Diğer meyveler için `item.at('orange', 900, 480)` veya `item.onPlatform('pear', 1)`
+kullanılır. `outfits.pair(boy, girl)` ile farklı kayıtlı kıyafetler eşleştirilebilir.
+Elle nesne yazımı da geçerlidir; iki biçim aynı listede kullanılabilir.
+`defineLevel` eksik nesne kimliklerini bölüm içinde tamamlar; mevcut kimlikleri korur.
+Senaryoda belirli bir nesne kimliğine ihtiyaç varsa `item.at('star', 900, 480, { id: 'special-star' })`
+gibi açıkça ver. Otomatik kimlikler aynı girdi için tutarlıdır; sıralama değişirse değişebilir.
+
+Diğer bölüm alanları da aynı modülden kısa çağrılarla hazırlanabilir:
+
+| Alan | Oluşturucu örnekleri |
+| --- | --- |
+| Konumlar | `point(100, 480)` |
+| Bant ve alçak geçit | `belt(1500, 180, -100)`, `passage(1800, 400, 160)` |
+| Can yenileme | `fountain(2500)`; kimlik varsayılanı `fountain-2500`, ikinci parametreyle değişir |
+| Dekoratif hava | `weather.snow({ wind: -15 })`; kapatmak için `weather: false` |
+| Düşen tehlikeler | `rain.snow({ period: 5000 })`, `rain.fire({ speed: 280 })` |
+| Düşman hareketi | `movement.patrol(1150, 1450, 45)`, `movement.stationary()`, `movement.chase(1000, 1600, { speed: 70 })` |
+| Ek davranışlar | `behavior.hop(2500, 350, { height: 65, duration: 700 })`, `behavior.visibility(2800, 1800)` |
+| Dikey salınım / boss | `behavior.vertical(40)`, `behavior.jump(210, 1600, 3500)`, `behavior.breath([100, 400], 250, 600)` |
+| Silah | `weapon.bullet({ period: 3000 })`, `weapon.snowball()`, `weapon.iceShard()` |
+| Arka plan parçaları | `scenery.sun(650, 140)`, `scenery.pine(350, 400)`, `scenery.repeat(scenery.cloud(200, 110), 8, 500)` |
+| Tam arka plan | `scenery.background(0xcbe8f6, parts, { body: 0xaacbdc, edge: 0xf0f9ff })` |
+| Alan senaryosu | `scenario.zone(1000, 400, [action.weapon('guard', weapon.snowball())])` |
+| Kısa silah değişimi | `scenario.changeWeapon(1000, 400, 'guard', weapon.snowball())` |
+| Olay gönderme | `action.emit('rest-reached', { score: 10 })` |
+
+`rain` varsayılanları: `period: 10000`, `speed: 310`, `offset: 4500`. Diğer çizim,
+hava, hareket ve silah varsayılanları mevcut kayıtlarında kalır; yardımcılar bunları tekrar tanımlamaz.
+`behavior.hop(...)`, `visibility(...)`, `vertical(...)`, `jump(...)` ve `breath(...)`
+sonuçları düşmanın `behaviors` nesnesindeki karşılıklarına verilir.
+`scenario.changeWeapon` içindeki düşman kimliği, düşmana verdiğin `id` ile aynı olmalı.
+`{ once: false }` son parametresi, alan dışına çıkıp tekrar girince olayın yeniden çalışmasını sağlar.
+
+Yeni bir özellik kayıtlıysa `weapon.of(name, options)`, `movement.of(name, options)`,
+`behavior.of(name, options)`, `weather.of(name, options)`, `action.of(name, options)`
+ve `scenario.of(name, options)` kullanılabilir. Bu fonksiyonlar kayıt oluşturmaz;
+özelliğin önce mevcut `register...` API'siyle tanımlanmış olması gerekir.
 
 ### Dünya oluşturma
 
@@ -613,7 +697,7 @@ Mevcut dünya sayılarını ve sırasını değiştirme; kayıtlı ilerlemenin n
 Yeni dünyayı sona ekle veya hazır bekleyen Dünya 4/5 kaydının `levels` alanını doldur.
 Hazır olmayan yuvalar oynanabilir olmaz; sonraki dünyaların bölümleri önceki boş yuvalara taşınmaz.
 `characterSkins: { boy: 'ice_boy', girl: 'ice_girl' }` ile dünya kıyafeti seçilebilir.
-Yeni kıyafet için `src/data/characters.js` içindeki `registerCharacterSkin(ad, svgOnAdi)` kullanılır; Loader ve animasyon koduna ayrı ayrı ekleme gerekmez.
+Yeni kıyafet için `src/data/characters.ts` içindeki `registerCharacterSkin(ad, svgOnAdi)` kullanılır; Loader ve animasyon koduna ayrı ayrı ekleme gerekmez.
 Bölümdeki açık ayarlar dünya varsayılanlarından önceliklidir.
 Yeni bölüm için ayet dizisine satır eklemek zorunlu değildir: bölümün `verse` alanı,
 dünyanın `verse` alanı, eski ayet sırası ve mevcut varsayılan ayet sırasıyla kullanılır.
@@ -632,7 +716,7 @@ Yeni tema `registerTheme(name, { scenery, platform, drawPlatform, icy })` ile ka
 `icy: true` buzlu kolon/cami görünümünü seçer; kayganlık ayrıca bölümün `ice` ve platformların `ice` alanlarıyla belirlenir.
 Bu yapı yeni SVG'leri klasörden kendiliğinden keşfetmez; yeni tür için kayıt gereklidir.
 
-Kontroller: `node scripts/check.cjs`, `node --test tests/*.test.js`, `node scripts/build-site.cjs`.
+Kontroller: `node scripts/check.cjs`, `npm test`, `node scripts/build-site.cjs`.
 
 
 ### Bütün bölümlerde tek tanım biçimi
@@ -667,14 +751,106 @@ Düşmanlarda devriye, dikey hareket, zıplama, görünmezlik ve atış ayarlar�
 
 ### Menü ve dünya müzikleri
 
-Müzik dosyaları `assets/audio/music/` içindedir. Menü parçası `src/data/music.js`,
-dünya parçaları `src/world/levels/worlds.js` içindeki `music: { src, volume }` alanından seçilir.
+Müzik dosyaları `assets/audio/music/` içindedir. Menü parçası `src/data/music.ts`,
+dünya parçaları `src/world/levels/worlds.ts` içindeki `music: { src, volume }` alanından seçilir.
 `volume` 0–1 arasındadır; mevcut ses seviyesi `0.12` olarak ayarlanmıştır.
 Dünya 3, `assets/audio/music/world3.mp3` dosyasını kullanır.
 
-`src/audio/music.js` tek bir ses elemanını yönetir. Aynı dünyanın bölümleri arasında
+`src/audio/music.ts` tek bir ses elemanını yönetir. Aynı dünyanın bölümleri arasında
 parça baştan yüklenmez; yükleme, mola, çukura düşme ve bölüm sonu ekranlarında da çalmaya devam eder.
 Ana menüye dönünce dünya parçası durur ve menü parçası başlar. Uygulama arka plana alınınca
 müzik duraklar. Tarayıcı izni nedeniyle ilk açılışta müzik ilk dokunuş veya tuşla başlayabilir.
 Ana menü ve mola menüsündeki nota düğmesi yalnızca müziği açıp kapatır; oyun efektleri etkilenmez.
 Seçim `meyve-oyunu-music-enabled` anahtarıyla localStorage'da saklanır.
+
+## Bağımsız özelliklerle bölüm ve eklenti yazma
+
+Yeni bölüm için `examples/composed-level.ts`, yeni özellik kaydı için
+`examples/extensions/winter-pack.ts` çalışan örneklerdir. Bu örnekler mevcut menüye eklenmez.
+TypeScript kullanılır; `contracts.ts` bölüm ve eklenti sözleşmelerini tanımlar.
+
+Temel ayrım: **Özelliği bir kez kaydet, bölümde adını seç.**
+Yeni bir düşman hareketi veya silah için `GameScene.update()` değiştirilmez.
+
+### 1. Bölümde hazır parçaları seç
+
+```js
+const level = defineLevel({
+    name: 'Karlı Orman', width: 4000,
+    environment: {
+        background: 'moonwood',
+        platformStyle: 'snow',
+        weather: { type: 'snow', intensity: 0.8, wind: -10 }
+    },
+    player: { costume: { boy: 'ice_boy', girl: 'ice_girl' } },
+    platforms: [
+        { x: 400, y: 430, width: 220, ice: true },
+        { x: 900, y: 400, width: 220, style: 'moonwood', ice: false }
+    ],
+    // Üç yıldız, diğer nesneler ve bölümün yerleşimini burada yaz.
+    fruits: [...],
+    enemies: [defineEnemy('snowman', {
+        id: 'guard', x: 1500,
+        movement: { type: 'patrol', minX: 1400, maxX: 1700, speed: 55 },
+        behaviors: { hop: { walkMs: 2500, height: 60 } },
+        weapon: { type: 'bullet', period: 2400, speed: 220 }
+    })]
+});
+```
+
+Arka plan, kar yağışı, platform görünümü ve kayganlık bağımsızdır.
+`weather: false` temanın varsayılan karını da kapatır.
+Kostüm dünya ayarından alınabilir veya bölümde tek ad/cinsiyete göre eşleme ile değiştirilebilir.
+`movement` için `stationary`, `patrol`, `chase` veya yeni kaydettiğin hareket seçilebilir.
+`weapon` için `snowball`, `ice-shard`, `bullet` veya yeni bir silah seçilebilir;
+`weapon: false` kardan adamın varsayılan kar topunu da kapatır.
+`hop`, `visibility` ve diğer ek davranışlar `behaviors` içinde birlikte kullanılabilir.
+Standart bölümde yıldız veya düşman için `platform: 0` yazmak merkez konumunu hesaplatır.
+
+Yeni bağımsız bölümlerde `template` yazmadan veya `template: 'standard'` ile başla.
+Eski `ice` ve `night` şablonları mevcut bölümlerin oynanışını korumak için otomatik yerleşim
+hazırlıklarını sürdürür; bunları seçersen şablonun meyve, hız ve buz düzenlemeleri uygulanır.
+
+### 2. Yeni bir özellik gerekiyorsa önce kaydet
+
+Eklenti dosyasını `src/extensions/` içinde oluştur. Kayıt fonksiyonlarını `./api.js` içinden al.
+Eklentiyi `src/extensions.ts` içinde bir yan etkili import ile yükle; bu giriş,
+oyun bölüm listesi kurulmadan önce çalışır. Eklentiden `game.js`, `extensions.js`
+veya dünya/bölüm listesini import etme.
+
+| Kayıt fonksiyonu | Bir kez tanımlanan özellik |
+| --- | --- |
+| `registerEnemyType` | SVG yolu/boyutu, fizik gövdesi, isteğe bağlı varsayılanlar |
+| `registerCharacterSkin` | SVG ön adı ve klasörü; altı normal, üzgün, mutlu kare ve blink çizimi |
+| `registerEnemyBehavior` | Hareket/davranış; `create`, `update`, `destroy` yaşam döngüsü |
+| `registerWeaponType` | Görsel, atış planı, mermi hareketi ve isteğe bağlı atış koşulu |
+| `registerTheme` | Arka plan çizimi ve isteğe bağlı platform stili |
+| `registerPlatformTheme` | Arka plandan bağımsız platform paleti ve çizimi |
+| `registerWeather` | Phaser ile oluşturulan hava olayı ve isteğe bağlı temizlik |
+| `registerScenario` | Bölüme özel durum, güncelleme ve olay dinleme |
+| `registerScenarioAction` | Alanlara girildiğinde çalışacak yeni bir eylem |
+
+Davranışın `create` sonucu her düşman için ayrıdır. Bölümün seçenekleri `update` fonksiyonuna
+parametre olarak gelir; bölüm nesnesini değiştirerek durum tutma. Temizlik `destroy` ile yapılır.
+Silahın `launch` metodu atış planını, `frame` metodu merminin konumunu verir.
+`canFire` ile zıplarken ateş etme gibi özel koşullar tanımlanabilir.
+Silahlar aynı altı fizik nesnesini tekrar kullanır; her atışta yeni sprite oluşturulmaz.
+SVG silah için `asset: { src, width, height }`, kodla çizilen silah için `prepare(scene)` kullanılır.
+SVG düşman için `asset.src` veya `asset.folder`; kostüm için `{ prefix, folder }` tanımlanabilir.
+
+### 3. Bölüme özel olayları seç
+
+```js
+scenarios: [{ type: 'zones', zones: [{
+    x: 1200, width: 300,
+    actions: [{ type: 'weapon', enemyId: 'guard', weapon: { type: 'bullet' } }]
+}] }]
+```
+
+Bu alana ilk girişte `id: 'guard'` olan düşman silah değiştirir.
+`once: false` alan dışına çıkıp tekrar girildiğinde eylemi yeniden çalıştırır.
+Özel senaryolar `collect`, `key`, `hurt`, `checkpoint`, `complete`, `fall`, `crushed`, `respawn`
+olaylarını `onEvent` ile alır; eklentiler kendi olaylarını `emitLevelEvent` ile gönderebilir.
+`preload` ile senaryo görselleri yüklenebilir. Her bölüm denemesinde senaryo durumu yeniden
+kurulur; molada ve sonuç ekranında senaryo `update` çalışmaz, bölüm kapanınca `destroy` çağrılır.
+Bilinmeyen kayıt adları bölüm başlatılmadan doğrulanır.

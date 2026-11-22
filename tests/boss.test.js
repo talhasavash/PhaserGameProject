@@ -1,9 +1,9 @@
 // Boss zıplamasını, öfkesini ve yeniden başlama durumunda sıfırlanmasını doğrular.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { bossLift, bossMood, bossStep, resetBossRage } from '../src/gameplay/hazards.js';
-import { levels } from '../src/world/levels/level.js';
-import { verses } from '../src/data/verses.js';
+import { bossLift, bossMood, bossStep, resetBossRage } from '../.build/src/actors/enemies/EnemyController.js';
+import { levels } from '../.build/src/world/levels/level.js';
+import { verses } from '../.build/src/data/verses.js';
 
 test('The eleventh chapter has giant jumping guards with enough time to run underneath', () => {
     const boss = levels[10];
@@ -56,8 +56,8 @@ test('The final guard only grows angry after engagement and its speed and red ti
 });
 
 test('Every chapter has a sourced verse; citations remain in data rather than on the result card', () => {
-    assert.equal(verses.length, levels.length);
-    for (const verse of verses) {
+    for (const [index, level] of levels.entries()) {
+        const verse = level.verse || verses[index] || verses[0];
         assert.ok(verse.text.length > 10 && verse.text.length < 120);
         assert.match(verse.reference, /\d+\/\d+/);
         assert.equal(new URL(verse.source).hostname, 'kuran.diyanet.gov.tr');

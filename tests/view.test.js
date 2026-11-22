@@ -1,7 +1,7 @@
 // Telefon, tablet ve masaüstü ekranlarında görünür oyun alanı ölçülerini doğrular.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { gameView } from '../src/ui/browser.js';
+import { gameView } from '../.build/src/ui/browser.js';
 
 test('Landscape phone fills its game area with a closer, undistorted view', () => {
     const view = gameView(873, 393, true);

@@ -1,7 +1,7 @@
 // Mobilde yön ve zıplamanın birlikte çalışmasını ve dokunmaların doğru temizlenmesini doğrular.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { bindTouchControls } from '../src/gameplay/controls.js';
+import { bindTouchControls } from '../.build/src/actors/player/TouchControls.js';
 
 function fixture(nativeTouch = false) {
     const root = new EventTarget();

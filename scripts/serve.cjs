@@ -5,6 +5,19 @@ const path = require('node:path');
 
 const root = path.resolve(__dirname, '..', process.env.PREVIEW_DIST === '1' ? 'dist' : '.');
 const port = Number(process.env.PORT || 8095);
+const preview = process.env.PREVIEW_DIST === '1';
+if (!preview) {
+    require('./compile.cjs').compileProject();
+    let rebuild;
+    for (const folder of ['src', 'examples']) fs.watch(path.join(root, folder), { recursive: true }, (event, file) => {
+        if (!file?.endsWith('.ts')) return;
+        clearTimeout(rebuild);
+        rebuild = setTimeout(() => {
+            try { require('./compile.cjs').compileProject(); console.log('TypeScript güncellendi; tarayıcıyı yenileyebilirsin.'); }
+            catch (error) { console.error(error.message); }
+        }, 250);
+    });
+}
 const publicFolders = new Set(['assets', 'css', 'lib', 'src']);
 const contentTypes = {
     '.html': 'text/html; charset=utf-8',
@@ -44,7 +57,8 @@ const server = http.createServer(async (request, response) => {
         return;
     }
 
-    const filePath = path.resolve(root, relativePath);
+    // HTML aynı src/*.js adreslerini kullanır; geliştirmede bunlar derlenmiş dosyalardır.
+    const filePath = path.resolve(root, !preview && relativePath.startsWith('src/') ? '.build/' + relativePath : relativePath);
     if (!filePath.startsWith(root + path.sep)) {
         response.writeHead(404);
         response.end('Not found');

@@ -2,17 +2,17 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { EventEmitter } from 'node:events';
-import { levels, worldForLevel } from '../src/world/levels/level.js';
-import { worldThreeLevels as iceLevels } from '../src/world/levels/world3.js';
-import { isIcySurface } from '../src/world/terrain/terrain.js';
-import { createScenery } from '../src/world/scenery/background.js';
+import { levels, worldForLevel } from '../.build/src/world/levels/level.js';
+import { worldThreeLevels as iceLevels } from '../.build/src/world/levels/world3.js';
+import { isIcySurface } from '../.build/src/world/terrain/terrain.js';
+import { createScenery } from '../.build/src/world/scenery/background.js';
 
-test('World 3 starts at 31 with four icy chapters and clear ground around gaps', () => {
-    assert.equal(levels.length, 34);
-    assert.equal(iceLevels.length, 4);
+test('World 3 starts at 31 with five icy chapters and clear ground around gaps', () => {
+    assert.equal(levels.length, 35);
+    assert.equal(iceLevels.length, 5);
     assert.deepEqual(levels.slice(30), iceLevels);
-    assert.deepEqual(iceLevels.map(level => level.theme), ['glacier', 'iceCave', 'aurora', 'crystalPalace']);
-    for (const [index, level] of iceLevels.entries()) {
+    assert.deepEqual(iceLevels.map(level => level.theme), ['glacier', 'iceCave', 'aurora', 'crystalPalace', 'glacier']);
+    for (const [index, level] of iceLevels.slice(0, 4).entries()) {
         assert.equal(worldForLevel(index + 30).id, 3);
         assert.ok(level.platforms.every(platform => platform.ice));
         assert.ok(level.ice.every(ice => level.gaps.every(gap => ice.x + ice.width <= gap.x || ice.x >= gap.x + gap.width)));

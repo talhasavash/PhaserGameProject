@@ -1,8 +1,8 @@
 // Ateş yağmurunun konum, bekleme süresi ve düşüş hareketini doğrular.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { fireFrame, chooseFireX, fireWait, createFireRain, updateFireRain } from '../src/gameplay/fireRain.js';
-import { levels, worlds } from '../src/world/levels/level.js';
+import { fireFrame, chooseFireX, fireWait, createFireRain, updateFireRain } from '../.build/src/world/hazards/EnvironmentalHazards.js';
+import { levels, worlds } from '../.build/src/world/levels/level.js';
 
 test('A chosen target waits for 1.5 seconds, then falls and finishes without moving its target', () => {
     const plan = { x: 900, startAt: 2000, speed: 300 };

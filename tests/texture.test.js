@@ -1,7 +1,7 @@
 // Ortak doku önbelleğinin tekrar çizimi önlediğini ve geçici çizimleri temizlediğini doğrular.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { cacheTexture } from '../src/graphics/texture.js';
+import { cacheTexture } from '../.build/src/graphics/texture.js';
 
 function textureScene() {
     const cached = new Set();

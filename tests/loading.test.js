@@ -2,8 +2,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { EventEmitter } from 'node:events';
-import { showLoading, updateLoading, finishLoading } from '../src/ui/scenePage.js';
-import { bindWelcomeMenu } from '../src/ui/welcome.js';
+import { showLoading, updateLoading, finishLoading } from '../.build/src/ui/scenePage.js';
+import { bindWelcomeMenu } from '../.build/src/ui/welcome.js';
 import { readFileSync } from 'node:fs';
 
 test('The loading screen follows real progress and stays until the first rendered game frame', () => {

@@ -1,7 +1,7 @@
 // Can kaybı ve iyileşmede üç kalbin dolgusunu, puanın yalnızca sayı olmasını doğrular.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { updateHud } from '../src/ui/hud.js';
+import { updateHud } from '../.build/src/ui/hud.js';
 
 test('HUD empties lost hearts, restores healing and shows only the score number', () => {
     const hearts = Array.from({ length: 3 }, () => ({

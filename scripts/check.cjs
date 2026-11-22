@@ -3,6 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 const root = path.resolve(__dirname, '..');
+require('./compile.cjs').compileProject(true);
 function checkDirectory(directory) {
     for (const file of fs.readdirSync(directory, { withFileTypes: true })) {
         const full = path.join(directory, file.name);

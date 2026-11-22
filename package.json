@@ -7,11 +7,18 @@
   "scripts": {
     "start": "node scripts/serve.cjs",
     "check": "node scripts/check.cjs",
-    "test": "node --test tests/*.test.js",
+    "test": "node scripts/compile.cjs && node --test tests/*.test.js",
     "art": "node scripts/build-art.cjs",
-    "sounds": "node scripts/build-sounds.cjs"
+    "sounds": "node scripts/build-sounds.cjs",
+    "build": "node scripts/build-site.cjs",
+    "typecheck": "node scripts/compile.cjs --check"
   },
   "engines": {
     "node": ">=18"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.2",
+    "phaser": "4.2.1",
+    "typescript": "6.0.3"
   }
 }

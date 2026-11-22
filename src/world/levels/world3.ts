@@ -260,7 +260,7 @@ const tmpLevel = defineLevel({
             scenery.repeat(scenery.cloud(200, 110, { width: 160, height: 80, color: 0xf5faf3, scrollFactor: 0.18}), 8, 500),
             scenery.repeat(scenery.mountain(200, 370, { width: 600, height: 300, color: 0xa6bddb, detailColor: 0xf0f9ff, depth: -70, scrollFactor: 0.25}), 8, 500),
             scenery.repeat(scenery.hill(250, 510, { width: 800, height: 260, color: 0x708fb3, depth: -60, scrollFactor: 0.45}), 7, 650),
-            scenery.repeat(scenery.pine(350, 400, { width: 130, height: 240, color: 0x53867c, detailColor: 0x80634f, depth: -40, scrollFactor: 0.75}), 8, 550),
+            scenery.repeat(scenery.pine(100, 400, { width: 50, height: 100, color: 0x53867c, detailColor: 0x80634f, depth: -40, scrollFactor: 0.75}), 8, 550),
             scenery.repeat(scenery.hill(250, 520, { width: 180, height: 60, color: 0xf0f9ff, depth: -20, scrollFactor: 0.9}), 11, 350)
         ],
             { body: 0xaacbdc, edge: 0xf0f9ff }),

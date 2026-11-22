@@ -58,13 +58,13 @@ export function bindButtonFeedback(root = document) {
         if (event.type === 'pointerdown' && event.button !== 0) return;
         const button = event.target.closest('button, .character-option');
         // Hareket tuşlarının görseli, parmak basılı kaldığı sürece controls.js tarafından yönetilir.
-        if (!button || button.disabled || button.matches('.touch-button') || reducedMotion.matches) return;
+        if (!button || button.disabled || button.matches('.touch-button, #settings-button, #settings-close') || reducedMotion.matches) return;
         const levelButton = button.matches('.level-option');
         button.animate(levelButton ? [
-            {scale: '1', filter: 'brightness(1)'},
-            {scale: '.82', filter: 'brightness(1.25)', offset: .28},
-            {scale: '1.12', filter: 'brightness(1.12)', offset: .72},
-            {scale: '1', filter: 'brightness(1)'}
+            {scale: '1'},
+            {scale: '.82', offset: .28},
+            {scale: '1.12', offset: .72},
+            {scale: '1'}
         ] : [{scale: '.94'}, {scale: '1'}], {duration: levelButton ? 340 : 180, easing: 'ease-out'});
     }
     root.addEventListener('pointerdown', press, { capture: true });

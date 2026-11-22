@@ -84,7 +84,11 @@ button {
     padding: 7px 12px;
     touch-action: manipulation;
     transition: scale 100ms ease-out;
+    -webkit-tap-highlight-color: transparent;
 }
+
+.character-option { -webkit-tap-highlight-color: transparent; }
+button:focus:not(:focus-visible) { outline: none; }
 
 button:not(:disabled):not(.touch-button):active {
     scale: .94;

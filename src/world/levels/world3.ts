@@ -2,8 +2,7 @@
 
 import {defineLevel} from '../model/definitions.js';
 import {defineEnemy} from '../../actors/enemies/EnemyCatalog.js';
-import { platform, item, outfits, gap, iceArea, column, scenery, weather,
-    rain, movement, behavior, weapon, scenario } from '../model/levelParts.js';
+import { platform, item, outfits, gap, iceArea, column, scenery, weather, rain, movement, behavior, weapon, scenario } from '../model/levelParts.js';
 
 const frozenLake = defineLevel({
     template: 'ice',
@@ -246,10 +245,10 @@ const crystalPalace = defineLevel({
     }
 });
 
-const fireWinter = defineLevel({
+const tmpLevel = defineLevel({
 
-    name: 'Karlı Ateş',
-    draft: true,
+    name: 'Deneme Bölümü',
+    draft: false,
     width: 4000,
 
     environment: {
@@ -257,25 +256,14 @@ const fireWinter = defineLevel({
         platformStyle: 'snow',
         scenery: scenery.background(0xcbe8f6, [
             scenery.sun(650, 140, { width: 100, height: 100 }),
-            scenery.repeat(scenery.cloud(200, 110, {
-                width: 160, height: 80, color: 0xf5faf3, scrollFactor: 0.18
-            }), 8, 500),
-            scenery.repeat(scenery.mountain(200, 370, {
-                width: 600, height: 300, color: 0xa6bddb, detailColor: 0xf0f9ff,
-                depth: -70, scrollFactor: 0.25
-            }), 8, 500),
-            scenery.repeat(scenery.hill(250, 510, {
-                width: 800, height: 260, color: 0x708fb3, depth: -60, scrollFactor: 0.45
-            }), 7, 650),
-            scenery.repeat(scenery.pine(350, 400, {
-                width: 130, height: 240, color: 0x53867c, detailColor: 0x80634f,
-                depth: -40, scrollFactor: 0.75
-            }), 8, 550),
-            scenery.repeat(scenery.hill(250, 520, {
-                width: 180, height: 60, color: 0xf0f9ff, depth: -20, scrollFactor: 0.9
-            }), 11, 350)
-        ], { body: 0xaacbdc, edge: 0xf0f9ff }),
-        weather: weather.snow({ intensity: 1, wind: -15 })
+            scenery.repeat(scenery.cloud(200, 110, { width: 160, height: 80, color: 0xf5faf3, scrollFactor: 0.18}), 8, 500),
+            scenery.repeat(scenery.mountain(200, 370, { width: 600, height: 300, color: 0xa6bddb, detailColor: 0xf0f9ff, depth: -70, scrollFactor: 0.25}), 8, 500),
+            scenery.repeat(scenery.hill(250, 510, { width: 800, height: 260, color: 0x708fb3, depth: -60, scrollFactor: 0.45}), 7, 650),
+            scenery.repeat(scenery.pine(350, 400, { width: 130, height: 240, color: 0x53867c, detailColor: 0x80634f, depth: -40, scrollFactor: 0.75}), 8, 550),
+            scenery.repeat(scenery.hill(250, 520, { width: 180, height: 60, color: 0xf0f9ff, depth: -20, scrollFactor: 0.9}), 11, 350)
+        ],
+            { body: 0xaacbdc, edge: 0xf0f9ff }),
+            weather: weather.snow({ intensity: 1, wind: -15 })
     },
 
     player: outfits.winter(),
@@ -296,35 +284,22 @@ const fireWinter = defineLevel({
 
     ice: [iceArea(1000, 300), iceArea(1800, 250)],
     gaps: [gap(2200, 140, { style: 'lava' })],
-
-    columns: [
-        column(1700, 80, {
-            raisedBottom: 200,
-            openMs: 2200,
-            style: 'lava'
-        })
-    ],
-
+    columns: [column(1700, 80, { raisedBottom: 200, openMs: 2200, style: 'lava'})],
     fireRain: [rain.snow({ period: 5000, speed: 310, offset: 4500 })],
 
     enemies: [
         defineEnemy('snowman', {
             id: 'winter-guard',
             x: 1300,
-
             movement: movement.patrol(1150, 1450, 45),
-            behaviors: {
-                hop: behavior.hop(2500, 350, { height: 65, duration: 700 })
-            },
-
+            behaviors: { hop: behavior.hop(2500, 350, { height: 65, duration: 700 })},
             weapon: weapon.bullet({ period: 3000, speed: 190 })
         })
     ],
     scenarios: [
-        scenario.changeWeapon(1000, 400, 'winter-guard',
-            weapon.snowball({ period: 2400, speed: 170 }))
+        scenario.changeWeapon(1000, 400, 'winter-guard', weapon.snowball({ period: 2400, speed: 170 }))
     ]
 
 });
 
-export const worldThreeLevels = [frozenLake, frozenCave, polarLights, crystalPalace,fireWinter];
+export const worldThreeLevels = [frozenLake, frozenCave, polarLights, crystalPalace,tmpLevel];

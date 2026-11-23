@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+    <title>Matter · Fizik Atölyesi · Yerel Deneme</title>
+    <link rel="stylesheet" href="./lab.css">
+    <script defer src="/lib/phaser.min.js"></script>
+    <script type="module" src="./boot.js"></script>
+</head>
+<body>
+    <header class="lab-toolbar">
+        <span class="lab-title">Fizik Atölyesi <small>YEREL DENEME · MATTER</small></span>
+        <select id="lab-station" aria-label="Deneme alanı"></select>
+        <label class="lab-debug"><input id="lab-debug" type="checkbox" disabled> Fizik gövdeleri</label>
+        <button id="lab-release" type="button" aria-label="Topları aynı anda serbest bırak" hidden>↓</button>
+        <button id="lab-pause" type="button" aria-label="Duraklat" disabled>Ⅱ</button>
+        <button id="lab-restart" type="button" aria-label="Denemeyi yeniden başlat" disabled>↻</button>
+    </header>
+    <main id="lab-game" aria-label="Kutu, tahta ve taş fizik denemesi"></main>
+    <section id="lab-intro" class="lab-overlay">
+        <div class="lab-intro-card">
+            <p class="lab-eyebrow">YALNIZCA GELİŞTİRME SUNUCUSUNDA</p>
+            <h1>İt, dengele, köprü kur.</h1>
+            <p>Kutuları it, tepelerde top yuvarla, tahterevalliyi dengele ve domino tahtalarını devir.</p>
+            <label>Karakter <select id="lab-character"><option value="boy">Erkek çocuk</option><option value="girl">Kız çocuk</option></select></label>
+            <button id="lab-start" type="button">Denemeyi başlat ▶</button>
+            <small>← → / A D · Zıpla: ↑ W Boşluk · R: sıfırla · Esc: mola</small>
+            <small>Telefon ve tablette ekranı yatay kullanabilirsin.</small>
+        </div>
+    </section>
+    <div id="lab-loading" class="lab-overlay" role="status" hidden>Atölye hazırlanıyor…</div>
+    <p id="lab-status" role="status" aria-live="polite">Nesneleri istediğin kadar yeniden kurup deneyebilirsin.</p>
+    <div id="touch-controls" class="lab-controls" aria-label="Hareket düğmeleri">
+        <div class="lab-directions">
+            <button id="move-left" class="touch-button" type="button" aria-label="Sola yürü"><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M83 12Q88 10 88 20V80Q88 90 80 86L18 55Q8 50 18 45Z"/></svg></button>
+            <button id="move-right" class="touch-button" type="button" aria-label="Sağa yürü"><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M17 12Q12 10 12 20V80Q12 90 20 86L82 55Q92 50 82 45Z"/></svg></button>
+        </div>
+        <button id="jump" class="touch-button lab-jump" type="button" aria-label="Zıpla"><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="42"/></svg></button>
+    </div>
+</body>
+</html>

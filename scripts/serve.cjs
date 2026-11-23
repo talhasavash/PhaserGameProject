@@ -41,12 +41,14 @@ const server = http.createServer(async (request, response) => {
     }
 
     let relativePath;
+    let developmentExample = false;
     try {
         const pathname = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
         relativePath = pathname === '/' ? 'index.html' : pathname.slice(1);
+        developmentExample = !preview && relativePath.startsWith('examples/matter-lab/');
         const segments = relativePath.split(/[\\/]/);
         if (segments.some(segment => segment.startsWith('.')) ||
-            (!['index.html', 'manifest.webmanifest', 'sw.js'].includes(relativePath) && !publicFolders.has(segments[0]))) {
+            (!developmentExample && !['index.html', 'manifest.webmanifest', 'sw.js'].includes(relativePath) && !publicFolders.has(segments[0]))) {
             response.writeHead(404);
             response.end('Not found');
             return;
@@ -58,7 +60,8 @@ const server = http.createServer(async (request, response) => {
     }
 
     // HTML aynı src/*.js adreslerini kullanır; geliştirmede bunlar derlenmiş dosyalardır.
-    const filePath = path.resolve(root, !preview && relativePath.startsWith('src/') ? '.build/' + relativePath : relativePath);
+    const compiled = !preview && (relativePath.startsWith('src/') || (developmentExample && relativePath.endsWith('.js')));
+    const filePath = path.resolve(root, compiled ? '.build/' + relativePath : relativePath);
     if (!filePath.startsWith(root + path.sep)) {
         response.writeHead(404);
         response.end('Not found');

@@ -1,0 +1,34 @@
+/* Yalnızca yerel fizik atölyesinin ekranı; normal oyunun CSS kurallarını değiştirmez. */
+* {box-sizing: border-box;}
+html, body {margin: 0; width: 100%; height: 100%; overflow: hidden; font: 16px 'Trebuchet MS', sans-serif; background: #183647; color: #f7f4dd;}
+button, select {font: inherit; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent;}
+button {border: 2px solid #f4e7bb; color: #fff7e4; background: #a54550; border-radius: 12px; padding: 8px 16px;}
+button:disabled {opacity: .45; cursor: default;}
+button:focus-visible, select:focus-visible {outline: 3px solid #f5d78d; outline-offset: 2px;}
+[hidden] {display: none !important;}
+.lab-toolbar {position: absolute; inset: 0 0 auto; display: flex; align-items: center; gap: 10px; height: 64px; padding: max(8px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)); z-index: 3; background: #183647;}
+.lab-title {margin-right: auto; font-weight: bold;}
+.lab-title small {display: block; font-size: 10px; color: #a7c5ce; letter-spacing: 1px; margin-top: 4px;}
+.lab-toolbar button {width: 44px; height: 44px; padding: 3px; font-size: 28px;}
+.lab-toolbar select {max-width: 190px; padding: 6px; border: 1px solid #b6cbd3; border-radius: 8px; background: #edf5f4; color: #244455;}
+.lab-debug {font-size: 12px; display: flex; align-items: center; gap: 5px;}
+#lab-game {position: absolute; inset: 64px 0 0; touch-action: none;}
+#lab-game canvas {display: block;}
+.lab-overlay {position: absolute; inset: 64px 0 0; display: grid; place-items: center; padding: 20px; background: #163445e8; z-index: 4;}
+.lab-intro-card {max-width: 560px; text-align: center; display: grid; justify-items: center; gap: 15px;}
+.lab-eyebrow {letter-spacing: 2px; font-size: 11px; color: #b9d0d6;}
+.lab-intro-card h1, .lab-intro-card p {margin: 0;}
+.lab-intro-card h1 {font-size: clamp(28px, 5vw, 42px); color: #f7d890;}
+.lab-intro-card select {padding: 6px; border-radius: 8px; border: 0; margin-left: 8px;}
+.lab-intro-card small {font-size: 12px; color: #b9d0d6;}
+#lab-start {padding: 14px 28px; font-size: 19px; font-weight: bold; box-shadow: 0 4px 0 #602b3c;}
+#lab-status {position: absolute; top: 70px; left: 50%; transform: translateX(-50%); width: max-content; max-width: 80%; margin: 0; padding: 7px 12px; border-radius: 10px; background: #183647b3; text-align: center; font-size: 13px; pointer-events: none; z-index: 2;}
+.lab-controls {display: none; position: absolute; inset: auto 0 max(6px, env(safe-area-inset-bottom)); height: 110px; z-index: 2; pointer-events: none;}
+.lab-directions {position: absolute; left: 0; bottom: 0; display: flex; gap: 4px;}
+.touch-button {width: 102px; height: 102px; background: transparent; border: 0; padding: 0; pointer-events: auto; touch-action: none; user-select: none;}
+.touch-button svg {width: 100%; height: 100%; pointer-events: none;}
+.touch-button path, .touch-button circle {fill: #ffffff08; stroke: #ffffff65; stroke-width: 2; stroke-linejoin: round;}
+.lab-jump {position: absolute; right: 0; bottom: 0;}
+@media (any-pointer: coarse), (max-width: 1024px) {.lab-controls {display: block;}}
+@media (max-width: 600px) {.lab-title {font-size: 13px;} .lab-title small {font-size: 8px;} .lab-debug {font-size: 10px;} .lab-toolbar {gap: 6px;} .lab-toolbar select {max-width: 120px; font-size: 11px;} .lab-toolbar button {width: 40px; height: 40px;} #lab-status {font-size: 11px;}}
+@media (orientation: landscape) and (max-height: 500px) {.lab-toolbar {height: 48px;} #lab-game, .lab-overlay {top: 48px;} #lab-status {top: 54px;} .lab-intro-card {gap: 8px;} .lab-eyebrow {display: none;}}

@@ -6,6 +6,37 @@ Bu bir öğrenme ve deneme projesidir; senaryo zamanla değişebilir. Yeni özel
 çocukların kullanımı, okunabilir TypeScript ve bilgisayar/telefon/tablet desteği birlikte düşünülür.
 Mobil desteği korumak için klavye ve dokunmatik giriş aynı hareket koduna bağlanır.
 
+## Yerel Matter fizik atölyesi
+
+Geliştirme sunucusunu `node scripts/serve.cjs` ile başlatıp
+`http://localhost:8095/examples/matter-lab/index.html` adresini aç.
+Kutu itme, kutuya çıkma, dönen/yığılan kutular, devrilerek köprü olan tahta ve
+yuvarlanan taş burada denenir. `R` bütün gövdeleri ve eklemleri ilk konumlarına getirir;
+`Esc` mola verir. Dokunmatik yön ve zıplama da desteklenir.
+Üstteki alan seçimiyle on iki denemeden birine doğrudan başlayabilirsin. Tepeli parkurda
+yerçekimiyle hızlanma, tahterevallide ağırlık/denge, esnek top ve domino alanında
+sekme ve momentum aktarımı denenir.
+İkinci alandaki yığılmış kutular serbestçe devrilebilir. Sekizinci alan 29 farklı
+boy/ağırlıktaki kutuyla yığın, devrilme ve itiş denemesidir. Aynı boydaki hafif/ağır
+kutuların yoğunlukları 6 kat farklıdır. Karakterin kuvvet sınırları `movement.ts`
+içindeki `maxGroundForce` / `maxAirForce`, nesnelerin kütlesi ise boyut ve `density`
+ile belirlenir. Büyük/ağır kutuların aynı hızla ilerlemesi zorlanmaz.
+9–12. alanlarda sarkaç/ağır metal, iki askıyla taşınan platform, buz–kauçuk sürtünmesi
+ve aynı yükseklikten bırakılan üç topun sekmesi karşılaştırılır. Son alandaki `↓`
+düğmesi topları birlikte serbest bırakır; `R` deneyi tekrar hazırlar.
+Bu dört düzenek `examples/matter-lab/experiments.ts` içinde aynı Factory oluşturucularıyla
+tanımlanır. Askı bağlantıları `links` alanıyla, sürtünme `friction`, sekme `restitution`
+ile seçilir; çizilmiş animasyon yerine Matter kuvvetleri ve bağlantıları kullanılır.
+
+Bu sayfa normal bölüm listesine ve kayıtlı ilerlemeye bağlı değildir. `examples/`
+yayın paketine kopyalanmadığı ve yayın önizleme sunucusu bu yolu açmadığı için
+GitHub Pages/PWA kullanıcılarına sunulmaz. Normal bölümler Arcade kullanmaya devam eder.
+
+Kod sırası: `examples/matter-lab/definition.ts` (interface, nesne oluşturucuları ve bölüm),
+`MatterObjects.ts` (gövde/görsel Factory'si), `MatterLabScene.ts` (Matter sahnesi),
+`movement.ts` (hareket ayarları), `simulation.ts` (sabit fizik adımı ve görüntü oranı),
+`boot.ts` (yerel sayfanın başlangıcı).
+
 ## İnternetten oyna
 
 Adres: https://talhasavash.github.io/PhaserGameProject/

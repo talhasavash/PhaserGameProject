@@ -44,6 +44,8 @@ test('Published modules resolve across folders, share a version, and leave sourc
         }
     }
     const html = fs.readFileSync(path.join(root, 'dist', 'index.html'), 'utf8');
+    assert.equal(fs.existsSync(path.join(root, 'dist', 'examples', 'matter-lab')), false);
+    assert.equal(html.includes('matter-lab'), false, 'The private physics experiment is not linked in the public menu');
     assert.ok(html.includes('src/game.js?v=1234567'));
     assert.ok(html.includes('Demo · 1234567'));
     const assets = fs.readFileSync(path.join(output, 'data', 'assets.js'), 'utf8');

@@ -7,7 +7,7 @@ import type { BuiltInSkinName } from '../../data/characters.js';
 import type { BuiltInCollectibleName } from '../../data/assets.js';
 import type { BuiltInTemplateName } from './templates.js';
 import type { BuiltInWeatherName } from '../scenery/weather.js';
-import type { MatterObjectDefinition, MatterJointDefinition, MatterSurface } from '../../physics/matter/definitions.js';
+import type { MatterObjectDefinition, MatterJointDefinition, MatterSurface, PressureBridgeDefinition } from '../../physics/matter/definitions.js';
 
 /** Hazır isimleri IDE'de önerir; eklentilerle kaydedilen özel isimleri de kabul eder. */
 export type SuggestedName<Known extends string> = Known | (string & {});
@@ -181,6 +181,7 @@ export interface LevelDefinition {
     props?: MatterObjectDefinition[];
     links?: MatterJointDefinition[];
     matterSurfaces?: MatterSurface[];
+    mechanisms?: PressureBridgeDefinition[];
     id?: string;
     /** Deneme bölümü: menüde kilitli kalır ve bölüm akışında açılmaz. */
     draft?: boolean;

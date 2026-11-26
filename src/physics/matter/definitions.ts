@@ -18,9 +18,18 @@ export interface MatterJointDefinition {
     objectId: string; anchor: Point; localPoint: Point;
     length?: number; stiffness?: number; damping?: number;
 }
+export interface PressureBridgeDefinition {
+    type: 'pressure-bridge';
+    id: string;
+    cargoId: string;
+    plankId: string;
+    plate: Point & {width: number};
+    holdMs?: number;
+}
 export type MatterSurface = ({x: number; y: number; width: number; height: number; angle?: number} |
     {vertices: Point[]}) & {hidden?: boolean};
 export interface MatterWorldDefinition {
+    mechanisms?: PressureBridgeDefinition[];
     width: number;
     groundY: number;
     spawn: Point;

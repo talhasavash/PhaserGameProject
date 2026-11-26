@@ -53,24 +53,32 @@ oluşturulmaz. İlk 45 bölümün numaraları ve Arcade ayarları korunur.
 `MatterGameScene` açılır. Ortak `sceneRouting.ts` sözleşmesi mola/yenileme ve motor
 değişimlerinde karakter/puan aktarımını sağlar. İki motor aynı bölümde karıştırılmaz.
 
-Matter pilotu şimdilik ortak arka plan, platform, meyve/yıldız, anahtar, cami,
-HUD ve sonuç ekranını destekler. Arcade düşmanları/silahları, buz kayganlığı,
-kolonlar ve özel senaryolar henüz Matter'a taşınmadı; bu alanlar eklenirse bölüm
+Matter sahnesi ortak arka plan, platform, meyve/yıldız, anahtar, cami,
+HUD, sonuç ekranı ve yavaş, silahsız devriye düşmanlarını destekler. Silahlar, buz kayganlığı,
+kolonlar ve özel Arcade senaryoları henüz Matter'a taşınmadı; bu alanlar eklenirse bölüm
 doğrulaması açık bir hata verir. Mevcut bölümler bu sınırlamadan etkilenmez.
 
 ## Dünya 6: Denge Atölyesi
 
-Menüde altıncı dünyayı seç. 76–90 numaralı 15 bölüm Matter kullanır; ilk bölüm
-doğrudan açıktır, diğerleri sırayla açılır. Tamamlanmamış 4. ve 5. dünyalar bu dünyayı
-engellemez. İlerleme `meyve-oyunu-world-6-unlocked` anahtarında ayrı saklanır;
-eski `meyve-oyunu-unlocked-levels` kaydı değişmez. Pilot 46. yuvada kapalı kalır.
+Menüde altıncı dünyayı seç. 76–90 numaralı 15 bölüm Matter kullanır. 76. bölüm,
+75 tamamlanınca açılır; diğerleri de sırayla açılır. Henüz hazırlanmayan 4. ve 5.
+dünyalar tamamlanmadan bu dünya oynanamaz. Ortak `meyve-oyunu-unlocked-levels`
+kaydı kullanılır. Eski ayrı dünya kaydı bu kilidi atlatmaz; pilot 46. yuvada kapalı kalır.
 
 `src/world/levels/world6.ts` her bölümün üç fizik düzeneğini, renklerini ve camisini
 belirler. `src/world/model/physicsPuzzles.ts` içindeki tipli Factory ile sandık,
 kule, buz/kauçuk/metal blok, devrilen köprü, kargo köprüsü, tahterevalli, asılı
 platform, rampa/taş, domino ve sarkaç birleştirilir. Yerleşimler sabittir; her
-yenilemede aynı bulmaca geri gelir. Yıldız raflarına ulaşmak için sandıklar basamak
-olarak taşınır; uzun çukurlar tahta köprüyle geçilir. Ortak Matter ayarları değişmez.
+yenilemede aynı bulmaca geri gelir. Yassı kargo alçak tünelden geçirilir, buz kızağı
+rampaya itilir, üst raftaki sandık boşluğu aşmak için taşınır. Köprü sandığı/taşı
+işaretli baskı plakasında kısa süre durunca mandal açılır, tahta yerçekimiyle geçişi
+kurar. Plaka yeşile döner ve kısa bir ses çalar. Ortak Matter ayarları değişmez.
+
+Her bölümde yıldızlardan ve mekanizmalardan uzakta iki yavaş düşman bulunur.
+Üstüne zıplanınca etkisizleşir; yandan temas bir can azaltır ve iki saniye koruma
+verir. `src/physics/matter/MatterEnemies.ts` bu sensörleri, `BridgeMechanisms.ts`
+baskı plakası/mandal durumunu yönetir. Mola sırasında ikisi de ilerlemez; yenileme
+düşmanları, köprüleri ve plakaları başlangıç durumuna döndürür.
 
 `src/physics/matter/terrainArt.ts` sabit rampaları fizik gövdeleriyle aynı noktalarda
 çizer. Menü görseli `assets/images/scene/menu-world6.svg` içindedir. Bölüm sonuçları

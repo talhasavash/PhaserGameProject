@@ -11,10 +11,12 @@ import {createLabWorld, wakeTouchedObjects} from '../.build/src/physics/matter/M
 import {labMotion, moveLabPlayer} from '../.build/src/physics/matter/movement.js';
 import {labPhysics, FixedStepSimulation} from '../.build/src/physics/matter/simulation.js';
 import {worldUnlockedLevels, unlockWorldNext, readUnlocked} from '../.build/src/data/progress.js';
+import {BridgeMechanisms} from '../.build/src/physics/matter/BridgeMechanisms.js';
 
 function fixture(definition) {
     const engine = Matter.Engine.create({...labPhysics, gravity: {x: 0, y: labMotion.gravity}});
     const world = createLabWorld(Matter, definition, objects => Matter.Composite.add(engine.world, objects));
+    const mechanisms = new BridgeMechanisms(Matter, world, definition.mechanisms ?? []);
     let clock = 0, groundAt = -Infinity, jumpAt = -Infinity;
     for (const event of ['collisionStart', 'collisionActive']) Matter.Events.on(engine, event, e => {
         wakeTouchedObjects(Matter, world.player, e.pairs);
@@ -24,10 +26,10 @@ function fixture(definition) {
                 !other.isSensor && Math.abs(pair.collision.normal.y) > .5) groundAt = clock;
         }
     });
-    return {world, grounded: () => clock - groundAt < 110,
+    return {world, mechanisms, grounded: () => clock - groundAt < 110,
         jump() {jumpAt = clock; groundAt = -Infinity; Matter.Body.setVelocity(world.player, {x: world.player.velocity.x, y: -labMotion.jump});},
         step(count, before = () => {}) {
-        for (let i = 0; i < count; i++) {clock += FixedStepSimulation.stepMs; before(); Matter.Engine.update(engine, FixedStepSimulation.stepMs);}
+        for (let i = 0; i < count; i++) {clock += FixedStepSimulation.stepMs; before(); mechanisms.update(FixedStepSimulation.stepMs); Matter.Engine.update(engine, FixedStepSimulation.stepMs);}
     }};
 }
 
@@ -58,11 +60,11 @@ test('World 6 publishes 15 different Matter chapters while the local pilot stays
     assert.equal(worlds[5].menu.image, 'assets/images/scene/menu-world6.svg');
 });
 
-test('World 6 starts at one, unlocks sequentially and persists independently of old progress', () => {
+test('Opt-in independent worlds preserve their own progress', () => {
     const values = new Map([['meyve-oyunu-unlocked-levels', '23']]);
     const storage = {getItem: key => values.get(key) ?? null, setItem: (key, value) => values.set(key, value)};
     globalThis.window = {localStorage: storage};
-    const world = worlds[5];
+    const world = {...worlds[5], independentProgress: true};
     assert.equal(worldUnlockedLevels(world, 90), 1);
     for (let index = 75; index < 90; index++) {
         assert.equal(unlockWorldNext(world, index, 90), index - 75 + 2);
@@ -71,6 +73,24 @@ test('World 6 starts at one, unlocks sequentially and persists independently of 
     assert.equal(values.get('meyve-oyunu-world-6-unlocked'), '16');
     assert.equal(worldUnlockedLevels(world, 90), 16, 'Last chapter is remembered as completed');
     assert.equal(unlockWorldNext(world, 75, 90), 16, 'Replay cannot relock later chapters');
+});
+
+test('World 6 follows global progress: 76 stays locked until 75 is completed, ignoring the old separate save', () => {
+    const values = new Map([['meyve-oyunu-unlocked-levels', '1'], ['meyve-oyunu-world-6-unlocked', '16']]);
+    const storage = {getItem: key => values.get(key) ?? null, setItem: (key, value) => values.set(key, value)};
+    globalThis.window = {localStorage: storage};
+    const world = worlds[5];
+    assert.equal(world.independentProgress, undefined);
+    assert.equal(worldUnlockedLevels(world, 90), 0);
+    values.set('meyve-oyunu-unlocked-levels', '75');
+    assert.equal(worldUnlockedLevels(world, 90), 0, 'An unlocked 75 is not yet a completed 75');
+    unlockWorldNext(worlds[4], 74, 90);
+    assert.equal(worldUnlockedLevels(world, 90), 1);
+    for (let index = 75; index < 90; index++) {
+        unlockWorldNext(world, index, 90);
+        assert.equal(worldUnlockedLevels(world, 90), Math.min(index - 75 + 2, 15));
+    }
+    assert.equal(values.get('meyve-oyunu-world-6-unlocked'), '16', 'Archived separate save is left intact');
 });
 
 test('Each chapter settles with finite bodies, valid constraints and repeatable fresh worlds', () => {
@@ -102,7 +122,7 @@ test('Each chapter settles with finite bodies, valid constraints and repeatable 
 test('Tipping bridge covers a gap wider than a normal jump at each difficulty', () => {
     for (const variant of [0, 1, 2]) {
         const puzzle = makePhysicsPuzzle('bridge', 0, 'test', variant);
-        const level = {...worldSixLevels[0], spawn: {x: 20, y: 480}, platforms: [], gaps: puzzle.gaps, props: puzzle.props, links: puzzle.links, matterSurfaces: []};
+        const level = {...worldSixLevels[0], spawn: {x: 20, y: 480}, platforms: [], gaps: puzzle.gaps, props: puzzle.props, links: puzzle.links, matterSurfaces: [], mechanisms: puzzle.mechanisms};
         const {world, step} = fixture(matterWorldForLevel(level));
         const board = world.objects.get('test-bridge').body;
         step(600, () => moveLabPlayer(Matter, world.player, 1, true, FixedStepSimulation.stepMs));
@@ -118,7 +138,7 @@ test('Cargo can be pushed across the hinged bridge without falling into the pit'
     for (const variant of [0, 1, 2]) {
         const puzzle = makePhysicsPuzzle('balance', 0, 'test', variant);
         const level = {...worldSixLevels[0], spawn: {x: 20, y: 480}, platforms: puzzle.platforms,
-            gaps: puzzle.gaps, props: puzzle.props, links: puzzle.links, matterSurfaces: puzzle.surfaces};
+            gaps: puzzle.gaps, props: puzzle.props, links: puzzle.links, matterSurfaces: puzzle.surfaces, mechanisms: puzzle.mechanisms};
         const {world, step} = fixture(matterWorldForLevel(level));
         const cargo = world.objects.get('test-cargo').body;
         step(900, () => moveLabPlayer(Matter, world.player, cargo.position.x < 700 ? 1 : 0, true, FixedStepSimulation.stepMs));
@@ -131,7 +151,7 @@ test('The crate tower can be climbed to its star shelf at all three difficulties
     for (const variant of [0, 1, 2]) {
         const puzzle = makePhysicsPuzzle('tower', 0, 'test', variant);
         const level = {...worldSixLevels[0], spawn: {x: 20, y: 480}, platforms: puzzle.platforms,
-            gaps: [], props: puzzle.props, links: [], matterSurfaces: []};
+            gaps: [], props: puzzle.props, links: [], matterSurfaces: [], mechanisms: []};
         const {world, step, jump, grounded} = fixture(matterWorldForLevel(level));
         step(60);
         const walk = target => () => {
@@ -146,6 +166,46 @@ test('The crate tower can be climbed to its star shelf at all three difficulties
         assert.ok(world.player.bounds.max.y < 405, `Upper box supports the second landing: ${JSON.stringify(world.player.position)}`);
         jump(); step(150, walk(410));
         assert.ok(world.player.bounds.max.y < puzzle.platforms[0].y + 5, `variant ${variant}: shelf must support the player: ${JSON.stringify(world.player.position)}`);
+        assert.ok(Math.abs(world.player.position.x - puzzle.star.x) < 30);
+    }
+});
+
+test('Flat cargo passes the low tunnel and the ice sled can be pushed up its ramp', () => {
+    for (const [kind, id, target] of [['tunnel', 'cargo', 425], ['sled', 'sled', 450]]) {
+        const puzzle = makePhysicsPuzzle(kind, 0, 'test');
+        const level = {...worldSixLevels[0], spawn: {x: 0, y: 480}, platforms: puzzle.platforms, gaps: [],
+            props: puzzle.props, links: [], matterSurfaces: puzzle.surfaces, mechanisms: []};
+        const {world, step, grounded} = fixture(matterWorldForLevel(level));
+        const cargo = world.objects.get(`test-${id}`).body;
+        step(1000, () => moveLabPlayer(Matter, world.player, cargo.position.x < target ? 1 : 0, grounded(), FixedStepSimulation.stepMs));
+        assert.ok(cargo.position.x >= target, `${kind}: cargo stopped at ${cargo.position.x}`);
+        assert.ok(cargo.position.y < 510);
+        if (kind === 'sled') assert.ok(cargo.bounds.max.y < 455, 'Sled reaches the upper terrace');
+    }
+});
+
+test('High cargo and the loose deck give reachable routes to the two new raised stars', () => {
+    for (const kind of ['drop', 'stepping']) {
+        const puzzle = makePhysicsPuzzle(kind, 0, 'test');
+        const level = {...worldSixLevels[0], spawn: {x: 20, y: 480}, platforms: puzzle.platforms,
+            gaps: [], props: puzzle.props, links: [], matterSurfaces: [], mechanisms: []};
+        const {world, step, jump, grounded} = fixture(matterWorldForLevel(level));
+        const walk = target => () => {
+            const difference = target - world.player.position.x;
+            const direction = Math.abs(difference) > 3 ? Math.sign(difference)
+                : Math.abs(world.player.velocity.x) > .25 ? -Math.sign(world.player.velocity.x) : 0;
+            moveLabPlayer(Matter, world.player, direction, grounded(), FixedStepSimulation.stepMs);
+        };
+        step(60);
+        for (const x of kind === 'drop' ? [125, 270, 415] : [95, 310, 470]) {jump(); step(150, walk(x));}
+        if (kind === 'drop') {
+            const cargo = world.objects.get('test-high-cargo').body;
+            step(360, () => moveLabPlayer(Matter, world.player, cargo.position.x < 540 ? 1 : 0, grounded(), FixedStepSimulation.stepMs));
+            jump(); step(150, walk(560));
+        } else step(100, walk(535));
+        jump(); step(180, walk(kind === 'drop' ? 730 : 650));
+        step(100, walk(puzzle.star.x));
+        assert.ok(world.player.bounds.max.y < puzzle.platforms.at(-1).y + 5, `${kind}: player did not reach the final shelf`);
         assert.ok(Math.abs(world.player.position.x - puzzle.star.x) < 30);
     }
 });

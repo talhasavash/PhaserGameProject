@@ -23,7 +23,7 @@ export const worldDefinitions: import('../model/contracts.js').WorldInput[] = [
         menu: { image: 'assets/images/scene/menu-world4.svg', color: '#49657c' } },
     { id: 5, title: "Kabe'nin Yolları", music: { src: 'assets/audio/music/world5.aac', volume: 0.12 },
         menu: { image: 'assets/images/scene/menu-world5.svg', color: '#18294c' } },
-    {id: 6, title: 'Denge Atölyesi', levels: worldSixLevels, independentProgress: true,
+    {id: 6, title: 'Denge Atölyesi', levels: worldSixLevels,
         music: {src: 'assets/audio/music/world1.mpeg', volume: .12},
         menu: {image: 'assets/images/scene/menu-world6.svg', color: '#b9d7df'}}
 ].map(definition => defineWorld(definition));

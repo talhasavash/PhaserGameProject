@@ -68,7 +68,7 @@ test('World pages show names, preserve locks, and navigate using arrows and dots
         assert.equal(selected, 1);
         assert.equal(tabs.querySelectorAll('button')[0].attributes['aria-pressed'], 'true');
         // Eski kayıt yüksek olsa da henüz yazılmayan bölümler açılamaz.
-        saved = '75';
+        saved = '90';
         // Gerçek bölümün yayın durumundan bağımsız olarak taslak kilidini doğrula.
         const draftIndex = levels.length - 1;
         const publishedLevel = levels[draftIndex];

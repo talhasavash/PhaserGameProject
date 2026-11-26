@@ -96,7 +96,8 @@ test('Pilot uses real Matter bodies; floors leave the authored pit open and rest
 
 test('Matter rejects unimplemented Arcade behaviors and malformed props before loading the scene', () => {
     assert.doesNotThrow(() => validateMatterLevel(pilot));
-    assert.throws(() => validateMatterLevel({...pilot, enemies: [{type: 'hedgehog', x: 500}]}), /desteklenmeyen/);
+    assert.doesNotThrow(() => validateMatterLevel({...pilot, enemies: [{type: 'snail', x: 500, speed: 30}]}));
+    assert.throws(() => validateMatterLevel({...pilot, enemies: [{type: 'snail', x: 500, weapon: {type: 'bullet'}}]}), /desteklenmeyen/);
     assert.throws(() => validateMatterLevel({...pilot, props: [pilot.props[0], pilot.props[0]]}), /benzersiz/);
     assert.throws(() => validateMatterLevel({...pilot, props: [{...pilot.props[0], width: 0}]}), /boyutu/);
     assert.throws(() => validateMatterLevel({...pilot, links: [{...pilot.links[0], objectId: 'missing'}]}), /bulunamadı/);

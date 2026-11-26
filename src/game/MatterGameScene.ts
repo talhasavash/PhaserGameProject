@@ -2,6 +2,10 @@
 import {levels, worldForLevel, isPlayableLevel, LEVEL_SLOT_COUNT} from '../world/levels/level.js';
 import type {LevelDefinition, Collectible} from '../world/model/contracts.js';
 import {MatterRuntime} from '../physics/matter/MatterRuntime.js';
+import {MatterEnemies} from '../physics/matter/MatterEnemies.js';
+import type {MatterEnemyActor} from '../physics/matter/MatterEnemies.js';
+import {createBridgeMechanisms} from '../physics/matter/BridgeMechanisms.js';
+import type {BridgeMechanisms} from '../physics/matter/BridgeMechanisms.js';
 import {matterWorldForLevel} from '../physics/matter/levelWorld.js';
 import type {MatterContact} from '../physics/matter/MatterObjects.js';
 import {createGameState, recordFruit, isKeyReady, takeKey, finishLevel} from './rules.js';
@@ -31,6 +35,10 @@ export class MatterGameScene extends Phaser.Scene implements ActiveGameScene {
     private carriedScore = 0;
     private characterSkin = 'boy';
     private runtime!: MatterRuntime;
+    private enemies!: MatterEnemies;
+    private mechanisms!: BridgeMechanisms;
+    private elapsed = 0;
+    private hurtUntil = 0;
     private lost = false;
     private resultShown = false;
     private sensors = new Map<MatterJS.BodyType, () => void>();
@@ -51,6 +59,7 @@ export class MatterGameScene extends Phaser.Scene implements ActiveGameScene {
         this.characterSkin = selectCharacterSkin(this.level, worldForLevel(this.levelIndex), this.character);
         this.gameState = createGameState(this.carriedScore);
         this.paused = this.lost = this.resultShown = false;
+        this.elapsed = this.hurtUntil = 0;
         this.sensors.clear(); this.pending.clear();
     }
     preload() {
@@ -71,6 +80,9 @@ export class MatterGameScene extends Phaser.Scene implements ActiveGameScene {
         this.runtime.setDebug(false);
         this.runtime.onJump = () => this.sound.play('jump', {volume: .2});
         createFeedback(this);
+        this.enemies = new MatterEnemies(this, this.runtime.library, this.runtime.world.player, this.level.enemies,
+            enemy => this.hitEnemy(enemy), this.level.groundY);
+        this.mechanisms = createBridgeMechanisms(this, this.runtime.library, this.runtime.world, this.level.mechanisms ?? []);
         for (const item of this.level.fruits) this.createItem(item);
         this.keySprite = this.add.image(this.level.key.x, this.level.key.y, 'key').setScale(.75).setDepth(10).setVisible(false);
         this.door = createMosque(this, this.level.exit.x, this.level.theme, this.level.mosqueStyle);
@@ -79,7 +91,7 @@ export class MatterGameScene extends Phaser.Scene implements ActiveGameScene {
             for (const pair of event.pairs) {
                 const a = pair.bodyA.parent, b = pair.bodyB.parent;
                 const other = a === this.runtime.world.player ? b : b === this.runtime.world.player ? a : undefined;
-                const action = other && this.sensors.get(other);
+                const action = other && (this.sensors.get(other) ?? this.enemies.actionFor(other));
                 if (action) this.pending.add(action);
             }
         };
@@ -147,6 +159,29 @@ export class MatterGameScene extends Phaser.Scene implements ActiveGameScene {
             this.sound.play('level-complete', {volume: .22});
         });
     }
+    private hitEnemy(enemy: MatterEnemyActor) {
+        if (this.paused || this.lost || this.gameState.complete || this.elapsed < this.hurtUntil) return;
+        this.hurtUntil = this.elapsed + 2000;
+        this.gameState.hearts--;
+        this.sound.play('hurt', {volume: .18});
+        const body = this.runtime.world.player;
+        this.runtime.library.Body.setVelocity(body, {x: body.position.x < enemy.body.position.x ? -2.5 : 2.5, y: -3});
+        this.tweens.add({targets: this.player, alpha: .3, duration: 100, yoyo: true, repeat: 8,
+            onComplete: () => this.player.setAlpha(1)});
+        this.updateHud();
+        if (this.gameState.hearts <= 0) this.loseAttempt();
+    }
+    private loseAttempt() {
+        if (this.lost) return;
+        this.lost = true;
+        this.gameState.hearts = 0;
+        this.runtime.setPaused(true);
+        this.player.setTexture(`${characterPrefix('sad', this.characterSkin)}0`);
+        element('touch-controls').hidden = true;
+        element('fall-result').hidden = false;
+        element('retry-fall').focus({preventScroll: true});
+        this.updateHud();
+    }
     update(time: number, delta: number) {
         if (!this.runtime) return;
         const keys = this.runtime.keys;
@@ -157,20 +192,16 @@ export class MatterGameScene extends Phaser.Scene implements ActiveGameScene {
             return;
         }
         if (this.paused || this.lost) return;
+        this.elapsed += Math.min(delta, 100);
+        this.enemies.update(this.elapsed);
+        this.mechanisms.update(Math.min(delta, 100));
         this.runtime.update(time, delta);
         // Oyun kurallarını fizik çözümleyicisinin ortasında çalıştırma.
         for (const action of this.pending) action();
         this.pending.clear();
         if (this.runtime.world.player.position.y > 640) {
-            this.lost = true;
-            this.gameState.hearts = 0;
-            this.runtime.setPaused(true);
-            this.player.setTexture(`${characterPrefix('sad', this.characterSkin)}0`);
             this.sound.play('hurt', {volume: .23});
-            element('touch-controls').hidden = true;
-            element('fall-result').hidden = false;
-            element('retry-fall').focus({preventScroll: true});
-            this.updateHud();
+            this.loseAttempt();
         }
     }
     togglePause() {

@@ -1,6 +1,6 @@
 // Tek yıldızlı fizik düzenekleri: bölüm yazarı kutu, köprü, rampa ve denge parçalarını birleştirir.
 import {prop} from '../../physics/matter/definitions.js';
-import type {MatterObjectDefinition, MatterJointDefinition, MatterSurface} from '../../physics/matter/definitions.js';
+import type {MatterObjectDefinition, MatterJointDefinition, MatterSurface, PressureBridgeDefinition} from '../../physics/matter/definitions.js';
 import type {Point, Platform, Gap} from './contracts.js';
 
 export interface PhysicsPuzzle {
@@ -10,9 +10,10 @@ export interface PhysicsPuzzle {
     gaps: Gap[];
     surfaces: MatterSurface[];
     links: MatterJointDefinition[];
+    mechanisms: PressureBridgeDefinition[];
 }
 const part = (data: Partial<PhysicsPuzzle> & Pick<PhysicsPuzzle, 'star'>): PhysicsPuzzle =>
-    ({props: [], platforms: [], gaps: [], surfaces: [], links: [], ...data});
+    ({props: [], platforms: [], gaps: [], surfaces: [], links: [], mechanisms: [], ...data});
 const box = (id: string, x: number, y: number, width: number, height: number, fixedRotation = true): MatterObjectDefinition =>
     ({type: 'crate', id, x, y, width, height, fixedRotation});
 
@@ -29,6 +30,34 @@ const puzzles = {
     ice: (variant: number) => crateStep(variant, 'ice'),
     rubber: (variant: number) => crateStep(variant, 'rubber'),
     metal: (variant: number) => crateStep(variant, 'metal'),
+    tunnel(variant: number): PhysicsPuzzle {
+        // Yassı kargo alçak tünelden geçer; dışarıda yüksek rafa çıkmak için basamak olur.
+        return part({star: {x: 570, y: 345}, platforms: [{x: 120, y: 420, width: 220}, {x: 490, y: 380, width: 160}],
+            props: [prop.block('cargo', 65, 496, 110, 48, 'metal', {density: .00035, fixedRotation: true}),
+                prop.ball('small-ball', 380, 495, 25, {restitution: .25 + variant * .05})]});
+    },
+    drop(variant: number): PhysicsPuzzle {
+        // Sandığı yüksekteki rafın ucuna taşı; aradaki boşluğu onun üzerinden aş.
+        return part({star: {x: 785, y: 165}, platforms: [
+            {x: 80, y: 450, width: 100}, {x: 220, y: 380, width: 120},
+            {x: 390, y: 310, width: 180}, {x: 700, y: 200, width: 160}],
+            props: [prop.crate('high-cargo', 470, 270, 80, {fixedRotation: true}),
+                prop.ball('ball', 90, 495, 25 + variant, {restitution: .45})]});
+    },
+    sled(variant: number): PhysicsPuzzle {
+        const size = 80 + variant * 4;
+        return part({star: {x: 650, y: 265}, platforms: [{x: 570, y: 300, width: 160}],
+            surfaces: [{vertices: [{x: 110, y: 520}, {x: 310, y: 450}, {x: 510, y: 450}, {x: 510, y: 520}]},
+                {x: 510, y: 444, width: 12, height: 12}],
+            props: [prop.block('sled', 65, 520 - size / 2, size, size, 'ice', {density: .0003, fixedRotation: true})]});
+    },
+    stepping(variant: number): PhysicsPuzzle {
+        // Farklı yüksekliklerdeki serbest blokları iki aralıklı raf arasında kullan.
+        return part({star: {x: 690, y: 255}, platforms: [{x: 240, y: 415, width: 150}, {x: 610, y: 290, width: 160}],
+            props: [prop.crate('low', 95, 490, 60, {fixedRotation: true}),
+                prop.block('high', 470, 460, 90, 120, 'rubber', {fixedRotation: true, density: .0003}),
+                prop.plank('loose-step', 480, 392, 140 + variant * 10, 16, {density: .0002, fixedRotation: true})]});
+    },
     tower(variant: number): PhysicsPuzzle {
         // Geniş alt sandığın solunda üst sandığa çıkabilecek bir basamak kalır.
         const top = 320 - variant * 8;
@@ -40,8 +69,12 @@ const puzzles = {
         const width = 260 + variant * 15, length = width + 120;
         return part({star: {x: 650, y: 475}, gaps: [{x: 250, width, style: 'factory'}],
             props: [prop.plank('bridge', 210, 500 - (length / 2 - 5), 22, length,
-                {asleep: true, density: .0004, angle: .025})],
-            links: [{objectId: 'bridge', anchor: {x: 210, y: 500}, localPoint: {x: 0, y: length / 2 - 5}, length: 0}]});
+                {asleep: true, density: .0004, angle: .025}),
+                variant === 2 ? prop.rock('switch-cargo', 80, 486, 34, {density: .0003})
+                    : prop.crate('switch-cargo', 80, 480, 80, {fixedRotation: true})],
+            links: [{objectId: 'bridge', anchor: {x: 210, y: 500}, localPoint: {x: 0, y: length / 2 - 5}, length: 0}],
+            mechanisms: [{id: 'release', type: 'pressure-bridge', cargoId: 'switch-cargo', plankId: 'bridge',
+                plate: {x: 145, y: 520, width: 110}, holdMs: 450}]});
     },
     balance(variant: number): PhysicsPuzzle {
         // Sandık geniş çukurun karşısına itilmeden yüksek yıldız rafına ulaşılamaz.
@@ -105,6 +138,8 @@ export function makePhysicsPuzzle(name: PhysicsPuzzleName, x: number, id: string
         surfaces: source.surfaces.map(p => 'vertices' in p
             ? {...p, vertices: p.vertices.map(point => ({...point, x: point.x + x}))} : {...p, x: p.x + x}),
         links: source.links.map(link => ({...link, objectId: `${id}-${link.objectId}`,
-            anchor: {...link.anchor, x: link.anchor.x + x}, localPoint: {...link.localPoint}}))
+            anchor: {...link.anchor, x: link.anchor.x + x}, localPoint: {...link.localPoint}})),
+        mechanisms: source.mechanisms.map(m => ({...m, id: `${id}-${m.id}`, cargoId: `${id}-${m.cargoId}`,
+            plankId: `${id}-${m.plankId}`, plate: {...m.plate, x: m.plate.x + x}}))
     };
 }

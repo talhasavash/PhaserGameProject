@@ -8,13 +8,13 @@ import { worldThreeLevels } from '../.build/src/world/levels/world3.js';
 import { readUnlocked, unlockNext } from '../.build/src/data/progress.js';
 import { columnFrame, columnTiming, prepareColumn, visibleColumn, RAISED_BOTTOM, CLOSED_BOTTOM } from '../.build/src/world/hazards/EnvironmentalHazards.js';
 
-test('Five worlds reserve 15 sequential slots each without changing playable level indexes', () => {
+test('Six worlds reserve 15 sequential slots each without changing playable level indexes', () => {
     assert.deepEqual(levels.slice(0, 15), worldOneLevels);
     assert.deepEqual(levels.slice(15, 30), worldTwoLevels);
     assert.deepEqual(levels.slice(30, 45), worldThreeLevels);
-    assert.deepEqual(worlds.map(world => [world.id, world.start, world.count]), [[1, 0, 15], [2, 15, 15], [3, 30, 15], [4, 45, 15], [5, 60, 15]]);
-    assert.equal(LEVEL_SLOT_COUNT, 75);
-    assert.deepEqual(worlds.map(world => world.title), ['Meyve Rüyası', 'Gece Karanlığı', 'Buz Dağları', 'Ateş ve Çukur', "Kabe'nin Yolları"]);
+    assert.deepEqual(worlds.map(world => [world.id, world.start, world.count]), [[1, 0, 15], [2, 15, 15], [3, 30, 15], [4, 45, 15], [5, 60, 15], [6, 75, 15]]);
+    assert.equal(LEVEL_SLOT_COUNT, 90);
+    assert.deepEqual(worlds.map(world => world.title), ['Meyve Rüyası', 'Gece Karanlığı', 'Buz Dağları', 'Ateş ve Çukur', "Kabe'nin Yolları", 'Denge Atölyesi']);
     assert.equal(levels[10], bossGate);
     assert.equal(worldForLevel(10).id, 1);
     assert.equal(chapterNumber(10), 11);
@@ -101,7 +101,7 @@ test('Five factory presses fall in order on every cycle with room to wait betwee
 });
 
 test('Every column has a fair walk-under window, a safe waiting area and an unjumpable top', () => {
-    for (const level of levels.slice(11).filter(level => level.columns?.length)) {
+    for (const level of levels.slice(11).filter(level => level?.columns?.length)) {
         for (const column of level.columns) {
             assert.ok(columnTiming(column).open > (column.width + 24) / 185 * 1000 + 500);
             assert.ok(level.groundY - RAISED_BOTTOM > 54, 'Standing player clears the raised base');

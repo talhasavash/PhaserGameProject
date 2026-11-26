@@ -42,7 +42,7 @@ test('Random fire targets vary, stay near the player and avoid safe spots and ot
     let seed = 41;
     const random = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
     const targets = new Set();
-    for (const level of levels.slice(2)) for (let playerX = 100; playerX < level.exit.x; playerX += 70) {
+    for (const level of levels.slice(2).filter(Boolean)) for (let playerX = 100; playerX < level.exit.x; playerX += 70) {
         const x = chooseFireX(level, playerX, random, [900]);
         if (x === null) continue;
         targets.add(Math.round(x));
@@ -54,10 +54,10 @@ test('Random fire targets vary, stay near the player and avoid safe spots and ot
     assert.equal(chooseFireX(levels[2], levels[2].exit.x, random), null);
     assert.equal(chooseFireX(levels[2], 100, () => 0), null, 'Do not fall back to an unsafe target');
 });
-test('Every chapter has three reachable stars before its key and exit', () => {
+test('Every Arcade chapter has three reachable stars before its key and exit', () => {
     assert.ok(levels.length <= worlds.reduce((count, world) => count + world.count, 0), 'Playable chapters fit within reserved menu slots');
     const maxRise = 590 ** 2 / (2 * 1600);
-    for (const level of levels) {
+    for (const level of levels.filter(level => level && level.physics !== 'matter')) {
         const reached = [];
         let groundStart = 0;
         for (const gap of [...(level.gaps || []), { x: level.width, width: 0 }]) {
@@ -96,7 +96,7 @@ test('Every chapter has three reachable stars before its key and exit', () => {
 });
 
 test('Fire is sparse: one reusable ball per level and at least eight seconds between drops', () => {
-    for (const level of levels) {
+    for (const level of levels.filter(Boolean)) {
         assert.ok((level.fireRain || []).length <= 1);
         for (const rain of level.fireRain || []) {
             assert.ok(rain.offset >= 4000);
@@ -105,9 +105,9 @@ test('Fire is sparse: one reusable ball per level and at least eight seconds bet
     }
 });
 
-test('Pits have safe respawn areas, clear approaches and widths within a running jump', () => {
+test('Arcade pits have safe respawn areas, clear approaches and widths within a running jump', () => {
     const jumpRange = 265 * (2 * 590 / 1600);
-    for (const level of levels) {
+    for (const level of levels.filter(level => level && level.physics !== 'matter')) {
         let end = 0;
         for (const gap of level.gaps || []) {
             assert.ok(gap.width >= 80 && gap.width + 30 < jumpRange);

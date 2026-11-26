@@ -1,38 +1,24 @@
-// Yalnızca geliştirmede açılan Matter sahnesi; karakter girişini, fizik temaslarını ve deneme akışını yönetir.
+// Yerel atölyenin ekranı ve deneme seçimi; fizik ve karakter ana oyunla aynı Runtime'dan gelir.
 import {matterLab} from './definition.js';
-import {createLabWorld, drawLabObjects, wakeTouchedObjects, captureLabPositions, renderLabObjects, renderLabLinks} from './MatterObjects.js';
-import type {MatterLabWorld, MatterLibrary, MatterContact, LabVisual} from './MatterObjects.js';
-import {bindTouchControls} from '../../src/actors/player/TouchControls.js';
+import {MatterRuntime} from '../../src/physics/matter/MatterRuntime.js';
 import {characterSkin} from '../../src/data/characters.js';
-import {labMotion, moveLabPlayer} from './movement.js';
-import {FixedStepSimulation} from './simulation.js';
 
 export class MatterLabScene extends Phaser.Scene {
     private character: 'boy' | 'girl' = 'boy';
     private stationIndex = 0;
-    private world!: MatterLabWorld;
-    private player!: Phaser.GameObjects.Sprite;
-    private visuals: LabVisual[] = [];
-    private readonly simulation = new FixedStepSimulation();
-    private matterLibrary!: MatterLibrary;
-    private linkGraphics!: Phaser.GameObjects.Graphics;
-    private controls!: ReturnType<typeof bindTouchControls>;
-    private keys!: Record<string, Phaser.Input.Keyboard.Key>;
-    private groundedAt = -Infinity;
-    private jumpAt = -Infinity;
-    private queuedJumpAt = -Infinity;
+    private runtime!: MatterRuntime;
     private resetting = false;
     private completed = false;
+    private goalGlow!: Phaser.GameObjects.Arc;
     paused = false;
-
+    private get world() { return this.runtime.world; }
+    private get player() { return this.runtime.player; }
     constructor() { super('MatterLab'); }
 
     init(data: {character?: 'boy' | 'girl'; station?: number} = {}) {
         this.character = data.character ?? this.character;
         this.stationIndex = Number.isInteger(data.station) && matterLab.stations[data.station!] ? data.station! : 0;
-        this.groundedAt = this.jumpAt = this.queuedJumpAt = -Infinity;
         this.resetting = this.completed = this.paused = false;
-        this.simulation.reset();
     }
 
     preload() {
@@ -43,158 +29,68 @@ export class MatterLabScene extends Phaser.Scene {
     }
 
     create() {
-        // Matter motoru yalnızca bu sahneye aittir; Arcade sahnesi ve bölüm kayıtları kullanılmaz.
-        const matter = (Phaser.Physics.Matter as unknown as {Matter: MatterLibrary}).Matter;
-        this.matterLibrary = matter;
         const station = matterLab.stations[this.stationIndex];
-        this.world = createLabWorld(matter, {...matterLab, spawn: station.spawn}, objects => this.matter.world.add(objects));
+        this.runtime = new MatterRuntime(this, {...matterLab, spawn: station.spawn}, `lab-${characterSkin(this.character).prefix}-`);
         this.drawWorkshop();
-        this.visuals = drawLabObjects(this, this.world);
-        const prefix = characterSkin(this.character).prefix;
-        this.player = this.add.sprite(station.spawn.x, station.spawn.y, `lab-${prefix}-0`).setScale(.8).setDepth(8);
-        this.visuals.push({body: this.world.player, image: this.player,
-            previous: {...this.world.player.position, angle: 0}});
-        this.linkGraphics = this.add.graphics().setDepth(4);
-        renderLabLinks(this.linkGraphics, this.world, this.visuals);
-        const animation = `lab-walk-${prefix}`;
-        if (!this.anims.exists(animation)) this.anims.create({key: animation,
-            frames: [1, 4, 2, 5].map(i => ({key: `lab-${prefix}-${i}`})), frameRate: 10, repeat: -1});
-        this.controls = bindTouchControls();
-        this.keys = this.input.keyboard!.addKeys('LEFT,RIGHT,UP,A,D,W,SPACE,R,ESC') as typeof this.keys;
-        const contact = (event: {pairs: MatterContact[]}) => {
-            wakeTouchedObjects(matter, this.world.player, event.pairs);
-            this.observeGround(event.pairs);
-        };
-        this.matter.world.on('collisionstart', contact);
-        this.matter.world.on('collisionactive', contact);
-        this.matter.world.on('beforeupdate', (event: {delta: number}) => this.move(event.delta));
         this.cameras.main.setBounds(0, 0, matterLab.width, 600).startFollow(this.player, false, 1, 0);
         this.alignCamera();
         this.scale.on('resize', this.alignCamera, this);
         this.setDebug((document.getElementById('lab-debug') as HTMLInputElement).checked);
-        this.status(station.instruction);
+        document.getElementById('lab-status')!.textContent = station.instruction;
         const release = document.getElementById('lab-release') as HTMLButtonElement;
         release.hidden = !station.release?.length;
         release.disabled = false;
         this.updatePauseButton();
         document.getElementById('lab-loading')!.hidden = true;
         this.events.once('shutdown', () => {
-            this.controls.destroy();
+            this.runtime.destroy();
             this.scale.off('resize', this.alignCamera, this);
-            // Matter eklentisi kapanırken kendi dünyasını ve temas dinleyicilerini temizler.
-            this.anims.resumeAll();
         });
-    }
-
-    private observeGround(pairs: MatterContact[]) {
-        if (this.time.now - this.jumpAt < 150) return;
-        for (const pair of pairs) {
-            const feet = pair.bodyA === this.world.feet || pair.bodyB === this.world.feet;
-            const other = pair.bodyA === this.world.feet ? pair.bodyB : pair.bodyA;
-            if (feet && !other.isSensor && Math.abs(pair.collision.normal.y) > .5) this.groundedAt = this.time.now;
-        }
-    }
-
-    private move(delta: number) {
-        if (this.paused || this.resetting) return;
-        const touch = this.controls.keys;
-        const direction = Number(this.keys.RIGHT.isDown || this.keys.D.isDown || touch.right.isDown) -
-            Number(this.keys.LEFT.isDown || this.keys.A.isDown || touch.left.isDown);
-        moveLabPlayer(this.matterLibrary,
-            this.world.player, direction, this.time.now - this.groundedAt < 110, delta);
     }
 
     update(time: number, delta: number) {
-        if (Phaser.Input.Keyboard.JustDown(this.keys.R)) { this.restart(); return; }
-        if (Phaser.Input.Keyboard.JustDown(this.keys.ESC)) this.togglePause();
+        if (Phaser.Input.Keyboard.JustDown(this.runtime.keys.R)) { this.restart(); return; }
+        if (Phaser.Input.Keyboard.JustDown(this.runtime.keys.ESC)) this.togglePause();
         if (this.paused || this.resetting) return;
-        const touch = this.controls.keys;
-        const direction = Number(this.keys.RIGHT.isDown || this.keys.D.isDown || touch.right.isDown) -
-            Number(this.keys.LEFT.isDown || this.keys.A.isDown || touch.left.isDown);
-        const body = this.world.player;
-        const grounded = time - this.groundedAt < 110;
-        const jump = [this.keys.UP, this.keys.W, this.keys.SPACE].some(key => Phaser.Input.Keyboard.JustDown(key));
-        if (jump || touch.up.justPressed) this.queuedJumpAt = time;
-        touch.up.justPressed = false;
-        if (grounded && time - this.queuedJumpAt < 200 && time - this.jumpAt > 180) {
-            this.matterLibrary.Body.setVelocity(body, {x: body.velocity.x, y: -labMotion.jump});
-            this.jumpAt = time;
-            this.queuedJumpAt = this.groundedAt = -Infinity;
-        }
-        const held = this.keys.UP.isDown || this.keys.W.isDown || this.keys.SPACE.isDown || touch.up.isDown;
-        if (!held && time - this.jumpAt > 70 && body.velocity.y < -labMotion.shortJump) {
-            this.matterLibrary.Body.setVelocity(body, {x: body.velocity.x, y: -labMotion.shortJump});
-        }
-        const alpha = this.simulation.advance(delta, milliseconds => {
-            captureLabPositions(this.visuals);
-            this.matter.world.step(milliseconds);
-        });
-        renderLabObjects(this.visuals, alpha);
-        renderLabLinks(this.linkGraphics, this.world, this.visuals);
-        const prefix = characterSkin(this.character).prefix;
-        if (direction) this.player.setFlipX(direction < 0);
-        if (grounded && Math.abs(body.velocity.x) > .5) {
-            this.player.play(`lab-walk-${prefix}`, true);
-            this.player.anims.timeScale = .6 + Math.abs(body.velocity.x) / labMotion.speed * .8;
-        }
-        else { this.player.anims.stop(); this.player.setTexture(`lab-${prefix}-${grounded ? 0 : 3}`); }
-        if (body.position.y > 720) {
+        this.runtime.update(time, delta);
+        if (this.world.player.position.y > 720) {
             this.resetting = true;
-            this.controls.reset();
-            this.matter.world.pause();
-            this.status('Çukura düştün. Deneme alanı yeniden kuruluyor…');
+            this.runtime.setPaused(true);
+            document.getElementById('lab-status')!.textContent = 'Çukura düştün. Deneme alanı yeniden kuruluyor…';
             this.time.delayedCall(550, () => this.restart());
         }
-        if (!this.completed && body.position.x > matterLab.goal.x - 35) {
+        if (!this.completed && this.world.player.position.x > matterLab.goal.x - 35) {
             this.completed = true;
-            this.status('Deneme tamamlandı! Yenileyerek bütün nesneleri başa alabilirsin.');
+            document.getElementById('lab-status')!.textContent = 'Deneme tamamlandı! Yenileyerek bütün nesneleri başa alabilirsin.';
             this.tweens.add({targets: this.goalGlow, alpha: .9, duration: 350, yoyo: true, repeat: 3});
         }
     }
 
     togglePause() {
         this.paused = !this.paused;
-        this.controls.reset();
-        this.simulation.reset();
-        if (this.paused) { this.matter.world.pause(); this.anims.pauseAll(); }
-        else { this.matter.world.resume(); this.anims.resumeAll(); }
+        this.runtime.setPaused(this.paused);
         this.updatePauseButton();
     }
-
-    restart() {
-        this.matter.world.resume();
-        this.anims.resumeAll();
-        this.scene.restart({character: this.character, station: this.stationIndex});
-    }
-
+    restart() { this.runtime.setPaused(false); this.scene.restart({character: this.character, station: this.stationIndex}); }
     goToStation(station: number) { this.scene.restart({character: this.character, station}); }
-
+    setDebug(enabled: boolean) { this.runtime.setDebug(enabled); }
     releaseObjects() {
         if (this.paused) return;
         for (const id of matterLab.stations[this.stationIndex].release ?? []) {
             const object = this.world.objects.get(id);
-            if (object) this.matterLibrary.Sleeping.set(object.body, false);
+            if (object) this.runtime.library.Sleeping.set(object.body, false);
         }
         (document.getElementById('lab-release') as HTMLButtonElement).disabled = true;
     }
-
-    setDebug(enabled: boolean) {
-        this.matter.world.drawDebug = enabled;
-        this.matter.world.debugGraphic.setVisible(enabled);
-    }
-
     private alignCamera() {
         this.cameras.main.scrollY = Math.max(0, 600 - this.scale.height);
         this.cameras.main.setDeadzone(this.scale.width * .3, this.scale.height);
     }
-    private status(text: string) { document.getElementById('lab-status')!.textContent = text; }
     private updatePauseButton() {
         const button = document.getElementById('lab-pause')!;
         button.textContent = this.paused ? '▶' : 'Ⅱ';
         button.setAttribute('aria-label', this.paused ? 'Devam et' : 'Duraklat');
     }
-    private goalGlow!: Phaser.GameObjects.Arc;
-
     private drawWorkshop() {
         this.cameras.main.setBackgroundColor(0xc9e6eb);
         this.add.circle(700, 130, 60, 0xffe7a5).setScrollFactor(.12).setDepth(-9);

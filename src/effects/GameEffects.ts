@@ -32,10 +32,10 @@ export function createFeedback(scene) {
     scene.nextIceSpark = 0;
 }
 
-export function animateCollection(scene, sprite) {
+export function animateCollection(scene, sprite, deactivate = () => sprite.disableBody(true, false)) {
     scene.tweens.killTweensOf(sprite);
     // Temas hemen kapanır; görsel kısa süre büyüyüp yukarı süzülerek kaybolur.
-    sprite.disableBody(true, false);
+    deactivate();
     scene.collectSparks.emitParticleAt(sprite.x, sprite.y, 9);
     scene.tweens.add({ targets: sprite, y: sprite.y - 38,
         scaleX: sprite.scaleX * 1.55, scaleY: sprite.scaleY * 1.55,

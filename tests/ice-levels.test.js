@@ -8,9 +8,8 @@ import { isIcySurface } from '../.build/src/world/terrain/terrain.js';
 import { createScenery } from '../.build/src/world/scenery/background.js';
 
 test('World 3 fills chapters 31–45 and preserves the original ice layouts', () => {
-    assert.equal(levels.length, 45);
     assert.equal(iceLevels.length, 15);
-    assert.deepEqual(levels.slice(30), iceLevels);
+    assert.deepEqual(levels.slice(30, 45), iceLevels);
     assert.deepEqual(iceLevels.slice(0, 5).map(level => level.theme), ['glacier', 'iceCave', 'aurora', 'crystalPalace', 'glacier']);
     for (const [index, level] of iceLevels.slice(0, 4).entries()) {
         assert.equal(worldForLevel(index + 30).id, 3);

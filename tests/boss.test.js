@@ -57,6 +57,7 @@ test('The final guard only grows angry after engagement and its speed and red ti
 
 test('Every chapter has a sourced verse; citations remain in data rather than on the result card', () => {
     for (const [index, level] of levels.entries()) {
+        if (!level) continue;
         const verse = level.verse || verses[index] || verses[0];
         assert.ok(verse.text.length > 10 && verse.text.length < 120);
         assert.match(verse.reference, /\d+\/\d+/);

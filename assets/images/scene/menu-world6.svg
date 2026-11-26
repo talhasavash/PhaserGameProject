@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900">
+  <defs>
+    <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#9bcbd7"/><stop offset="1" stop-color="#e3e9cf"/></linearGradient>
+    <linearGradient id="wood" x2="0" y2="1"><stop stop-color="#dca86a"/><stop offset="1" stop-color="#947052"/></linearGradient>
+    <linearGradient id="water" x2="0" y2="1"><stop stop-color="#7ebbbf"/><stop offset="1" stop-color="#446f84"/></linearGradient>
+    <pattern id="bricks" width="90" height="44" patternUnits="userSpaceOnUse"><path d="M0 0h90v44H0zm45 0v44" fill="#718f98" stroke="#9eb8b5" stroke-width="3"/></pattern>
+    <g id="crate"><rect width="110" height="110" rx="7" fill="url(#wood)" stroke="#795840" stroke-width="7"/><path d="M8 8l94 94M102 8L8 102" stroke="#f2ce92" stroke-width="10"/><path d="M9 35h90M9 75h90" stroke="#8e6546" stroke-width="3" opacity=".5"/><g fill="#775742"><circle cx="13" cy="13" r="4"/><circle cx="96" cy="13" r="4"/><circle cx="13" cy="96" r="4"/><circle cx="96" cy="96" r="4"/></g></g>
+    <g id="gear" fill="#cda877" stroke="#a48059" stroke-width="5"><path d="M-15-68h30l4 18 15 7 16-10 21 21-10 16 7 15 18 4v30l-18 4-7 15 10 16-21 21-16-10-15 7-4 18h-30l-4-18-15-7-16 10-21-21 10-16-7-15-18-4v-30l18-4 7-15-10-16 21-21 16 10 15-7z"/><circle r="37" fill="#9cb2ae"/><circle r="13" fill="#e8d4a3"/></g>
+    <g id="pine"><path d="M-10 0h20v160h-20" fill="#7d8d79"/><path d="M0-90L-70 65h140zM0-20l-88 135H88z" fill="#679798"/></g>
+  </defs>
+  <path fill="url(#sky)" d="M0 0h1600v900H0z"/>
+  <circle cx="1230" cy="155" r="110" fill="#fff0b3" opacity=".75"/><circle cx="1230" cy="155" r="82" fill="#ffe7a0"/>
+  <g fill="#f0f6e7" opacity=".7"><path d="M-70 190q40-70 100-35 20-85 95-55 65-28 100 49 85-7 105 41z"/><path d="M600 120q30-55 85-30 30-65 85-25 65-20 95 55z"/></g>
+  <path d="M0 410l200-170 140 130 180-210 270 230 190-155 240 160 160-140 220 160v300H0z" fill="#87aeb8"/>
+  <path d="M0 530q200-165 470 0t590-45 540 10v405H0z" fill="#7da5a3"/>
+  <path d="M0 645q240-130 490-40t510 5 600 20v270H0z" fill="#65938e"/>
+  <g opacity=".4"><use href="#pine" transform="translate(80 510)"/><use href="#pine" transform="translate(1500 540) scale(1.3)"/><use href="#pine" transform="translate(1230 490) scale(.65)"/></g>
+  <path d="M0 750q450-90 850-10t750-25v185H0z" fill="url(#water)"/>
+  <g fill="none" stroke="#c6e0cf" stroke-width="4" opacity=".4"><path d="M500 810h200m400 25h290M720 870h360"/></g>
+  <path d="M0 670h245l55 230H0zM1290 700h310v200h-360z" fill="#866f5d"/>
+  <path d="M0 669h249v24H0zm1290 29h310v24h-310z" fill="#d1bb88"/>
+  <path d="M170 650q610 155 1210 0v34q-610 155-1210 0z" fill="url(#wood)" stroke="#826b53" stroke-width="5"/>
+  <g fill="none" stroke="#a88c61" stroke-width="8"><path d="M165 462v237m1220-237v237M165 492q610 270 1220 0"/><path d="M320 551v125m180-65v80m180-49v72m180-66v64m180-106v85m180-143v134" stroke-width="4"/></g>
+  <g opacity=".48"><path d="M1080 545V350h245v195M1090 350l110-77 136 77" fill="url(#bricks)" stroke="#73959e" stroke-width="8"/><path d="M1165 545v-75a40 40 0 0 1 80 0v75" fill="#b2c4b7"/><path d="M1115 380h38v48h-38m100-48h38v48h-38" fill="#f3d59b"/></g>
+  <use href="#gear" transform="translate(1375 657) scale(1.3)"/>
+  <use href="#gear" transform="translate(1480 765) scale(.65)"/>
+  <use href="#crate" transform="translate(45 565) scale(.9)"/><use href="#crate" transform="translate(150 599) scale(.65)"/>
+  <use href="#crate" transform="translate(1420 595) scale(.8)"/>
+  <g fill="#dee9d6" opacity=".28"><path d="M0 260h1600v330H0z"/></g>
+</svg>

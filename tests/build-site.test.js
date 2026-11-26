@@ -80,7 +80,7 @@ test('Published modules resolve across folders, share a version, and leave sourc
     assert.ok(fs.readFileSync(path.join(output, 'world/levels/worlds.js'), 'utf8').includes('assets/audio/music/world5.aac?v=1234567'));
     assert.ok(precache.includes('./assets/fonts/Baloo2.ttf?v=1234567'));
     assert.ok(fs.existsSync(path.join(root, 'dist/assets/fonts/OFL-Baloo2.txt')));
-    for (let world = 1; world <= 5; world++) {
+    for (let world = 1; world <= 6; world++) {
         assert.ok(precache.includes(`./assets/images/scene/menu-world${world}.svg?v=1234567`));
     }
     for (const file of precache) assert.ok(fs.existsSync(path.join(root, 'dist', file.split('?')[0])), file);

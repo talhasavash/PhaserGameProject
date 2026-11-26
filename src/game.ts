@@ -2,10 +2,12 @@
 
 import { element } from './ui/dom.js';
 import './extensions.js';
-import { GameScene, GAME_SCENE_KEY } from './game/GameScene.js';
+import {GAME_SCENE_KEY, isLocalMatterPreview} from './game/sceneRouting.js';
+import type {ActiveGameScene, GameSessionData} from './game/sceneRouting.js';
+import {createLevelScene, levelPhysicsConfig} from './game/SceneFactory.js';
 import { gameView, setupPwa, enterGameDisplay, releaseGameOrientation, bindDisplayRecovery, bindButtonFeedback } from './ui/browser.js';
-import { levels, worldForLevel, isPlayableLevel } from './world/levels/level.js';
-import { unlockedLevels } from './data/progress.js';
+import { levels, worldForLevel, isPlayableLevel, LEVEL_SLOT_COUNT } from './world/levels/level.js';
+import {worldUnlockedLevels} from './data/progress.js';
 import { createWorldMenu, createLevelMenu, refreshLevelLocks, slideWorld } from './ui/levelMenu.js';
 import { showLoading, hideLoading } from './ui/scenePage.js';
 import { backgroundMusic, bindMusicLifecycle } from './audio/music.js';
@@ -36,7 +38,7 @@ function toggleSettings() {
     element<HTMLButtonElement>('pause-button').hidden = !gameStarted;
     element('game-stage').inert = opening;
     element('touch-controls').inert = opening;
-    const scene = (activeGame?.scene.getScene(GAME_SCENE_KEY) as GameScene | undefined);
+    const scene = (activeGame?.scene.getScene(GAME_SCENE_KEY) as ActiveGameScene | undefined);
     if (scene?.player && !scene.gameState.complete && scene.paused !== opening) scene.togglePause();
     (opening ? element<HTMLButtonElement>('settings-close') : settingsButton).focus();
 }
@@ -51,9 +53,12 @@ function selectWorld(worldId) {
     });
 }
 
-function startSelectedGame(levelIndex) {
+function startSelectedGame(levelIndex, preview = false) {
     const selected = characterForm.querySelector<HTMLInputElement>('input[name="character"]:checked');
-    if (!selected || !isPlayableLevel(levelIndex) || levelIndex >= unlockedLevels(levels.length) || gameStarted) return;
+    const localPreview = preview && levels[levelIndex] && isLocalMatterPreview(window.location, levels[levelIndex]);
+    const world = worldForLevel(levelIndex);
+    if (!selected || gameStarted || (!localPreview &&
+        (!world || !isPlayableLevel(levelIndex) || levelIndex - world.start >= worldUnlockedLevels(world, LEVEL_SLOT_COUNT)))) return;
     // Await etmeden, doğrudan dokunuş sırasında başlat: tarayıcı bu etkileşimi ister.
     void enterGameDisplay();
     gameStarted = true;
@@ -69,7 +74,7 @@ function startSelectedGame(levelIndex) {
     startGame(selected.value, levelIndex);
 }
 
-function startGame(character, levelIndex) {
+function startGame(character, levelIndex, score = 0) {
     document.body.dataset.character = character;
     const area = element('game');
     const touchLayout = matchMedia('(any-pointer: coarse), (max-width: 1024px)');
@@ -82,14 +87,8 @@ function startGame(character, levelIndex) {
         parent: 'game',
         backgroundColor: '#183c36',
         scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
-        physics: {
-            default: 'arcade', // Phaser'ın 2D platform oyunlarına uygun fizik sistemi.
-            arcade: {
-                gravity: { x: 0, y: 1600 }, // Aşağı yön pozitif. Karakteri yere çeker.
-                debug: false // true yaparsan çarpışma kutularını görebilirsin.
-            }
-        },
-        scene: new GameScene(character, levelIndex),
+        physics: levelPhysicsConfig(levelIndex),
+        scene: createLevelScene(character, levelIndex, score),
         title: 'Meyve Oyunu 2026',
         render: { antialias: true, roundPixels: true }
     });
@@ -119,6 +118,18 @@ function startGame(character, levelIndex) {
     };
     menuButton.onclick = () => openMenu();
     game.events.on('world-complete', openMenu);
+    game.events.on('level-change', (data: GameSessionData) => {
+        closeSettings();
+        showLoading();
+        game.events.once(Phaser.Core.Events.DESTROY, () => {
+            // DESTROY olayı canvas ve renderer temizlenmeden önce yayılır.
+            queueMicrotask(() => {
+                activeGame = null;
+                startGame(data.character, data.levelIndex, data.score ?? 0);
+            });
+        });
+        game.destroy(true);
+    });
 }
 
 function returnToMenu(game, levelIndex?: number) {
@@ -171,3 +182,14 @@ document.addEventListener('keydown', event => {
 
 // Bütün başlangıç bağlantıları hazır olduğunda Play açılır ve ilk yükleme kapanır.
 bindWelcomeMenu({ enterDisplay: enterGameDisplay, showLoading, hideLoading });
+
+// Yerel önizleme dışında draft bölümler, kayıt değeri ne olursa olsun kapalı kalır.
+const pilotIndex = levels.findIndex(level => level?.id === 'matter-pilot');
+if (pilotIndex >= 0 && isLocalMatterPreview(window.location, levels[pilotIndex])) {
+    const preview = document.createElement('button');
+    preview.type = 'button';
+    preview.textContent = 'Matter pilotunu dene';
+    preview.id = 'matter-pilot-preview';
+    preview.onclick = () => startSelectedGame(pilotIndex, true);
+    characterForm.prepend(preview);
+}

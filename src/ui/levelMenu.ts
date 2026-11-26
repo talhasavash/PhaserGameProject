@@ -1,8 +1,8 @@
 // Dünya ve bölüm seçim düğmelerini oluşturur; açılan ve kilitli bölümlerin görünümünü günceller.
 
 import { element } from './dom.js';
-import { levels, worlds, chapterNumber, LEVEL_SLOT_COUNT, isPlayableLevel } from '../world/levels/level.js';
-import { unlockedLevels } from '../data/progress.js';
+import { levels, worlds, chapterNumber, LEVEL_SLOT_COUNT, isPlayableLevel, worldForLevel } from '../world/levels/level.js';
+import {worldUnlockedLevels} from '../data/progress.js';
 
 // Bu dosya yalnızca HTML seçimlerini kurar; seçilen dünya game.js içinde tutulur.
 export function createWorldMenu(worldTabs, selectWorld) {
@@ -63,7 +63,7 @@ export function createLevelMenu(levelGrid, worldId, preferredIndex?: number, sta
         button.append(card);
         levelGrid.append(button);
     }
-    updateLevelLocks(levelGrid, unlockedLevels(LEVEL_SLOT_COUNT));
+    updateLevelLocks(levelGrid);
 }
 
 // Başlık ve arka plan hemen yenilenir; eski liste çıkarken yeni liste karşıdan girer.
@@ -107,7 +107,6 @@ export async function slideWorld(levelGrid, fromWorld, toWorld, render) {
 }
 
 export function refreshLevelLocks(worldTabs, levelGrid, worldId) {
-    const unlocked = unlockedLevels(LEVEL_SLOT_COUNT);
     const selectedWorld = worlds.find(world => world.id === worldId)!;
     const selectedIndex = worlds.indexOf(selectedWorld);
     worldTabs.dataset.selected = worldId;
@@ -127,17 +126,19 @@ export function refreshLevelLocks(worldTabs, levelGrid, worldId) {
     element<HTMLButtonElement>('next-world').disabled = selectedIndex === worlds.length - 1;
     for (const button of worldTabs.querySelectorAll('button')) {
         const world = worlds.find(world => world.id === Number(button.dataset.world))!;
-        const worldLocked = !levels[world.start] || world.start >= unlocked;
+        const worldLocked = !isPlayableLevel(world.start) || worldUnlockedLevels(world, LEVEL_SLOT_COUNT) < 1;
         button.setAttribute('aria-pressed', String(world.id === worldId));
         button.classList.toggle('locked', worldLocked);
         button.setAttribute('aria-label', `Dünya ${world.id}: ${world.title}${worldLocked ? ' · Kilitli' : ''}`);
     }
-    updateLevelLocks(levelGrid, unlocked);
+    updateLevelLocks(levelGrid);
 }
 
-function updateLevelLocks(levelGrid, unlocked) {
+function updateLevelLocks(levelGrid) {
     for (const button of levelGrid.querySelectorAll('button')) {
         const index = Number(button.value);
+        const world = worldForLevel(index)!;
+        const unlocked = world.start + worldUnlockedLevels(world, LEVEL_SLOT_COUNT);
         const ready = isPlayableLevel(index);
         button.disabled = !ready || index >= unlocked;
         if (button.disabled) button.setAttribute('aria-current', 'false');

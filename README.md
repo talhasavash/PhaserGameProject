@@ -30,12 +30,51 @@ ile seçilir; çizilmiş animasyon yerine Matter kuvvetleri ve bağlantıları k
 
 Bu sayfa normal bölüm listesine ve kayıtlı ilerlemeye bağlı değildir. `examples/`
 yayın paketine kopyalanmadığı ve yayın önizleme sunucusu bu yolu açmadığı için
-GitHub Pages/PWA kullanıcılarına sunulmaz. Normal bölümler Arcade kullanmaya devam eder.
+GitHub Pages/PWA kullanıcılarına sunulmaz. Mevcut ilk 45 bölüm Arcade kullanmaya devam eder.
 
-Kod sırası: `examples/matter-lab/definition.ts` (interface, nesne oluşturucuları ve bölüm),
-`MatterObjects.ts` (gövde/görsel Factory'si), `MatterLabScene.ts` (Matter sahnesi),
-`movement.ts` (hareket ayarları), `simulation.ts` (sabit fizik adımı ve görüntü oranı),
-`boot.ts` (yerel sayfanın başlangıcı).
+Atölyenin verisi `examples/matter-lab/definition.ts`, başlangıcı `boot.ts` içindedir.
+Ortak interface ve `prop` oluşturucuları `src/physics/matter/definitions.ts` içindedir.
+Aynı klasördeki `MatterObjects.ts` gövde/görsel Factory'sini, `MatterRuntime.ts` kontrol
+ve fizik döngüsünü, `movement.ts` hareket ayarlarını, `simulation.ts` 120 Hz sabit adımı yönetir.
+Atölyenin eski modül yolları bu ortak kodu yeniden dışa açar; ikinci bir ayar kopyası yoktur.
+
+## Ana oyundaki kapalı Matter pilotu
+
+Yerelde `http://localhost:8095/?pilot=matter` adresini aç. Play'e bastıktan sonra
+**Matter pilotunu dene** düğmesiyle gir. Kutu itme/üstüne çıkma, dönen kutu,
+yuvarlanan taş ve devrilen tahta köprü; üç yıldız, anahtar ve cami akışıyla birlikte denenir.
+Mola menüsündeki yenileme veya `R`, nesneleri ve toplananları bölüm başına döndürür.
+Pilot kaydedilmiş bölüm ilerlemesini değiştirmez.
+
+Pilot `src/world/levels/matterPilot.ts` içinde `physics: 'matter', draft: true` olarak
+46. yuvaya bağlıdır. Normal menüde kilitlidir; yerel önizleme düğmesi canlı alan adında
+oluşturulmaz. İlk 45 bölümün numaraları ve Arcade ayarları korunur.
+`src/game/SceneFactory.ts` motoru seçer: Arcade için `GameScene`, Matter için
+`MatterGameScene` açılır. Ortak `sceneRouting.ts` sözleşmesi mola/yenileme ve motor
+değişimlerinde karakter/puan aktarımını sağlar. İki motor aynı bölümde karıştırılmaz.
+
+Matter pilotu şimdilik ortak arka plan, platform, meyve/yıldız, anahtar, cami,
+HUD ve sonuç ekranını destekler. Arcade düşmanları/silahları, buz kayganlığı,
+kolonlar ve özel senaryolar henüz Matter'a taşınmadı; bu alanlar eklenirse bölüm
+doğrulaması açık bir hata verir. Mevcut bölümler bu sınırlamadan etkilenmez.
+
+## Dünya 6: Denge Atölyesi
+
+Menüde altıncı dünyayı seç. 76–90 numaralı 15 bölüm Matter kullanır; ilk bölüm
+doğrudan açıktır, diğerleri sırayla açılır. Tamamlanmamış 4. ve 5. dünyalar bu dünyayı
+engellemez. İlerleme `meyve-oyunu-world-6-unlocked` anahtarında ayrı saklanır;
+eski `meyve-oyunu-unlocked-levels` kaydı değişmez. Pilot 46. yuvada kapalı kalır.
+
+`src/world/levels/world6.ts` her bölümün üç fizik düzeneğini, renklerini ve camisini
+belirler. `src/world/model/physicsPuzzles.ts` içindeki tipli Factory ile sandık,
+kule, buz/kauçuk/metal blok, devrilen köprü, kargo köprüsü, tahterevalli, asılı
+platform, rampa/taş, domino ve sarkaç birleştirilir. Yerleşimler sabittir; her
+yenilemede aynı bulmaca geri gelir. Yıldız raflarına ulaşmak için sandıklar basamak
+olarak taşınır; uzun çukurlar tahta köprüyle geçilir. Ortak Matter ayarları değişmez.
+
+`src/physics/matter/terrainArt.ts` sabit rampaları fizik gövdeleriyle aynı noktalarda
+çizer. Menü görseli `assets/images/scene/menu-world6.svg` içindedir. Bölüm sonuçları
+aynı ayet/Play kartını kullanır; son bölümden sonra dünya menüsüne dönülür.
 
 ## İnternetten oyna
 

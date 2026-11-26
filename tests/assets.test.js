@@ -21,7 +21,7 @@ test('Both characters load existing assets and every chapter item and enemy has 
             }
         } };
         loadGameAssets(scene, character);
-        for (const level of levels) {
+        for (const level of levels.filter(Boolean)) {
             for (const fruit of level.fruits) assert.ok(images.has(fruit.type), fruit.type);
             const enemies = [...level.enemies, ...(level.extraHazards || [])];
             if (level.ball) enemies.push(level.ball);

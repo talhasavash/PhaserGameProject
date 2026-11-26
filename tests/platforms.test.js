@@ -12,12 +12,12 @@ test('Every chapter has a platform skin, and cached steps use one small image pe
     graphics.generateTexture = (key, width, height) => { generated++; textures.set(key, { width, height }); };
     const image = { setOrigin() { return this; }, setDepth() { return this; } };
     const scene = { textures: { exists: key => textures.has(key) }, make: { graphics: () => graphics }, add: { image: () => image } };
-    for (const level of levels) {
+    for (const level of levels.filter(Boolean)) {
         assert.ok(platformThemes[level.theme]);
         for (const platform of level.platforms) createPlatformArt(scene, platform, level.theme);
     }
     const firstPass = generated;
-    for (const level of levels) for (const platform of level.platforms) createPlatformArt(scene, platform, level.theme);
+    for (const level of levels.filter(Boolean)) for (const platform of level.platforms) createPlatformArt(scene, platform, level.theme);
     assert.equal(generated, firstPass, 'Restart must reuse generated step textures');
     for (const size of textures.values()) {
         assert.ok(size.width <= 256 && (size.width & (size.width - 1)) === 0);

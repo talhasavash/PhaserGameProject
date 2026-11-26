@@ -4,6 +4,8 @@ import { defineWorld } from '../model/definitions.js';
 import { worldOneLevels } from './world1.js';
 import { worldTwoLevels } from './world2.js';
 import { worldThreeLevels } from './world3.js';
+import {matterPilot} from './matterPilot.js';
+import {worldSixLevels} from './world6.js';
 
 export const worldDefinitions: import('../model/contracts.js').WorldInput[] = [
     { id: 1, title: 'Meyve Rüyası', levels: worldOneLevels,
@@ -17,8 +19,11 @@ export const worldDefinitions: import('../model/contracts.js').WorldInput[] = [
         characterSkins: { boy: 'ice_boy', girl: 'ice_girl' },
         menu: { image: 'assets/images/scene/menu-world3.svg', color: '#cbe8f6',
             headingColor: '#2a6281', headingStroke: '2px #f4fdff', headingShadow: '0 3px 0 #2e678633' } },
-    { id: 4, title: 'Ateş ve Çukur', music: { src: 'assets/audio/music/world4.mpeg', volume: 0.12 },
+    { id: 4, title: 'Ateş ve Çukur', levels: [matterPilot], music: { src: 'assets/audio/music/world4.mpeg', volume: 0.12 },
         menu: { image: 'assets/images/scene/menu-world4.svg', color: '#49657c' } },
     { id: 5, title: "Kabe'nin Yolları", music: { src: 'assets/audio/music/world5.aac', volume: 0.12 },
-        menu: { image: 'assets/images/scene/menu-world5.svg', color: '#18294c' } }
+        menu: { image: 'assets/images/scene/menu-world5.svg', color: '#18294c' } },
+    {id: 6, title: 'Denge Atölyesi', levels: worldSixLevels, independentProgress: true,
+        music: {src: 'assets/audio/music/world1.mpeg', volume: .12},
+        menu: {image: 'assets/images/scene/menu-world6.svg', color: '#b9d7df'}}
 ].map(definition => defineWorld(definition));

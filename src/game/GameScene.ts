@@ -18,8 +18,10 @@ import { element } from '../ui/dom.js';
 import type { PlayerSprite } from '../actors/player/PlayerController.js';
 import type { Point, LevelDefinition } from '../world/model/contracts.js';
 import { LevelRuntime, resetLevelEnemies } from './LevelRuntime.js';
+import {GAME_SCENE_KEY, restartOrChangeLevel} from './sceneRouting.js';
+import type {ActiveGameScene} from './sceneRouting.js';
 
-export const GAME_SCENE_KEY = 'Garden';
+export {GAME_SCENE_KEY} from './sceneRouting.js';
 const ITEM_MESSAGES = {
     bead: 'Tesbih taneleri buldun! +10 puan.',
     mat: 'Bir seccade buldun! +20 puan.',
@@ -27,7 +29,7 @@ const ITEM_MESSAGES = {
     crescent: 'Hilal ve yıldız buldun! +20 puan.'
 };
 
-export class GameScene extends Phaser.Scene {
+export class GameScene extends Phaser.Scene implements ActiveGameScene {
     declare runtime: LevelRuntime;
     declare character: string;
     declare characterSkin: string;
@@ -312,7 +314,7 @@ export class GameScene extends Phaser.Scene {
         }
         this.tweens.resumeAll();
         this.physics.resume();
-        this.scene.restart({ levelIndex: this.levelIndex + 1, score: this.gameState.score });
+        restartOrChangeLevel(this, { levelIndex: this.levelIndex + 1, score: this.gameState.score });
     }
 
     togglePause() {

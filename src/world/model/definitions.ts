@@ -10,6 +10,7 @@ import { weatherTypes } from '../scenery/weather.js';
 import { validateScenarios } from '../../game/LevelScenarios.js';
 import { defineEnemy } from '../../actors/enemies/EnemyCatalog.js';
 import { validateBackground } from '../scenery/BackgroundBuilder.js';
+import {validateMatterLevel} from '../../physics/matter/levelWorld.js';
 
 const levelInputs = new WeakMap();
 
@@ -111,6 +112,7 @@ export function validateLevel(level) {
     if (level.environment?.scenery) validateBackground(level.environment.scenery);
     if (weather && weather.type !== 'none' && !weatherTypes.has(weather.type)) fail(`Bilinmeyen hava olayı: ${weather.type}`);
     validateScenarios(level);
+    if (level.physics === 'matter') validateMatterLevel(level);
     return level;
 }
 

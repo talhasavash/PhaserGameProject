@@ -35,7 +35,7 @@ test('World pages show names, preserve locks, and navigate using arrows and dots
     };
     try {
         createWorldMenu(tabs, selectWorld);
-        assert.equal(tabs.querySelectorAll('button').length, 5);
+        assert.equal(tabs.querySelectorAll('button').length, 6);
         selectWorld(1);
         assert.equal(nodes.get('world-name').textContent.trim(), 'Meyve Rüyası');
         assert.equal(nodes.get('world-number').textContent, '1.');
@@ -51,8 +51,8 @@ test('World pages show names, preserve locks, and navigate using arrows and dots
         assert.ok(grid.querySelectorAll('button').every(button => button.disabled && button.attributes['aria-current'] === 'false'));
         grid.querySelectorAll('button')[0].onclick();
         assert.deepEqual(started, [0], 'Locked chapters must not start');
-        tabs.querySelectorAll('button')[4].onclick();
-        assert.equal(selected, 5);
+        tabs.querySelectorAll('button')[5].onclick();
+        assert.equal(selected, 6);
         assert.equal(nodes.get('next-world').disabled, true);
         saved = '16';
         selectWorld(2);
@@ -87,7 +87,7 @@ test('World pages show names, preserve locks, and navigate using arrows and dots
             assert.equal(buttons.length, 15);
             assert.deepEqual(buttons.map(button => Number(button.value)), Array.from({ length: 15 }, (_, i) => world.start + i));
             for (const button of buttons) {
-                if (Number(button.value) >= levels.length) {
+                if (!levels[Number(button.value)]) {
                     assert.equal(button.disabled, true);
                     assert.match(button.attributes['aria-label'], /Hazırlanıyor/);
                     button.onclick();
@@ -96,15 +96,15 @@ test('World pages show names, preserve locks, and navigate using arrows and dots
         }
         assert.deepEqual(started, [0, 15], 'Placeholder buttons cannot start scenes');
         // Sonraki bölüm eklendiğinde aynı menü yeri otomatik olarak oynanabilir olur.
-        const nextIndex = levels.length;
-        levels.push(levels[0]);
+        const nextIndex = 60;
+        levels[nextIndex] = levels[0];
         try {
             selectWorld(worldForLevel(nextIndex).id);
             const nextButton = grid.querySelectorAll('button').find(button => Number(button.value) === nextIndex);
             assert.equal(nextButton.disabled, false);
             nextButton.onclick();
             assert.deepEqual(started, [0, 15, nextIndex]);
-        } finally { levels.pop(); }
+        } finally { delete levels[nextIndex]; }
     } finally {
         globalThis.document = previousDocument;
         globalThis.window = previousWindow;

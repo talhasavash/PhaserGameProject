@@ -87,12 +87,12 @@ test('Pit drawing is cached per theme and width, and never creates a physical fl
         textures: { exists: key => cached.has(key) }, make: { graphics: () => g },
         add: { image() { images++; return { setOrigin() { return this; }, setDepth() { return this; } }; } }
     };
-    for (const level of levels) {
+    for (const level of levels.filter(Boolean)) {
         scene.level = level;
         for (const gap of level.gaps || []) createPitArt(scene, gap);
     }
     const firstPass = generated;
-    for (const level of levels) {
+    for (const level of levels.filter(Boolean)) {
         scene.level = level;
         for (const gap of level.gaps || []) createPitArt(scene, gap);
     }

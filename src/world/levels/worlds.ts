@@ -25,6 +25,6 @@ export const worldDefinitions: import('../model/contracts.js').WorldInput[] = [
     { id: 5, title: "Kabe'nin Yolları", levels: worldFiveLevels, music: { src: 'assets/audio/music/world5.aac', volume: 0.12 },
         menu: { image: 'assets/images/scene/menu-world5.svg', color: '#18294c' } },
     {id: 6, title: 'Denge Atölyesi', levels: worldSixLevels,
-        music: {src: 'assets/audio/music/world1.mpeg', volume: .12},
+        music: {src: 'assets/audio/music/world6.mp3', volume: .12},
         menu: {image: 'assets/images/scene/menu-world6.svg', color: '#b9d7df'}}
 ].map(definition => defineWorld(definition));

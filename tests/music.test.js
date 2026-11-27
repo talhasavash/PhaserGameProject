@@ -17,10 +17,11 @@ function fixture(play = () => Promise.resolve()) {
     return { audio, player, created: () => created };
 }
 
-test('Menu and all five worlds reference real music files', () => {
+test('Menu and all six worlds reference real music files', () => {
     assert.ok(existsSync(new URL('../' + menuMusic.src, import.meta.url)));
     assert.equal(worlds[2].music.src, 'assets/audio/music/world3.mp3');
-    for (const id of [1, 2, 3, 4, 5]) {
+    assert.equal(worlds[5].music.src, 'assets/audio/music/world6.mp3');
+    for (const id of [1, 2, 3, 4, 5, 6]) {
         const track = worlds.find(world => world.id === id).music;
         assert.ok(track.volume > 0 && track.volume < 0.3);
         assert.ok(existsSync(new URL('../' + track.src, import.meta.url)), track.src);

@@ -34,12 +34,21 @@ registerEnemyBehavior('chase', { update(scene, enemy, patrol, delta, options = {
 // Havada sabit yükseklikte takip eder; oyuncunun üstüne ışınlanmaz ve güvenli alanlara girmez.
 registerEnemyBehavior('overhead', { update(scene, enemy, patrol, delta, options = {}) {
     const {speed = 80, minX = patrol.minX, maxX = patrol.maxX, distance = 80} = options;
-    const target = Math.max(minX, Math.min(maxX, scene.player.x + distance));
+    let target = Math.max(minX, Math.min(maxX, scene.player.x + distance));
+    // Oyuncunun yaklaştığı platformun üstünde bekleyip zıplama yolunu kapatmasın.
+    for (const platform of scene.level?.platforms ?? []) {
+        if (scene.player.x < platform.x - 120 || scene.player.x > platform.x + platform.width + 120) continue;
+        if (target < platform.x - 80 || target > platform.x + platform.width + 80) continue;
+        const right = platform.x + platform.width + 100, left = platform.x - 100;
+        target = right <= maxX ? right : Math.max(minX, left);
+    }
     const difference = target - enemy.x;
-    enemy.setVelocityX(Math.abs(difference) < 8 ? 0 : Math.sign(difference) * Math.min(speed, Math.abs(difference) * 2));
+    const retreating = enemy.x > scene.player.x && enemy.x - scene.player.x < 180 && difference > 0;
+    const followSpeed = retreating ? Math.max(speed, Math.abs(scene.player.body?.velocity.x ?? 0) + 80) : speed;
+    enemy.setVelocityX(Math.abs(difference) < 8 ? 0 : Math.sign(difference) * Math.min(followSpeed, Math.abs(difference) * 2));
     // Kameranın üst bandında görünür kalır; oyuncunun y konumunu takip etmez.
     const cameraTop = scene.cameras?.main.scrollY ?? 0;
-    enemy.y = Math.max(patrol.baseY, cameraTop + 64);
+    enemy.y = Math.max(patrol.baseY, cameraTop + Math.max(36, (enemy.displayHeight ?? 56) / 2 + 8));
     enemy.setVelocityY(0);
 } });
 

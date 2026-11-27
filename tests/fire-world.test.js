@@ -154,7 +154,7 @@ test('Overhead sun follows at bounded speed, stays above the route and does not 
         definition.update(scene, enemy, patrol, 16);
         enemy.y += velocity.y * .016;
     }
-    assert.equal(enemy.y, 344, 'Sun remains 64 units inside the camera');
+    assert.equal(enemy.y, 338, 'Sun fits near the upper edge with its full radius visible');
     scene.cameras.main.scrollY = 0;
     definition.update(scene, enemy, patrol, 16);
     assert.equal(enemy.y, 145, 'Full-height view restores the authored position');
@@ -204,15 +204,33 @@ test('On mobile the sun stays in the upper camera band without tracking player j
         scene.cameras.main.scrollY = Math.max(0, y - 200);
         enemyBehaviors.get('overhead').update(scene, enemy, patrol, 16);
         assert.equal(vy, 0);
-        assert.equal(enemy.y, Math.max(145, scene.cameras.main.scrollY + 64));
-        assert.ok(enemy.y - scene.cameras.main.scrollY >= 64);
+        assert.equal(enemy.y, Math.max(145, scene.cameras.main.scrollY + 36));
+        assert.ok(enemy.y - scene.cameras.main.scrollY >= 36);
     }
     scene.cameras.main.scrollY = 280;
     for (const y of [480, 360, 260]) {
         scene.player.y = y;
         enemyBehaviors.get('overhead').update(scene, enemy, patrol, 16);
-        assert.equal(enemy.y, 344, 'Jumping alone never moves the sun');
+        assert.equal(enemy.y, 316, 'Jumping alone never moves the sun');
     }
+});
+
+test('Sun clears an approached platform and retreats before a running player reaches it', () => {
+    const scene = {player: {x: 950, body: {velocity: {x: 265}}},
+        cameras: {main: {scrollY: 280}}, level: {platforms: [{x: 900, y: 355, width: 230}]}};
+    let vx;
+    const enemy = {x: 1050, y: 145, displayHeight: 56,
+        setVelocityX(value) {vx = value;}, setVelocityY() {}};
+    const patrol = {minX: 500, maxX: 3000, baseY: 145};
+    const behavior = enemyBehaviors.get('overhead');
+    behavior.update(scene, enemy, patrol, 16, {speed: 100, distance: 260});
+    assert.ok(vx > 265, 'Nearby sun retreats faster than the approaching player');
+    for (let i = 0; i < 300; i++) {
+        behavior.update(scene, enemy, patrol, 16, {speed: 100, distance: 260});
+        enemy.x += vx * .016;
+    }
+    assert.ok(enemy.x >= 1130 + 80, 'Sun waits beyond the platform rather than above the jump');
+    assert.ok(enemy.y - scene.cameras.main.scrollY - enemy.displayHeight / 2 >= 8);
 });
 
 test('Fire mouths shoot both ways; sun embers aim down once and every shot expires', () => {

@@ -21,7 +21,6 @@ import { LevelRuntime, resetLevelEnemies } from './LevelRuntime.js';
 import {GAME_SCENE_KEY, restartOrChangeLevel} from './sceneRouting.js';
 import type {ActiveGameScene} from './sceneRouting.js';
 import {tryStompEnemy} from '../actors/enemies/EnemyController.js';
-import {platformCameraTop} from './camera.js';
 
 export {GAME_SCENE_KEY} from './sceneRouting.js';
 const ITEM_MESSAGES = {
@@ -389,10 +388,11 @@ export class GameScene extends Phaser.Scene implements ActiveGameScene {
     }
 
     updateCamera(delta: number) {
+        // Kamera yalnızca oyuncu görünür alanın kenarına yaklaşınca kayar.
         const camera = this.cameras.main;
-        const target = platformCameraTop(this.level, this.player.x, this.player.y,
-            this.player.body.bottom, this.scale.height);
-        camera.scrollY = Phaser.Math.Linear(camera.scrollY, target, Math.min(delta / 100, 1));
+        let top = Phaser.Math.Clamp(camera.scrollY, this.player.y - this.scale.height + 80, this.player.y - 80);
+        top = Phaser.Math.Clamp(top, 0, Math.max(0, 600 - this.scale.height));
+        camera.scrollY = Phaser.Math.Linear(camera.scrollY, top, Math.min(delta / 100, 1));
     }
 
     updateConveyor(delta: number) {

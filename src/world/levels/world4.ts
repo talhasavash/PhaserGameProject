@@ -21,7 +21,7 @@ const fireMouth = (x: number) => defineEnemy('fire-salamander', {
 });
 const sun = (minX: number, maxX: number, y = 145) => defineEnemy('cinder-sun', {
     x: minX + 180, y, minX, maxX, scale: .9,
-    movement: {type: 'overhead', minX, maxX, speed: 100, distance: 100},
+    movement: {type: 'overhead', minX, maxX, speed: 100, distance: 260},
     weapon: {type: 'sun-ember', period: 4100, speed: 150, initialDelay: 3200}
 });
 const build = createLevelBuilder({theme: 'lava', width: 4000, groundY: 520,

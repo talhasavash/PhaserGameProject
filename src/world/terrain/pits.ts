@@ -51,4 +51,28 @@ export function createPitArt(scene, gap: Gap) {
         }
     });
     scene.add.image(gap.x - 12, scene.level.groundY - 8, key).setOrigin(0).setDepth(3);
+    if (theme === 'magma') createLavaFlow(scene, gap, height);
+}
+
+// Her kare çizim yerine iki küçük tekrar dokusu kayar; geniş lav denizlerinde de nesne sayısı sabittir.
+function createLavaFlow(scene, gap: Gap, height: number) {
+    cacheTexture(scene, 'lava-current', 128, 64, g => {
+        for (const [x, y, width] of [[16, 12, 25], [72, 32, 39], [115, 52, 22]]) {
+            g.fillStyle(0xffd773, .8); g.fillEllipse(x, y, width, 5);
+            g.fillStyle(0xee9a40, .6); g.fillEllipse(x + 2, y + 7, width + 8, 5);
+        }
+    });
+    cacheTexture(scene, 'lava-boiling', 128, 64, g => {
+        g.lineStyle(2, 0xffe6a0, .85);
+        for (const [x, y, radius] of [[24, 24, 8], [82, 44, 5], [110, 15, 7]]) {
+            g.strokeCircle(x, y, radius);
+            g.fillStyle(0xffb94d, .6); g.fillCircle(x, y, radius * .55);
+        }
+    });
+    const top = scene.level.groundY + 12;
+    const flow = scene.add.tileSprite(gap.x, top, gap.width, height - 20, 'lava-current').setOrigin(0).setDepth(4);
+    const bubbles = scene.add.tileSprite(gap.x, top, gap.width, height - 20, 'lava-boiling').setOrigin(0).setDepth(4);
+    scene.tweens.add({targets: flow, tilePositionX: 128, duration: 2600, repeat: -1});
+    scene.tweens.add({targets: bubbles, tilePositionY: 64, duration: 1800, repeat: -1});
+    scene.tweens.add({targets: bubbles, alpha: .25, duration: 650, yoyo: true, repeat: -1});
 }

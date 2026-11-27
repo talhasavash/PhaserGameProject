@@ -73,10 +73,29 @@ const defaultBehaviors = ['jump', 'patrol', 'appearance', 'visibility'].map(name
 
 export function updateHazards(scene, delta) {
     for (const hazard of scene.hazards.getChildren()) {
+        if (hazard.getData('defeated') === true) continue;
         const patrol = hazard.getData('patrol');
         const behaviors = hazard.getData('behaviors') || defaultBehaviors;
         for (const behavior of behaviors) behavior.update(scene, hazard, patrol, delta);
     }
+}
+
+// Üstten inişte düşmanı bir kez ezer; yan/alt temas ve yükselirken temas hasar yolunda kalır.
+export function tryStompEnemy(scene, player, enemy): boolean {
+    const body = player.body, target = enemy.body;
+    const previousBottom = (body.prev?.y ?? body.y) + body.height;
+    const previousTop = target.prev?.y ?? target.top;
+    if (body.velocity.y <= 0 || body.bottom < target.top ||
+        body.bottom - body.height / 2 >= target.top || previousBottom > previousTop + 12) return false;
+    enemy.setData('defeated', true);
+    enemy.setVelocity(0, 0);
+    target.enable = false;
+    for (const key of ['thread', 'shadow', 'breath-glow']) enemy.getData(key)?.setVisible(false);
+    player.setVelocityY(-270);
+    scene.tweens.add({targets: enemy, alpha: 0, scaleY: enemy.scaleY * .15, duration: 180,
+        onComplete: () => enemy.setVisible(false)});
+    scene.sound.play('collect', {volume: .13});
+    return true;
 }
 
 function updatePatrol(scene, hazard, patrol) {

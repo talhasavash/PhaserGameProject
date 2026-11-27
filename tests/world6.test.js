@@ -60,6 +60,23 @@ test('World 6 publishes 15 different Matter chapters while the local pilot stays
     assert.equal(worlds[5].menu.image, 'assets/images/scene/menu-world6.svg');
 });
 
+test('Every workshop chapter has two reachable fountains on clear, solid ground outside patrols', () => {
+    for (const level of worldSixLevels) {
+        assert.equal(level.fountains.length, 2, level.name);
+        assert.equal(new Set(level.fountains.map(f => f.id)).size, 2);
+        const definition = matterWorldForLevel(level);
+        const engine = Matter.Engine.create();
+        const world = createLabWorld(Matter, definition, bodies => Matter.Composite.add(engine.world, bodies));
+        for (const fountain of level.fountains) {
+            assert.ok(level.gaps.every(g => fountain.x + 50 < g.x || fountain.x - 50 > g.x + g.width), level.name);
+            assert.ok(level.enemies.every(e => fountain.x < e.minX - 85 || fountain.x > e.maxX + 85), level.name);
+            assert.equal(Matter.Query.point(world.surfaces, {x: fountain.x, y: level.groundY + 2}).length, 1, level.name);
+            assert.equal(Matter.Query.region(world.surfaces, {min: {x: fountain.x - 42, y: 440},
+                max: {x: fountain.x + 42, y: 518}}).length, 0, `${level.name}: obstructed fountain`);
+        }
+    }
+});
+
 test('Opt-in independent worlds preserve their own progress', () => {
     const values = new Map([['meyve-oyunu-unlocked-levels', '23']]);
     const storage = {getItem: key => values.get(key) ?? null, setItem: (key, value) => values.set(key, value)};

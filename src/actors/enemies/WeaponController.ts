@@ -32,6 +32,7 @@ export function resetEnemyWeapons(scene) {
     scene.weaponUsers.length = 0;
     for (const enemy of scene.hazards.getChildren()) {
         const initial = enemy.getData('initial-weapon');
+        if (enemy.getData('defeated') === true) continue;
         if (!initial) continue;
         Object.assign(enemy.getData('patrol'), structuredClone(initial));
         const weapon = resolveWeapon(enemy.getData('patrol'));
@@ -77,6 +78,7 @@ export function updateEnemyWeapons(scene) {
         }
     }
     for (const enemy of scene.weaponUsers) {
+        if (enemy.getData('defeated') === true) continue;
         const weapon = resolveWeapon(enemy.getData('patrol'));
         if (!weapon) continue;
         const { definition, config } = weapon;
@@ -171,6 +173,7 @@ export function updateGuardianFire(scene) {
     if (scene.guardianShots.length === 0) return;
     updateShots(scene);
     for (const guard of scene.hazards.getChildren()) {
+        if (guard.getData('defeated') === true) continue;
         const patrol = guard.getData('patrol');
         if (patrol.breath) updateGuardBreath(scene, guard, patrol);
     }
@@ -216,6 +219,7 @@ export function resetGuardianFire(scene) {
     if (!scene.guardianShots) return;
     for (const shot of scene.guardianShots) deactivateShot(shot);
     for (const guard of scene.hazards.getChildren()) {
+        if (guard.getData('defeated') === true) continue;
         const patrol = guard.getData('patrol');
         if (!patrol.breath) continue;
         patrol.jumpClock = 0;

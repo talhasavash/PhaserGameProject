@@ -21,8 +21,8 @@ const fireMouth = (x: number) => defineEnemy('fire-salamander', {
 });
 const sun = (minX: number, maxX: number, y = 145) => defineEnemy('cinder-sun', {
     x: minX + 180, y, minX, maxX, scale: .9,
-    movement: {type: 'overhead', minX, maxX, speed: 120, distance: 100},
-    weapon: {type: 'sun-ember', period: 4100, speed: 175, initialDelay: 3200}
+    movement: {type: 'overhead', minX, maxX, speed: 100, distance: 100},
+    weapon: {type: 'sun-ember', period: 4100, speed: 150, initialDelay: 3200}
 });
 const build = createLevelBuilder({theme: 'lava', width: 4000, groundY: 520,
     spawn: {x: 100, y: 480}, checkpoint: {x: 100, y: 480}});
@@ -148,7 +148,7 @@ const lastSun = chapter(13, 'sunset', {
     platforms: ledges([[330, 440, 130], [540, 355, 220], [1170, 435, 130], [1390, 350, 220],
         [2120, 445, 140], [2340, 360, 170], [2600, 280, 230], [3150, 430, 180]]),
     gaps: lava([850, 160], [1770, 160], [2930, 160]), fruits: stars(1, 3, 6),
-    enemies: [sun(500, 2950), fireMouth(3100), walk('basalt-crab', 3420, 3350, 3480, 80)],
+    enemies: [sun(500, 2950), fireMouth(3200), walk('basalt-crab', 3420, 3350, 3480, 80)],
     columns: [{x: 2040, width: 65, style: 'lava', raisedBottom: 235, openMs: 2150}]
 });
 const calderaGuardian = chapter(14, 'volcano', {

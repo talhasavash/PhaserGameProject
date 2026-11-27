@@ -20,6 +20,7 @@ import type { Point, LevelDefinition } from '../world/model/contracts.js';
 import { LevelRuntime, resetLevelEnemies } from './LevelRuntime.js';
 import {GAME_SCENE_KEY, restartOrChangeLevel} from './sceneRouting.js';
 import type {ActiveGameScene} from './sceneRouting.js';
+import {tryStompEnemy} from '../actors/enemies/EnemyController.js';
 
 export {GAME_SCENE_KEY} from './sceneRouting.js';
 const ITEM_MESSAGES = {
@@ -140,7 +141,7 @@ export class GameScene extends Phaser.Scene implements ActiveGameScene {
         // overlap: temas olunca belirtilen fonksiyonu çalıştır (örneğin meyve topla).
         this.physics.add.collider(this.player, this.solids);
         this.physics.add.overlap(this.player, this.fruits, this.collectFruit, undefined, this);
-        this.physics.add.overlap(this.player, this.hazards, this.hitHazard, undefined, this);
+        this.physics.add.overlap(this.player, this.hazards, this.hitEnemy, undefined, this);
         this.physics.add.overlap(this.player, this.fireballs, this.hitHazard, undefined, this);
         this.physics.add.overlap(this.player, this.enemyProjectiles, this.hitHazard, undefined, this);
         this.physics.add.overlap(this.player, this.guardianFlames, this.hitHazard, undefined, this);
@@ -213,6 +214,14 @@ export class GameScene extends Phaser.Scene implements ActiveGameScene {
         this.door.open();
         this.announce(`Anahtar sende! Şimdi ${this.level.exitLabel || 'cami girişine'} ulaş.`);
         this.updateHud();
+    }
+
+    // Ezilebilir düşmanlar 4–6. dünyalarda aynı davranır; mermi ve kolonlar bu yoldan geçmez.
+    hitEnemy(player, enemy) {
+        if (this.paused || this.lost || this.falling || this.gameState.complete || enemy.getData('defeated') === true) return;
+        const worldId = worldForLevel(this.levelIndex)?.id;
+        if ([4, 5, 6].includes(worldId ?? 0) && tryStompEnemy(this, player, enemy)) return;
+        this.hitHazard(player, enemy);
     }
 
     // Tehlikeye temas: can azalt, kısa süre koru, gerekirse geri döndür.

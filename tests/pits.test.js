@@ -81,11 +81,18 @@ test('Pit drawing is cached per theme and width, and never creates a physical fl
     let generated = 0;
     let images = 0;
     const g = {};
-    for (const name of ['fillStyle', 'fillPoints', 'fillTriangle', 'lineStyle', 'lineBetween', 'fillRect', 'fillEllipse', 'destroy']) g[name] = () => g;
-    g.generateTexture = (key, width, height) => { generated++; cached.add(key); assert.ok(width >= 104 && height > 80); };
+    for (const name of ['fillStyle', 'fillPoints', 'fillTriangle', 'lineStyle', 'lineBetween', 'fillRect', 'fillEllipse', 'fillCircle', 'strokeCircle', 'destroy']) g[name] = () => g;
+    g.generateTexture = (key, width, height) => {
+        generated++; cached.add(key);
+        if (key.startsWith('pit-')) assert.ok(width >= 104 && height > 80);
+        else assert.deepEqual([width, height], [128, 64]);
+    };
     const scene = {
         textures: { exists: key => cached.has(key) }, make: { graphics: () => g },
-        add: { image() { images++; return { setOrigin() { return this; }, setDepth() { return this; } }; } }
+        add: {
+            image() { images++; return { setOrigin() { return this; }, setDepth() { return this; } }; },
+            tileSprite() { return {setOrigin() {return this;}, setDepth() {return this;}}; }
+        }, tweens: {add() {}}
     };
     for (const level of levels.filter(Boolean)) {
         scene.level = level;
@@ -98,4 +105,35 @@ test('Pit drawing is cached per theme and width, and never creates a physical fl
     }
     assert.equal(generated, firstPass);
     assert.ok(images > generated);
+});
+
+test('Boiling lava uses two shared small textures and three looping tweens, independent of pit width', () => {
+    const cached = new Set(), sizes = [], tiles = [], tweens = [];
+    const graphic = new Proxy({}, {get(target, key) {
+        if (key === 'generateTexture') return (name, width, height) => {cached.add(name); sizes.push([name, width, height]);};
+        return () => graphic;
+    }});
+    const image = () => ({setOrigin() {return this;}, setDepth() {return this;}});
+    const scene = {level: {theme: 'lava', groundY: 520}, textures: {exists: key => cached.has(key)},
+        make: {graphics: () => graphic}, tweens: {add: tween => tweens.push(tween)},
+        add: {image, tileSprite(x, y, width, height, key) {
+            const tile = {...image(), x, y, width, height, key}; tiles.push(tile); return tile;
+        }}};
+    for (const gap of [{x: 400, width: 140, style: 'magma'}, {x: 1000, width: 3220, style: 'magma'}]) {
+        const tileCount = tiles.length, tweenCount = tweens.length;
+        createPitArt(scene, gap);
+        assert.equal(tiles.length - tileCount, 2);
+        assert.equal(tweens.length - tweenCount, 3);
+        for (const tile of tiles.slice(tileCount)) {
+            assert.equal(tile.x, gap.x); assert.equal(tile.width, gap.width);
+            assert.ok(tile.y > scene.level.groundY);
+            assert.ok(tile.y + tile.height <= 600);
+        }
+        assert.ok(tweens.slice(tweenCount).every(t => t.repeat === -1));
+    }
+    assert.equal(sizes.filter(([key]) => key.startsWith('lava-')).length, 2);
+    assert.ok(sizes.filter(([key]) => key.startsWith('lava-')).every(([, w, h]) => w === 128 && h === 64));
+    const before = tweens.length;
+    createPitArt(scene, {x: 5000, width: 140, style: 'desert'});
+    assert.equal(tweens.length, before, 'Other pit styles stay unchanged');
 });

@@ -56,6 +56,7 @@ export const worldSixLevels = chapters.map((chapter, index) => {
         platforms: sections.flatMap(p => p.platforms), gaps: sections.flatMap(p => p.gaps),
         props: sections.flatMap(p => p.props), links: sections.flatMap(p => p.links), matterSurfaces: sections.flatMap(p => p.surfaces),
         mechanisms: sections.flatMap(p => p.mechanisms),
+        fountains: origins.slice(0, 2).map((x, i) => ({id: `fountain-${i + 1}`, x: x + 800})),
         enemies: origins.slice(0, 2).map((x, i) => {
             const type = guardTypes[(index + i) % guardTypes.length];
             return {id: `guard-${i}`, type, x: x + 925, y: type === 'bee' || type === 'bird' ? 430 : 502,

@@ -5,7 +5,8 @@ import Matter from '../node_modules/phaser/src/physics/matter-js/CustomMain.js';
 import {worldFourLevels} from '../.build/src/world/levels/world4.js';
 import {levels, worlds, isPlayableLevel} from '../.build/src/world/levels/level.js';
 import {validateLevel} from '../.build/src/world/model/definitions.js';
-import {enemyBehaviors} from '../.build/src/actors/enemies/EnemyCatalog.js';
+import {enemyBehaviors, enemyTypes} from '../.build/src/actors/enemies/EnemyCatalog.js';
+import {EventEmitter} from 'node:events';
 import {resolveWeapon} from '../.build/src/actors/enemies/WeaponCatalog.js';
 import {matterWorldForLevel} from '../.build/src/physics/matter/levelWorld.js';
 import {createLabWorld} from '../.build/src/physics/matter/MatterObjects.js';
@@ -174,6 +175,37 @@ test('Mouth enemies face the player and the final drake leaves enough time to pa
     assert.ok(clearMs > (85 * boss.scale + 50) / 265 * 1000 + 200);
     assert.ok(level.fruits.filter(f => f.type === 'star').every(f => f.x < boss.x - 500));
     assert.ok(level.gaps.every(g => g.x + g.width < boss.x - 350));
+});
+
+test('Sun shrinks on phones and tablets, restores desktop scale and releases its resize listener', () => {
+    const scene = {scale: Object.assign(new EventEmitter(), {height: 320}), events: new EventEmitter()};
+    const sprite = Object.assign(new EventEmitter(), {setScale(value) {this.scale = value; return this;}});
+    enemyTypes.get('cinder-sun').setup(scene, sprite, {scale: .9});
+    assert.ok(112 * sprite.scale < 60);
+    assert.ok(70 * sprite.scale < 36, 'The same scale also shrinks its Arcade collision body');
+    scene.scale.height = 480; scene.scale.emit('resize');
+    assert.ok(112 * sprite.scale < 75);
+    scene.scale.height = 600; scene.scale.emit('resize');
+    assert.equal(sprite.scale, .9);
+    assert.equal(scene.scale.listenerCount('resize'), 1);
+    scene.events.emit('shutdown');
+    assert.equal(scene.scale.listenerCount('resize'), 0);
+    assert.equal(sprite.listenerCount('destroy'), 0);
+});
+
+test('On mobile the sun rises clear of a jumping player instead of occupying the star platform', () => {
+    const scene = {scale: {height: 320}, cameras: {main: {scrollY: 280}}, player: {x: 900, y: 360}};
+    let vy;
+    const enemy = {x: 1000, y: 310, displayHeight: 56, setVelocityX() {}, setVelocityY(value) {vy = value;}};
+    const patrol = {minX: 500, maxX: 3000, baseY: 145};
+    for (let i = 0; i < 120; i++) {
+        enemyBehaviors.get('overhead').update(scene, enemy, patrol, 16);
+        enemy.y += vy * .016;
+    }
+    assert.ok(enemy.y + enemy.displayHeight / 2 < scene.player.y - 80);
+    scene.player.y = 260; scene.cameras.main.scrollY = 100;
+    enemyBehaviors.get('overhead').update(scene, enemy, patrol, 16);
+    assert.ok(vy < 0);
 });
 
 test('Fire mouths shoot both ways; sun embers aim down once and every shot expires', () => {

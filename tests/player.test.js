@@ -211,7 +211,7 @@ test('The stopped character remains perfectly still at different times', () => {
 });
 
 test('All alternate skins keep their own normal, sad, happy and jumping frames', () => {
-    for (const character of ['girl', 'ice_girl', 'ice_boy', 'ihram_boy', 'chador_girl', 'workshop_boy', 'workshop_girl', 'lava_boy', 'lava_girl']) {
+    for (const character of ['girl', 'ice_girl', 'ice_boy', 'ihram_boy', 'chador_girl', 'workshop_boy', 'workshop_girl', 'lava_boy', 'lava_girl', 'night_boy', 'night_girl']) {
         const player = playerForTest();
         player.character = character;
         let texture;

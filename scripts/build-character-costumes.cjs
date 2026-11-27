@@ -12,7 +12,10 @@ function head(source, girl, theme) {
         .replace(/<path\b[^>]*d="M(?:18\.5 12\.5|19 11\.5|25 5\.5|39 41)[^"]*"[^>]*\/>/g, '');
     // Başlık ve örtü rengi kıyafete göre seçilir; mevcut yüz ve ifadesi aynı kalır.
     if (girl) {
-        const colors = theme === 'lava'
+        const colors = theme === 'night'
+            ? {'#b990c0': '#9bc9db', '#785780': '#d9ebf1', '#aa7db2': '#6396b5', '#a177ab': '#78abc7',
+                '#ead3e9': '#ffffff', '#d6b4d8': '#d6edf5', '#ead19a': '#e7f4ff'}
+            : theme === 'lava'
             ? {'#b990c0': '#963f55', '#785780': '#5c2d43', '#aa7db2': '#79364d', '#a177ab': '#79364d',
                 '#ead3e9': '#f2bd9a', '#d6b4d8': '#cd8290', '#ead19a': '#f5cc85'}
             : theme === 'workshop'
@@ -23,6 +26,22 @@ function head(source, girl, theme) {
         for (const [from, to] of Object.entries(colors)) {
             drawing = drawing.replaceAll(from, to);
         }
+        if (theme === 'night') {
+            drawing = drawing
+                .replace('M13 25Q10 1 31 1Q54 0 53 26L50 47Q34 55 15 47Z',
+                    'M13 25Q10 1 31 1Q54 0 53 26L49 37Q33 44 16 37Z')
+                .replace(/<path d="M15 34[^"]*"[^>]*\/>/, '')
+                .replace('M17 27Q17 37 31 42L23 49L16 44Z', 'M17 27Q18 35 32 39L25 43L17 37Z')
+                .replace('M48 27Q47 39 31 42L39 50L49 45Z', 'M48 27Q46 36 32 39L40 43L48 37Z')
+                .replace('M19 32Q22 39 32 42M45 33Q41 39 34 42', 'M19 32Q23 37 32 39M45 33Q41 37 34 39')
+                .replace('cx="39" cy="43"', 'cx="39" cy="40"');
+        }
+    } else if (theme === 'night') {
+        drawing += `<g data-headwear="moon-cap">
+            <path d="M15 13Q14 2 31 2Q48 1 49 14L46 17H18Z" fill="#354b7e" stroke="#bacde7" stroke-width="1.3"/>
+            <path d="M16 12Q32 9 48 13L48 17Q32 14 16 17Z" fill="#88c6d4" stroke="#d9ecdf" stroke-width="1"/>
+            <path d="M34 4A4 4 0 1 0 39 9A4 4 0 0 1 34 4Z" fill="#ffe5a1"/>
+        </g>`;
     } else if (theme === 'lava') {
         drawing += `<g data-headwear="explorer-goggles">
             <path d="M15 14Q14 2 31 2Q48 1 50 14L48 18Q32 14 16 18Z" fill="#774b42" stroke="#493b40" stroke-width="1.3"/>
@@ -115,8 +134,9 @@ function workshopCostume(frame, girl) {
 
 const outfits = [['child', 'ihram_boy', false, 'pilgrimage'], ['girl', 'chador_girl', true, 'pilgrimage'],
     ['child', 'workshop_boy', false, 'workshop'], ['girl', 'workshop_girl', true, 'workshop'],
-    ['child', 'lava_boy', false, 'lava'], ['girl', 'lava_girl', true, 'lava']];
-const costumeBuilders = {pilgrimage: pilgrimageCostume, workshop: workshopCostume, lava: lavaCostume};
+    ['child', 'lava_boy', false, 'lava'], ['girl', 'lava_girl', true, 'lava'],
+    ['child', 'night_boy', false, 'night'], ['girl', 'night_girl', true, 'night']];
+const costumeBuilders = {pilgrimage: pilgrimageCostume, workshop: workshopCostume, lava: lavaCostume, night: nightCostume};
 let written = 0;
 for (const [base, prefix, girl, theme] of outfits) {
     if (process.argv[2] && theme !== process.argv[2]) continue;
@@ -134,6 +154,40 @@ for (const [base, prefix, girl, theme] of outfits) {
     }
 }
 console.log(`${written} kıyafet SVG'si üretildi.`);
+
+function nightCostume(frame, girl) {
+    const [left, right] = poses[frame], feet = frame === 3 ? 65 : 74;
+    const cloth = girl ? '#315e89' : '#354b7e', dark = girl ? '#243b64' : '#233555';
+    const trim = girl ? '#d4e5f1' : '#9acdd8', hem = girl ? feet - 3 : 59;
+    const legs = `<path d="M27 55L${left} ${feet - 5}M36 55L${right} ${feet - 5}" stroke="${dark}" stroke-width="8"/>`;
+    const shoes = `<path d="M${left - 3} ${feet - 1}h10M${right - 2} ${feet - 1}h10" stroke="#39465c" stroke-width="7"/>
+        <path d="M${left - 3} ${feet + 2}h10M${right - 2} ${feet + 2}h10" stroke="${trim}" stroke-width="2"/>`;
+    const robe = girl
+        ? `<path d="M23 37L41 37L43 48L49 ${hem - 1}Q32 ${hem + 3} 15 ${hem - 1}L21 48Z" fill="${cloth}" stroke="${trim}" stroke-width="1.4"/>
+            <path d="M24 48L20 ${hem - 3}M31 49L29 ${hem - 1}M38 48L43 ${hem - 3}" fill="none" stroke="#7397b7" stroke-width="1.5"/>
+            <path d="M21 35Q31 32 43 36L42 46L34 49L32 41L29 49L21 46Z" fill="${dark}" stroke="#b2d3e5" stroke-width="1.2"/>
+            <path d="M22 47Q32 50 42 47" fill="none" stroke="#adcadc" stroke-width="2.5"/>
+            <path d="M18 ${hem - 4}Q32 ${hem} 46 ${hem - 4}" fill="none" stroke="#abcfe2" stroke-width="1.5"/>
+            <path d="M23 54A4.5 4.5 0 1 0 23 63A5 5 0 0 1 23 54Z" fill="#ecf6ff"/>
+            <path d="M26 56L26.8 58L29 58L27.3 59.3L28 61.4L26 60.1L24 61.4L24.7 59.3L23 58L25.2 58Z" fill="#ecf6ff"/>
+            <path d="M39 57A4 4 0 1 0 39 65A4.5 4.5 0 0 1 39 57Z" fill="#c6e4f2"/>
+            <path d="M42 59L42.6 60.6L44.4 60.6L43 61.7L43.5 63.4L42 62.4L40.5 63.4L41 61.7L39.6 60.6L41.4 60.6Z" fill="#c6e4f2"/>
+            <circle cx="32" cy="65" r="1.4" fill="#eaf5ff"/>`
+        : `<path d="M20 34Q32 29 44 35L${girl ? 49 : 46} ${hem}Q32 ${hem + 3} ${girl ? 14 : 18} ${hem}Z" fill="${cloth}" stroke="${trim}" stroke-width="1.4"/>
+        <path d="M24 47L21 ${hem - 2}M40 47L43 ${hem - 2}" fill="none" stroke="${dark}" stroke-width="1.4"/>
+        <path d="M32 40V${hem - 2}M${girl ? 16 : 20} ${hem - 2}Q32 ${hem + 1} ${girl ? 47 : 44} ${hem - 2}" fill="none" stroke="${trim}" stroke-width="1.4"/>
+        <path d="M20 34Q32 39 43 34L43 39Q32 44 20 39Z" fill="${trim}" stroke="${dark}" stroke-width="1"/>
+        <path d="M37 39L43 40L41 50L36 48Z" fill="${trim}"/>
+        <path d="M27 43A4 4 0 1 0 30 49A4 4 0 0 1 27 43Z" fill="#ffe7a0"/>
+        <circle cx="37" cy="54" r="1.2" fill="#ffe7a0"/>
+        ${girl ? '<path d="M24 61L25 64L28 65L25 66L24 69L23 66L20 65L23 64Z" fill="#e0d3f4"/>' : '<rect x="21" y="52" width="7" height="5" rx="1" fill="#6683ac" stroke="#b9cce0" stroke-width="1"/>'}`;
+    const leftArm = `<path d="M22 40L18 49" stroke="${cloth}" stroke-width="8"/>
+        <path d="M18 48L17 51" stroke="${trim}" stroke-width="7"/><circle cx="17" cy="53" r="3" fill="#efbb8b"/>`;
+    const rightArm = frame === 3
+        ? `<path d="M41 40Q48 43 50 38L52 34" fill="none" stroke="${cloth}" stroke-width="7"/><circle cx="52" cy="32" r="3" fill="#efbb8b"/>`
+        : `<path d="M41 40L46 49" stroke="${cloth}" stroke-width="8"/><path d="M46 48L47 51" stroke="${trim}" stroke-width="7"/><circle cx="47" cy="53" r="3" fill="#efbb8b"/>`;
+    return {legs, shoes, robe, leftArm, rightArm};
+}
 
 function lavaCostume(frame, girl) {
     const [left, right] = poses[frame], feet = frame === 3 ? 65 : 74;

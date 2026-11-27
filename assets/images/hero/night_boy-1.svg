@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="80" viewBox="0 0 64 80" data-costume="night">
+<g stroke-linecap="round" stroke-linejoin="round"><path d="M27 55L17 69M36 55L44 69" stroke="#233555" stroke-width="8"/><path d="M14 73h10M42 73h10" stroke="#39465c" stroke-width="7"/>
+        <path d="M14 76h10M42 76h10" stroke="#9acdd8" stroke-width="2"/>
+<g transform="translate(0 0)"><path d="M20 34Q32 29 44 35L46 59Q32 62 18 59Z" fill="#354b7e" stroke="#9acdd8" stroke-width="1.4"/>
+        <path d="M24 47L21 57M40 47L43 57" fill="none" stroke="#233555" stroke-width="1.4"/>
+        <path d="M32 40V57M20 57Q32 60 44 57" fill="none" stroke="#9acdd8" stroke-width="1.4"/>
+        <path d="M20 34Q32 39 43 34L43 39Q32 44 20 39Z" fill="#9acdd8" stroke="#233555" stroke-width="1"/>
+        <path d="M37 39L43 40L41 50L36 48Z" fill="#9acdd8"/>
+        <path d="M27 43A4 4 0 1 0 30 49A4 4 0 0 1 27 43Z" fill="#ffe7a0"/>
+        <circle cx="37" cy="54" r="1.2" fill="#ffe7a0"/>
+        <rect x="21" y="52" width="7" height="5" rx="1" fill="#6683ac" stroke="#b9cce0" stroke-width="1"/><path d="M22 40L18 49" stroke="#354b7e" stroke-width="8"/>
+        <path d="M18 48L17 51" stroke="#9acdd8" stroke-width="7"/><circle cx="17" cy="53" r="3" fill="#efbb8b"/><path d="M41 40L46 49" stroke="#354b7e" stroke-width="8"/><path d="M46 48L47 51" stroke="#9acdd8" stroke-width="7"/><circle cx="47" cy="53" r="3" fill="#efbb8b"/><ellipse cx="32" cy="22" rx="16" ry="17" fill="#f2c697" stroke="#a66e4c" stroke-width="1.5"/>
+      <circle cx="17" cy="24" r="4" fill="#efbb8b"/>
+      <path d="M17 22Q11 4 31 3Q50 1 49 19L41 14L34 15L28 11L24 18L21 18L21 25Z" fill="#543e34"/><path d="M23 8Q35 1 43 9" fill="none" stroke="#7a5740" stroke-width="3"/>
+      <ellipse cx="28.5" cy="23" rx="3.4" ry="4.2" fill="#fff9ed"/>
+      <ellipse cx="39" cy="23" rx="3.4" ry="4.2" fill="#fff9ed"/>
+      <ellipse cx="29.3" cy="23.4" rx="1.9" ry="2.8" fill="#273d42"/>
+      <ellipse cx="39.8" cy="23.4" rx="1.9" ry="2.8" fill="#273d42"/>
+      <circle cx="29.7" cy="22.4" r="0.7" fill="#fff"/>
+      <circle cx="40.2" cy="22.4" r="0.7" fill="#fff"/>
+      <path d="M26 17.5q3-1 5 0 M36.5 17.5q3-1 5 0" fill="none" stroke="#543e34" stroke-width="1.5"/>
+      <path d="M33.5 26v2h2" fill="none" stroke="#c18d65" stroke-width="1.2"/>
+      <path d="M29.5 31q4.5 4 9 0" fill="none" stroke="#8f5f4c" stroke-width="1.6"/>
+
+<g data-headwear="moon-cap">
+            <path d="M15 13Q14 2 31 2Q48 1 49 14L46 17H18Z" fill="#354b7e" stroke="#bacde7" stroke-width="1.3"/>
+            <path d="M16 12Q32 9 48 13L48 17Q32 14 16 17Z" fill="#88c6d4" stroke="#d9ecdf" stroke-width="1"/>
+            <path d="M34 4A4 4 0 1 0 39 9A4 4 0 0 1 34 4Z" fill="#ffe5a1"/>
+        </g></g></g></svg>

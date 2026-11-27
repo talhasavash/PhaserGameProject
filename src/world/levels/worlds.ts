@@ -13,6 +13,7 @@ export const worldDefinitions: import('../model/contracts.js').WorldInput[] = [
         music: { src: 'assets/audio/music/world1.mpeg', volume: 0.12 },
         menu: { image: 'assets/images/scene/menu-world1.svg', color: '#a6dcf0' } },
     { id: 2, title: 'Gece Karanlığı', levels: worldTwoLevels, starGuardsPause: true,
+        characterSkins: {boy: 'night_boy', girl: 'night_girl'},
         music: { src: 'assets/audio/music/world2.mpeg', volume: 0.12 },
         menu: { image: 'assets/images/scene/menu-world2.svg', color: '#18294c' } },
     { id: 3, title: 'Buz Dağları', levels: worldThreeLevels, starGuardsPause: true,

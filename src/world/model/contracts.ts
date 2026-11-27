@@ -191,6 +191,8 @@ export interface LevelDefinition {
     theme: SurfaceStyle;
     width: number;
     groundY: number;
+    /** Dikey parkurun tamamını gösterir; kamera zıplarken yukarı kaymaz. */
+    camera?: { visibleHeight: number };
     spawn: Point;
     checkpoint: Point;
     key: Point;

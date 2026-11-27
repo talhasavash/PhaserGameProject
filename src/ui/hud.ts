@@ -40,14 +40,33 @@ export function createHud(scene) {
     }
 }
 
+// En yüksek platformda tam zıplama için karaktere ve üst göstergelere yer bırakır.
+export function levelViewHeight(level, viewportHeight) {
+    const highest = Math.min(level.groundY, ...level.platforms.map(platform => platform.y));
+    // Kızgın Güneş gibi üstten takip eden tehlikeler de üst göstergelerin altında görünür kalsın.
+    const overheadTop = Math.min(600, ...(level.enemies ?? [])
+        .filter(enemy => enemy.components?.some(component =>
+            (typeof component === 'string' ? component : component.type) === 'overhead') && typeof enemy.y === 'number')
+        .map(enemy => enemy.y - 100));
+    const top = Math.max(0, Math.min(highest - 220, overheadTop));
+    return Math.max(viewportHeight, level.camera?.visibleHeight ?? 600 - top);
+}
+
 export function centerHud(scene) {
+    const camera = scene.cameras.main;
+    const visibleHeight = levelViewHeight(scene.level, scene.scale.height);
+    const zoom = scene.scale.height / visibleHeight;
+    camera.setZoom(zoom);
     // Canlar solda, puan sağ kenarda; orta alan saydam mola düğmesine ayrılır.
     const hudScale = Math.min(1.1, scene.scale.width / 680);
-    scene.hud.setScale(hudScale).setPosition(14 * hudScale, 12 * hudScale);
+    // Kamera uzaklaşsa da can ve puan göstergelerinin ekrandaki boyutu korunur.
+    scene.hud.setScale(hudScale / zoom).setPosition(
+        (14 * hudScale - scene.scale.width * (1 - zoom) / 2) / zoom,
+        (12 * hudScale - scene.scale.height * (1 - zoom) / 2) / zoom);
     scene.scoreText.setX(scene.scale.width / hudScale - 28);
     scene.starHud.setX(scene.scoreText.x - Math.max(50, scene.scoreText.width) - 78);
     // Zemini aynı yerde tut: zıplarken ekran yukarı-aşağı sallanmasın.
-    scene.cameras.main.scrollY = Math.max(0, 600 - scene.scale.height);
+    camera.scrollY = Math.max(0, 600 - visibleHeight) + (visibleHeight - scene.scale.height) / 2;
     scene.cameras.main.setFollowOffset(-Math.min(190, scene.scale.width * 0.2), 0);
 }
 

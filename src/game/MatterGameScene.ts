@@ -103,7 +103,7 @@ export class MatterGameScene extends Phaser.Scene implements ActiveGameScene {
         };
         this.matter.world.on('collisionstart', contact);
         this.matter.world.on('collisionactive', contact);
-        this.cameras.main.setBounds(0, 0, this.level.width, 600).startFollow(this.player, false, 1, .12);
+        this.cameras.main.setBounds(0, 0, this.level.width, 600).startFollow(this.player, false, 1, 0);
         createHud(this); this.centerHud();
         this.scale.on('resize', this.centerHud, this);
         bindSceneButtons(this);

@@ -388,11 +388,10 @@ export class GameScene extends Phaser.Scene implements ActiveGameScene {
     }
 
     updateCamera(delta: number) {
-        // Yüksek basamaklarda karakteri görünürde tut; yerdeyken kamera sabit kalsın.
+        // Görüş yüksekliği parkura göre ayarlanır; iniş zemini zıplarken kaybolmaz.
         const camera = this.cameras.main;
-        let top = Phaser.Math.Clamp(camera.scrollY, this.player.y - this.scale.height + 80, this.player.y - 80);
-        top = Phaser.Math.Clamp(top, 0, Math.max(0, 600 - this.scale.height));
-        camera.scrollY = Phaser.Math.Linear(camera.scrollY, top, Math.min(delta / 100, 1));
+        const height = this.scale.height / camera.zoom;
+        camera.scrollY = Math.max(0, 600 - height) + (height - this.scale.height) / 2;
     }
 
     updateConveyor(delta: number) {

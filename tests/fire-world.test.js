@@ -154,10 +154,11 @@ test('Overhead sun follows at bounded speed, stays above the route and does not 
         definition.update(scene, enemy, patrol, 16);
         enemy.y += velocity.y * .016;
     }
-    assert.equal(enemy.y, 145, 'Camera movement does not move the sun vertically');
+    assert.equal(enemy.y, 344, 'Sun remains 64 units inside the camera');
     scene.cameras.main.scrollY = 0;
     definition.update(scene, enemy, patrol, 16);
-    assert.equal(velocity.y, 0, 'Climbing does not change the authored height');
+    assert.equal(enemy.y, 145, 'Full-height view restores the authored position');
+    assert.equal(velocity.y, 0);
 });
 
 test('Mouth enemies face the player and the final drake leaves enough time to pass underneath', () => {
@@ -193,7 +194,7 @@ test('Sun shrinks on phones and tablets, restores desktop scale and releases its
     assert.equal(sprite.listenerCount('destroy'), 0);
 });
 
-test('On mobile the sun keeps its authored height while the player jumps and the camera moves', () => {
+test('On mobile the sun stays in the upper camera band without tracking player jumps', () => {
     const scene = {scale: {height: 320}, cameras: {main: {scrollY: 280}}, player: {x: 900, y: 360}};
     let vy;
     const enemy = {x: 1000, y: 145, displayHeight: 56, setVelocityX() {}, setVelocityY(value) {vy = value;}};
@@ -203,7 +204,14 @@ test('On mobile the sun keeps its authored height while the player jumps and the
         scene.cameras.main.scrollY = Math.max(0, y - 200);
         enemyBehaviors.get('overhead').update(scene, enemy, patrol, 16);
         assert.equal(vy, 0);
-        assert.equal(enemy.y, 145);
+        assert.equal(enemy.y, Math.max(145, scene.cameras.main.scrollY + 64));
+        assert.ok(enemy.y - scene.cameras.main.scrollY >= 64);
+    }
+    scene.cameras.main.scrollY = 280;
+    for (const y of [480, 360, 260]) {
+        scene.player.y = y;
+        enemyBehaviors.get('overhead').update(scene, enemy, patrol, 16);
+        assert.equal(enemy.y, 344, 'Jumping alone never moves the sun');
     }
 });
 

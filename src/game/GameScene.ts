@@ -21,6 +21,7 @@ import { LevelRuntime, resetLevelEnemies } from './LevelRuntime.js';
 import {GAME_SCENE_KEY, restartOrChangeLevel} from './sceneRouting.js';
 import type {ActiveGameScene} from './sceneRouting.js';
 import {tryStompEnemy} from '../actors/enemies/EnemyController.js';
+import {platformCameraTop} from './camera.js';
 
 export {GAME_SCENE_KEY} from './sceneRouting.js';
 const ITEM_MESSAGES = {
@@ -388,10 +389,10 @@ export class GameScene extends Phaser.Scene implements ActiveGameScene {
     }
 
     updateCamera(delta: number) {
-        // Görüş yüksekliği parkura göre ayarlanır; iniş zemini zıplarken kaybolmaz.
         const camera = this.cameras.main;
-        const height = this.scale.height / camera.zoom;
-        camera.scrollY = Math.max(0, 600 - height) + (height - this.scale.height) / 2;
+        const target = platformCameraTop(this.level, this.player.x, this.player.y,
+            this.player.body.bottom, this.scale.height);
+        camera.scrollY = Phaser.Math.Linear(camera.scrollY, target, Math.min(delta / 100, 1));
     }
 
     updateConveyor(delta: number) {

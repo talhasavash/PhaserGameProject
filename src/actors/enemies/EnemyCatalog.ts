@@ -37,8 +37,10 @@ registerEnemyBehavior('overhead', { update(scene, enemy, patrol, delta, options 
     const target = Math.max(minX, Math.min(maxX, scene.player.x + distance));
     const difference = target - enemy.x;
     enemy.setVelocityX(Math.abs(difference) < 8 ? 0 : Math.sign(difference) * Math.min(speed, Math.abs(difference) * 2));
-    // Yükseklik bölümdeki y değeridir; oyuncunun zıplaması veya kamera onu değiştirmez.
-    enemy.setVelocityY((patrol.baseY - enemy.y) * 4);
+    // Kameranın üst bandında görünür kalır; oyuncunun y konumunu takip etmez.
+    const cameraTop = scene.cameras?.main.scrollY ?? 0;
+    enemy.y = Math.max(patrol.baseY, cameraTop + 64);
+    enemy.setVelocityY(0);
 } });
 
 registerEnemyBehavior('face-player', {update(scene, enemy, patrol) {

@@ -125,10 +125,14 @@ test('Matter damage costs one heart per protection window and resets with a fres
     const nodes = new Map(['touch-controls', 'fall-result', 'retry-fall'].map(id => [id, {hidden: true, focus() {}}]));
     globalThis.document = {getElementById: id => nodes.get(id)};
     Object.assign(scene, {runtime: {world: {player: {position: {x: 0}}}, library: {Body: {setVelocity() {}}}, setPaused() {paused = true;}},
-        sound: {play() {sounds++;}}, tweens: {add() {}}, player: {setTexture() {}, setAlpha() {}}, updateHud() {}});
+        sound: {play() {sounds++;}}, tweens: {add() {}},
+        player: {character: scene.characterSkin, anims: {stop() {}}, setTexture(key) {this.texture = key;}, setAlpha() {},
+            recoveryGlow: {setVisible() {}}, recoveryStars: []}, updateHud() {}});
     const enemy = {body: {position: {x: 20}}};
     scene.hitEnemy(enemy); scene.hitEnemy(enemy);
     assert.equal(scene.gameState.hearts, 2);
+    assert.equal(scene.player.texture, 'workshop_boy-sad-0');
+    assert.equal(scene.player.recoveryUntil, 0);
     scene.elapsed = 1999; scene.hitEnemy(enemy);
     assert.equal(scene.gameState.hearts, 2);
     scene.elapsed = 2000; scene.hitEnemy(enemy);

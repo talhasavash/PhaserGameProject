@@ -6,7 +6,7 @@ import { loadGameAssets } from '../.build/src/data/assets.js';
 import { levels } from '../.build/src/world/levels/level.js';
 
 test('Both characters load existing assets and every chapter item and enemy has a texture', () => {
-    for (const character of ['boy', 'girl', 'ice_girl', 'ice_boy']) {
+    for (const character of ['boy', 'girl', 'ice_girl', 'ice_boy', 'ihram_boy', 'chador_girl', 'workshop_boy', 'workshop_girl']) {
         const images = new Map();
         const sounds = new Set();
         const scene = { load: {

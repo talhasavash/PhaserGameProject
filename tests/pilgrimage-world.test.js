@@ -14,6 +14,7 @@ import {BridgeMechanisms} from '../.build/src/physics/matter/BridgeMechanisms.js
 import {labPhysics, FixedStepSimulation} from '../.build/src/physics/matter/simulation.js';
 import {labMotion} from '../.build/src/physics/matter/movement.js';
 import {worldUnlockedLevels, unlockWorldNext} from '../.build/src/data/progress.js';
+import {selectCharacterSkin, characterPrefix} from '../.build/src/data/characters.js';
 
 function reachableSurfaces(level) {
     const surfaces = [];
@@ -55,6 +56,22 @@ test('World 5 fills 61–75; all 90 chapter slots now contain playable levels wi
     }
     for (const field of ['platforms', 'mosqueStyle']) assert.equal(new Set(worldFiveLevels.map(l => JSON.stringify(l[field]))).size, 15);
     assert.equal(new Set(worldFiveLevels.map(l => JSON.stringify(l.environment.scenery))).size, 15);
+});
+
+test('World costume selections stay scoped to pilgrimage, workshop and winter chapters', () => {
+    for (const world of worlds) for (const level of world.levels) {
+        for (const character of ['boy', 'girl']) {
+            const expected = world.id === 5 ? character === 'boy' ? 'ihram_boy' : 'chador_girl'
+                : world.id === 6 ? `workshop_${character}` : world.id === 3 ? `ice_${character}` : character;
+            const selected = selectCharacterSkin(level, world, character);
+            assert.equal(selected, expected, `${world.id}: ${level.name}: ${character}`);
+            if (world.id === 5) {
+                assert.equal(characterPrefix('normal', selected), `${expected}-`);
+                assert.equal(characterPrefix('sad', selected), `${expected}-sad-`);
+                assert.equal(characterPrefix('happy', selected), `${expected}-happy-`);
+            }
+        }
+    }
 });
 
 test('Every Arcade star, fountain and exit is reachable from spawn and no fountain stands in a pit', () => {

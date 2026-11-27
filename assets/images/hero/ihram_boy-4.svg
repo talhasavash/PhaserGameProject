@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="80" viewBox="0 0 64 80" data-costume="ihram">
+<g stroke-linecap="round" stroke-linejoin="round"><path d="M28 57L28 70M35 57L33 70" stroke="#efbb8b" stroke-width="6"/><path d="M25 74h9M31 74h9" stroke="#8e6a45" stroke-width="5"/>
+        <path d="M27 71l4 3M33 71l4 3" stroke="#d1ad78" stroke-width="2"/>
+<g transform="translate(0 -2)"><rect x="28" y="28" width="10" height="11" rx="4" fill="#e6a777"/>
+            <path d="M21 35Q26 32 30 35L35 37Q39 32 44 36L47 47Q34 55 19 49Z" fill="#fffef8" stroke="#a8b5ad" stroke-width="1.4"/>
+            <path d="M22 36Q31 43 45 40L45 46Q32 51 20 44Z" fill="#e4eae4"/>
+            <path d="M22 38Q32 45 44 43M22 45Q30 49 40 47" fill="none" stroke="#bdccc1" stroke-width="1.2"/>
+            <path d="M21 50L43 50L44 71Q33 72 19 71Z" fill="#fffef8" stroke="#a8b5ad" stroke-width="1.4"/>
+            <path d="M35 51L42 52L40 70L31 71Z" fill="#e6ece6"/>
+            <path d="M35 53L32 69M24 55L23 68" fill="none" stroke="#bccbc0" stroke-width="1.2"/>
+            <path d="M21 51Q32 54 43 51" fill="none" stroke="#ccd7ce" stroke-width="3"/><path d="M23 39L19 52" stroke="#efbb8b" stroke-width="6"/><path d="M40 40L45 50" stroke="#efbb8b" stroke-width="6"/>
+            <ellipse cx="32" cy="22" rx="16" ry="17" fill="#f2c697" stroke="#a66e4c" stroke-width="1.5"/>
+            <circle cx="17" cy="24" r="4" fill="#efbb8b"/>
+            <path d="M17 22Q11 4 31 3Q50 1 49 19L41 14L34 15L28 11L24 18L21 18L21 25Z" fill="#543e34"/>
+            <path d="M23 8Q35 1 43 9" fill="none" stroke="#7a5740" stroke-width="3"/>
+            <ellipse cx="28.5" cy="23" rx="3.4" ry="4.2" fill="#fff9ed"/>
+            <ellipse cx="39" cy="23" rx="3.4" ry="4.2" fill="#fff9ed"/>
+            <ellipse cx="29.3" cy="23.4" rx="1.9" ry="2.8" fill="#273d42"/>
+            <ellipse cx="39.8" cy="23.4" rx="1.9" ry="2.8" fill="#273d42"/>
+            <circle cx="29.7" cy="22.4" r="0.7" fill="#fff"/>
+            <circle cx="40.2" cy="22.4" r="0.7" fill="#fff"/>
+            <path d="M26 17.5q3-1 5 0 M36.5 17.5q3-1 5 0" fill="none" stroke="#543e34" stroke-width="1.5"/>
+            <path d="M33.5 26v2h2" fill="none" stroke="#c18d65" stroke-width="1.2"/>
+            <path d="M29.5 31q4.5 4 9 0" fill="none" stroke="#8f5f4c" stroke-width="1.6"/>
+
+<g data-headwear="turban">
+            <path d="M16 11L13 24Q16 28 19 24L20 12Z" fill="#e6ebe7" stroke="#adb7b1" stroke-width="1"/>
+            <path d="M15 14Q12 3 27 2Q42 -1 49 8L49 15Q32 21 15 14Z" fill="#fffef8" stroke="#aab6af" stroke-width="1.3"/>
+            <path d="M17 7Q32 15 47 11M16 11Q28 20 47 14M23 4Q36 5 44 10" fill="none" stroke="#c9d4cd" stroke-width="1.7"/>
+            <path d="M18 5Q30 7 38 4" fill="none" stroke="#ffffff" stroke-width="2"/>
+        </g></g></g></svg>

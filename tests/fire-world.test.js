@@ -154,10 +154,10 @@ test('Overhead sun follows at bounded speed, stays above the route and does not 
         definition.update(scene, enemy, patrol, 16);
         enemy.y += velocity.y * .016;
     }
-    assert.ok(enemy.y - 50 > 280, 'The whole sun enters the visible phone sky');
+    assert.equal(enemy.y, 145, 'Camera movement does not move the sun vertically');
     scene.cameras.main.scrollY = 0;
     definition.update(scene, enemy, patrol, 16);
-    assert.ok(velocity.y < 0, 'Climbing makes the sun return upward smoothly');
+    assert.equal(velocity.y, 0, 'Climbing does not change the authored height');
 });
 
 test('Mouth enemies face the player and the final drake leaves enough time to pass underneath', () => {
@@ -193,19 +193,18 @@ test('Sun shrinks on phones and tablets, restores desktop scale and releases its
     assert.equal(sprite.listenerCount('destroy'), 0);
 });
 
-test('On mobile the sun rises clear of a jumping player instead of occupying the star platform', () => {
+test('On mobile the sun keeps its authored height while the player jumps and the camera moves', () => {
     const scene = {scale: {height: 320}, cameras: {main: {scrollY: 280}}, player: {x: 900, y: 360}};
     let vy;
-    const enemy = {x: 1000, y: 310, displayHeight: 56, setVelocityX() {}, setVelocityY(value) {vy = value;}};
+    const enemy = {x: 1000, y: 145, displayHeight: 56, setVelocityX() {}, setVelocityY(value) {vy = value;}};
     const patrol = {minX: 500, maxX: 3000, baseY: 145};
-    for (let i = 0; i < 120; i++) {
+    for (const y of [480, 360, 260, 360, 480]) {
+        scene.player.y = y;
+        scene.cameras.main.scrollY = Math.max(0, y - 200);
         enemyBehaviors.get('overhead').update(scene, enemy, patrol, 16);
-        enemy.y += vy * .016;
+        assert.equal(vy, 0);
+        assert.equal(enemy.y, 145);
     }
-    assert.ok(enemy.y + enemy.displayHeight / 2 < scene.player.y - 80);
-    scene.player.y = 260; scene.cameras.main.scrollY = 100;
-    enemyBehaviors.get('overhead').update(scene, enemy, patrol, 16);
-    assert.ok(vy < 0);
 });
 
 test('Fire mouths shoot both ways; sun embers aim down once and every shot expires', () => {

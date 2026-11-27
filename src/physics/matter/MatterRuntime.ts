@@ -13,6 +13,7 @@ export class MatterRuntime {
     readonly controls = bindTouchControls();
     readonly keys: Record<string, Phaser.Input.Keyboard.Key>;
     onJump?: () => void;
+    onAnimate?: (grounded: boolean, speed: number, direction: number) => void;
     private readonly simulation = new FixedStepSimulation();
     private readonly visuals: LabVisual[];
     private readonly chains: Phaser.GameObjects.Graphics;
@@ -77,6 +78,7 @@ export class MatterRuntime {
         });
         this.render(alpha);
         const direction = this.direction();
+        if (this.onAnimate) { this.onAnimate(grounded, body.velocity.x * 60, direction); return; }
         if (direction) this.player.setFlipX(direction < 0);
         if (grounded && Math.abs(body.velocity.x) > .5) {
             this.player.play(`matter-walk-${this.prefix}`, true);

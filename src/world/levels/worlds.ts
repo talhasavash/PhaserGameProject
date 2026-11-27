@@ -23,8 +23,10 @@ export const worldDefinitions: import('../model/contracts.js').WorldInput[] = [
     { id: 4, title: 'Ateş ve Çukur', levels: worldFourLevels, music: { src: 'assets/audio/music/world4.mpeg', volume: 0.12 },
         menu: { image: 'assets/images/scene/menu-world4.svg', color: '#49657c' } },
     { id: 5, title: "Kabe'nin Yolları", levels: worldFiveLevels, music: { src: 'assets/audio/music/world5.aac', volume: 0.12 },
+        characterSkins: {boy: 'ihram_boy', girl: 'chador_girl'},
         menu: { image: 'assets/images/scene/menu-world5.svg', color: '#18294c' } },
     {id: 6, title: 'Denge Atölyesi', levels: worldSixLevels,
+        characterSkins: {boy: 'workshop_boy', girl: 'workshop_girl'},
         music: {src: 'assets/audio/music/world6.mp3', volume: .12},
         menu: {image: 'assets/images/scene/menu-world6.svg', color: '#b9d7df'}}
 ].map(definition => defineWorld(definition));

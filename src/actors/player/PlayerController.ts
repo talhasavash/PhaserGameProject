@@ -9,6 +9,12 @@ export interface PlayerMovement {
     wasJumpHeld: boolean; wasOnGround: boolean; lastDirection: number;
     touchJump: boolean; jumpStarted: number;
 }
+// Yüz ve parıltı verileri fizik motorundan bağımsızdır; Arcade ve Matter aynı çizimi kullanır.
+export interface PlayerPresentation extends Phaser.GameObjects.Sprite {
+    character: string;
+    expression: 'normal' | 'sad' | 'happy'; expressionUntil: number; recoveryUntil: number;
+    recoveryGlow: Phaser.GameObjects.Arc; recoveryStars: Phaser.GameObjects.Star[];
+}
 export interface PlayerSprite extends Phaser.Physics.Arcade.Sprite {
     body: Phaser.Physics.Arcade.Body;
     character: string;
@@ -53,6 +59,12 @@ export function createPlayer(scene: Phaser.Scene, x: number, y: number, characte
         touchJump: false, jumpStarted: 0
     };
 
+    initializePlayerPresentation(scene, player, character);
+    return player;
+}
+
+export function initializePlayerPresentation(scene: Phaser.Scene, player: PlayerPresentation, character: string) {
+    player.character = character;
     player.expression = 'normal';
     player.expressionUntil = 0;
     player.recoveryUntil = 0;
@@ -74,22 +86,21 @@ export function createPlayer(scene: Phaser.Scene, x: number, y: number, characte
         }
     }
     // Parıltılar fizik gövdesi değildir; karakterin çevresinde görsel olarak döner.
-    player.recoveryGlow = scene.add.circle(x, y, 26, 0xffe6a0).setDepth(14).setVisible(false);
+    player.recoveryGlow = scene.add.circle(player.x, player.y, 26, 0xffe6a0).setDepth(14).setVisible(false);
     player.recoveryStars = [];
     for (let i = 0; i < 6; i++) {
-        const star = scene.add.star(x, y, 5, 3, 7, 0xffd05b).setDepth(20).setVisible(false);
+        const star = scene.add.star(player.x, player.y, 5, 3, 7, 0xffd05b).setDepth(20).setVisible(false);
         star.setStrokeStyle(1, 0xfff7cb);
         player.recoveryStars.push(star);
     }
-    return player;
 }
 
-export function currentExpression(player: PlayerSprite, time) {
+export function currentExpression(player: PlayerPresentation, time) {
     if (time < player.expressionUntil) return player.expression;
     return 'normal';
 }
 
-export function showPlayerExpression(player: PlayerSprite, expression, time, duration) {
+export function showPlayerExpression(player: PlayerPresentation, expression, time, duration) {
     player.expression = expression;
     player.expressionUntil = time + duration;
     // Geri tepme sırasında hareket güncellenmese de yüz hemen değişsin.
@@ -97,12 +108,12 @@ export function showPlayerExpression(player: PlayerSprite, expression, time, dur
     player.setTexture(`${characterPrefix(expression, player.character)}0`);
 }
 
-export function showRecovery(player: PlayerSprite, time) {
+export function showRecovery(player: PlayerPresentation, time) {
     player.recoveryUntil = time + 2200;
     showPlayerExpression(player, 'happy', time, 2200);
 }
 
-export function updatePlayerEffects(player: PlayerSprite, time) {
+export function updatePlayerEffects(player: PlayerPresentation, time) {
     const recovering = time < player.recoveryUntil;
     player.recoveryGlow.setVisible(recovering);
     player.recoveryGlow.setPosition(player.x, player.y - 5);
@@ -173,7 +184,7 @@ export function movePlayer(player: PlayerSprite, time: number, delta: number, co
     const jumpHeld = readJumpInput(player, time);
     updateHorizontalSpeed(player, direction, grounded, seconds, conveyorSpeed, grip);
     updateJump(player, time, jumpHeld);
-    updatePlayerAnimation(player, time, direction, grounded);
+    updatePlayerAnimation(player, time, direction, grounded, player.body.velocity.x);
     updatePlayerLean(player, direction, grounded, seconds);
     movement.wasJumpHeld = Boolean(jumpHeld);
     movement.wasOnGround = grounded;
@@ -242,17 +253,17 @@ function updateJump(player: PlayerSprite, time, jumpHeld) {
     }
 }
 
-function updatePlayerAnimation(player: PlayerSprite, time, direction, grounded) {
+export function updatePlayerAnimation(player: PlayerPresentation, time, direction, grounded, speed: number) {
     const expression = currentExpression(player, time);
     const prefix = characterPrefix(expression, player.character);
     if (direction !== 0) player.setFlipX(direction < 0);
     if (!grounded) {
         player.anims.stop();
         player.setTexture(`${prefix}3`);
-    } else if (Math.abs(player.body.velocity.x) > 20) {
+    } else if (Math.abs(speed) > 20) {
         player.play(`${characterPrefix('normal', player.character)}walk-${expression}`, true);
         // Adımlar, karakterin gerçek hızına göre yavaşlar veya hızlanır.
-        player.anims.timeScale = 0.6 + Math.abs(player.body.velocity.x) / WALK_SPEED * 0.8;
+        player.anims.timeScale = 0.6 + Math.abs(speed) / WALK_SPEED * 0.8;
     } else {
         player.anims.stop();
         // Her birkaç saniyede kısa bir göz kırpma; yürürken ve zıplarken uygulanmaz.

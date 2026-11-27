@@ -23,12 +23,14 @@ import {createHud, centerHud, updateHud} from '../ui/hud.js';
 import {prepareScenePage, bindSceneButtons, clearSceneButtons, showLoading, updateLoading, finishLoading, showCompletion} from '../ui/scenePage.js';
 import {createFeedback, animateCollection} from '../effects/GameEffects.js';
 import {element} from '../ui/dom.js';
+import {initializePlayerPresentation, updatePlayerAnimation, showPlayerExpression, showRecovery, updatePlayerEffects} from '../actors/player/PlayerController.js';
+import type {PlayerPresentation} from '../actors/player/PlayerController.js';
 
 export class MatterGameScene extends Phaser.Scene implements ActiveGameScene {
     levelIndex: number;
     character: string;
     level!: LevelDefinition;
-    player!: Phaser.GameObjects.Sprite;
+    player!: PlayerPresentation;
     gameState = createGameState();
     soundMuted = false;
     paused = false;
@@ -76,7 +78,10 @@ export class MatterGameScene extends Phaser.Scene implements ActiveGameScene {
         for (const platform of this.level.platforms) createPlatformArt(this, platform,
             platform.style || this.level.platformTheme || this.level.theme);
         this.runtime = new MatterRuntime(this, matterWorldForLevel(this.level), characterPrefix('normal', this.characterSkin));
-        this.player = this.runtime.player;
+        this.player = this.runtime.player as PlayerPresentation;
+        initializePlayerPresentation(this, this.player, this.characterSkin);
+        this.runtime.onAnimate = (grounded, speed, direction) =>
+            updatePlayerAnimation(this.player, this.elapsed, direction, grounded, speed);
         this.runtime.setDebug(false);
         this.runtime.onJump = () => this.sound.play('jump', {volume: .2});
         createFeedback(this);
@@ -125,6 +130,7 @@ export class MatterGameScene extends Phaser.Scene implements ActiveGameScene {
         this.sensor(fountain.x, 480, 85, 80, () => {
             if (this.paused || this.lost || this.gameState.complete || !healAtFountain(this.gameState, fountain.id)) return;
             water.setFillStyle(0xd9efda);
+            showRecovery(this.player, this.elapsed);
             this.sound.play('heal', {volume: .2});
             this.tweens.add({targets: water, alpha: .4, duration: 250, yoyo: true, repeat: 2});
             this.updateHud();
@@ -174,6 +180,8 @@ export class MatterGameScene extends Phaser.Scene implements ActiveGameScene {
         if (this.paused || this.lost || this.gameState.complete || this.elapsed < this.hurtUntil) return;
         this.hurtUntil = this.elapsed + 2000;
         this.gameState.hearts--;
+        this.player.recoveryUntil = 0;
+        showPlayerExpression(this.player, 'sad', this.elapsed, 1500);
         this.sound.play('hurt', {volume: .18});
         const body = this.runtime.world.player;
         this.runtime.library.Body.setVelocity(body, {x: body.position.x < enemy.body.position.x ? -2.5 : 2.5, y: -3});
@@ -187,6 +195,9 @@ export class MatterGameScene extends Phaser.Scene implements ActiveGameScene {
         this.lost = true;
         this.gameState.hearts = 0;
         this.runtime.setPaused(true);
+        this.player.recoveryUntil = 0;
+        this.player.recoveryGlow.setVisible(false);
+        this.player.recoveryStars.forEach(star => star.setVisible(false));
         this.player.setTexture(`${characterPrefix('sad', this.characterSkin)}0`);
         element('touch-controls').hidden = true;
         element('fall-result').hidden = false;
@@ -210,6 +221,7 @@ export class MatterGameScene extends Phaser.Scene implements ActiveGameScene {
         // Oyun kurallarını fizik çözümleyicisinin ortasında çalıştırma.
         for (const action of this.pending) action();
         this.pending.clear();
+        updatePlayerEffects(this.player, this.elapsed);
         if (this.runtime.world.player.position.y > 640) {
             this.sound.play('hurt', {volume: .23});
             this.loseAttempt();

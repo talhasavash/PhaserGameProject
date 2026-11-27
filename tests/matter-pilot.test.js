@@ -12,6 +12,7 @@ import {labMotion as workshopMotion} from '../.build/examples/matter-lab/movemen
 import {createGameState, recordFruit, takeKey} from '../.build/src/game/rules.js';
 import {EventEmitter} from 'node:events';
 import {MatterRuntime} from '../.build/src/physics/matter/MatterRuntime.js';
+import {initializePlayerPresentation, updatePlayerAnimation, showPlayerExpression, showRecovery, updatePlayerEffects} from '../.build/src/actors/player/PlayerController.js';
 
 globalThis.Phaser = {Scene: class {}};
 const {createLevelScene, levelPhysicsConfig} = await import('../.build/src/game/SceneFactory.js');
@@ -117,7 +118,8 @@ test('Shared runtime walks, jumps, pauses and releases controls using real 120Hz
     Object.assign(world, {add: bodies => Matter.Composite.add(engine.world, bodies),
         step: delta => Matter.Engine.update(engine, delta), pause() {}, resume() {}});
     const sprite = {anims: {stop() {}}, setScale() {return this;}, setDepth() {return this;},
-        setPosition() {}, setRotation() {}, setTexture() {}, setFlipX() {}, play() {}};
+        setPosition(x, y) {this.x = x; this.y = y;}, setRotation() {}, setTexture(key) {this.texture = key;},
+        setFlipX() {}, play(key) {this.animation = key;}};
     const graphics = {setDepth() {return this;}, clear() {}, lineStyle() {}, lineBetween() {}};
     const scene = {matter: {world}, add: {sprite: () => sprite, graphics: () => graphics},
         anims: {exists: () => true, pauseAll() {}, resumeAll() {}}, time: {now: 0},
@@ -145,6 +147,32 @@ test('Shared runtime walks, jumps, pauses and releases controls using real 120Hz
     runtime.setPaused(false);
     step(90);
     assert.ok(runtime.world.player.position.y > 475);
+    const effect = () => ({setDepth() {return this;}, setVisible(v) {this.visible = v; return this;},
+        setStrokeStyle() {}, setPosition(x, y) {this.x = x; this.y = y;}, setAlpha() {}});
+    scene.add.circle = scene.add.star = effect;
+    for (const skin of ['workshop_boy', 'workshop_girl']) {
+        initializePlayerPresentation(scene, runtime.player, skin);
+        runtime.onAnimate = (grounded, speed, direction) => {
+            updatePlayerAnimation(runtime.player, scene.time.now, direction, grounded, speed);
+            updatePlayerEffects(runtime.player, scene.time.now);
+        };
+        showPlayerExpression(runtime.player, 'sad', scene.time.now, 1500);
+        step(2);
+        assert.equal(sprite.texture, `${skin}-sad-0`, 'Runtime must not overwrite a sad idle face');
+        runtime.keys.RIGHT.isDown = true;
+        step(15);
+        assert.equal(sprite.animation, `${skin}-walk-sad`);
+        showRecovery(runtime.player, scene.time.now);
+        step(2);
+        assert.equal(sprite.animation, `${skin}-walk-happy`);
+        assert.equal(sprite.recoveryStars.length, 6);
+        assert.ok(sprite.recoveryStars.every(star => star.visible));
+        assert.equal(sprite.recoveryGlow.x, sprite.x);
+        runtime.keys.RIGHT.isDown = false;
+        step(150);
+        assert.ok(sprite.recoveryStars.every(star => !star.visible));
+        assert.ok([`${skin}-0`, `${skin}-blink`].includes(sprite.texture));
+    }
     runtime.destroy();
 });
 
@@ -218,6 +246,7 @@ test('Matter fountains use non-blocking sensors, heal only once and preserve ful
     Object.assign(scene, {runtime: {library: Matter},
         matter: {world: {add: body => Matter.Composite.add(engine.world, body)}},
         add: {graphics: () => graphics, rectangle: shape, ellipse: shape},
+        player: {character: 'boy', anims: {stop() {}}, setTexture(key) {this.texture = key;}},
         tweens: {add() {}}, sound: {play: key => sounds.push(key)}, updateHud() {hudUpdates++;}});
     scene.createHealingSpot({id: 'spring', x: 500});
     const [body, heal] = [...scene.sensors.entries()][0];
@@ -230,6 +259,8 @@ test('Matter fountains use non-blocking sensors, heal only once and preserve ful
     assert.equal(scene.gameState.hearts, 2);
     heal(); heal();
     assert.equal(scene.gameState.hearts, 3);
+    assert.equal(scene.player.texture, 'child-happy-0');
+    assert.equal(scene.player.recoveryUntil, scene.elapsed + 2200);
     scene.gameState.hearts = 2; heal();
     assert.equal(scene.gameState.hearts, 2);
     assert.deepEqual(sounds, ['heal']);

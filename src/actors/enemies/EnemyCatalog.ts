@@ -37,12 +37,8 @@ registerEnemyBehavior('overhead', { update(scene, enemy, patrol, delta, options 
     const target = Math.max(minX, Math.min(maxX, scene.player.x + distance));
     const difference = target - enemy.x;
     enemy.setVelocityX(Math.abs(difference) < 8 ? 0 : Math.sign(difference) * Math.min(speed, Math.abs(difference) * 2));
-    const visibleY = (scene.cameras?.main.scrollY ?? 0) + (enemy.displayHeight ?? 0) / 2 + 12;
-    const compact = scene.scale?.height <= 480;
-    // Dar ekranda gökyüzünü görünür tutarken zıplayan çocuğun üstündeki yolu aç.
-    const ceiling = compact && Number.isFinite(scene.player.y) ? scene.player.y - 120 : Infinity;
-    const targetY = Math.min(Math.max(patrol.baseY, visibleY), ceiling);
-    enemy.setVelocityY((targetY - enemy.y) * (compact ? 8 : 4));
+    // Yükseklik bölümdeki y değeridir; oyuncunun zıplaması veya kamera onu değiştirmez.
+    enemy.setVelocityY((patrol.baseY - enemy.y) * 4);
 } });
 
 registerEnemyBehavior('face-player', {update(scene, enemy, patrol) {

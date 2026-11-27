@@ -75,7 +75,7 @@ test('Completion waits for Continue, restarts within a world and opens the next 
             time: { delayedCall(ms, callback) { assert.equal(ms, 1200); scheduled++; delayed = callback; } },
             tweens: { pauseAll() {}, resumeAll() {} }, announce() {}, updateHud() {},
             showLevelResult() { GameScene.prototype.showLevelResult.call(this); },
-            scene: { restart(data) { calls.push(data); } }, restart() { calls.push('replay'); },
+            scene: { restart(data) { calls.push(data); }, start(key, data) { calls.push({ending: key, ...data}); } }, restart() { calls.push('replay'); },
             game: { events: { emit(name, data) {
                 if (name === 'level-change') calls.push(data);
                 else { assert.equal(name, 'world-complete'); calls.push({ worldMenu: data }); }
@@ -92,6 +92,13 @@ test('Completion waits for Continue, restarts within a world and opens the next 
         GameScene.prototype.continueAfterResult.call(scene);
         assert.deepEqual(calls, [], 'No transition before result');
         delayed();
+        if (worldForLevel(index).id === 5 && index === worldForLevel(index).start + worldForLevel(index).count - 1) {
+            assert.deepEqual(calls, [{ending: 'PilgrimageEnding', nextLevelIndex: index + 1}]);
+            assert.equal(elements.get('game-result').hidden, true);
+            scene.showLevelResult();
+            assert.equal(calls.length, 1, 'Ending starts once after the completion sparkle');
+            continue;
+        }
         assert.ok(elements.get('result-verse').textContent.length > 10);
         assert.equal(elements.get('game-result').hidden, false);
         scene.showLevelResult();

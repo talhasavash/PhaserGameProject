@@ -14,6 +14,7 @@ import { backgroundMusic, bindMusicLifecycle } from './audio/music.js';
 import { menuMusic } from './data/music.js';
 import { bindMusicButtons } from './ui/musicButton.js';
 import { bindWelcomeMenu } from './ui/welcome.js';
+import {PilgrimageEndingScene} from './game/PilgrimageEndingScene.js';
 
 // Önce HTML formundan karakter seçilir; ardından Phaser başlatılır.
 // "import", başka bir dosyanın dışarı açtığı (export) kodu kullanmamızı sağlar.
@@ -88,7 +89,7 @@ function startGame(character, levelIndex, score = 0) {
         backgroundColor: '#183c36',
         scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
         physics: levelPhysicsConfig(levelIndex),
-        scene: createLevelScene(character, levelIndex, score),
+        scene: [createLevelScene(character, levelIndex, score), PilgrimageEndingScene],
         title: 'Meyve Oyunu 2026',
         render: { antialias: true, roundPixels: true }
     });

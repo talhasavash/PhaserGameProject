@@ -5,6 +5,11 @@ import {levels, worlds} from '../world/levels/level.js';
 import {matterPilot} from '../world/levels/matterPilot.js';
 
 export const GAME_SCENE_KEY = 'Garden';
+export const PILGRIMAGE_ENDING_SCENE_KEY = 'PilgrimageEnding';
+export function hasPilgrimageEnding(levelIndex: number): boolean {
+    const world = worlds.find(world => world.id === 5);
+    return Boolean(world && levelIndex === world.start + world.count - 1);
+}
 export interface GameSessionData {levelIndex: number; score?: number; character: string}
 export interface ActiveGameScene extends Phaser.Scene {
     levelIndex: number; character: string; level: LevelDefinition;

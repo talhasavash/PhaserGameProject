@@ -18,7 +18,7 @@ import { element } from '../ui/dom.js';
 import type { PlayerSprite } from '../actors/player/PlayerController.js';
 import type { Point, LevelDefinition } from '../world/model/contracts.js';
 import { LevelRuntime, resetLevelEnemies } from './LevelRuntime.js';
-import {GAME_SCENE_KEY, restartOrChangeLevel} from './sceneRouting.js';
+import {GAME_SCENE_KEY, restartOrChangeLevel, hasPilgrimageEnding, PILGRIMAGE_ENDING_SCENE_KEY} from './sceneRouting.js';
 import type {ActiveGameScene} from './sceneRouting.js';
 import {tryStompEnemy} from '../actors/enemies/EnemyController.js';
 
@@ -303,6 +303,10 @@ export class GameScene extends Phaser.Scene implements ActiveGameScene {
     showLevelResult() {
         if (this.resultShown) return;
         this.resultShown = true;
+        if (hasPilgrimageEnding(this.levelIndex)) {
+            this.scene.start(PILGRIMAGE_ENDING_SCENE_KEY, {nextLevelIndex: this.levelIndex + 1});
+            return;
+        }
         this.tweens.pauseAll();
         const title = showCompletion(this.levelIndex);
         this.sound.play('level-complete', { volume: 0.22 });

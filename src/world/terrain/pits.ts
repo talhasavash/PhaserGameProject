@@ -11,6 +11,17 @@ export function createPitArt(scene, gap: Gap) {
     const key = `pit-${theme}-${gap.width}-${height}${gap.style ? '-styled' : ''}`;
     const width = gap.width + 24;
     cacheTexture(scene, key, width, height, g => {
+        if (theme === 'magma') {
+            // Lav denizi yüzeye kadar görünür; üzerinde görünmez bir fizik zemini yoktur.
+            g.fillStyle(0xa53636); g.fillRect(12, 8, gap.width, height - 8);
+            g.fillStyle(0xf57736); g.fillRect(12, 18, gap.width, height - 18);
+            g.fillStyle(0xffbf54); g.fillRect(12, 13, gap.width, 9);
+            for (let x = 22; x < width - 20; x += 55) {
+                g.fillStyle(0xffd475); g.fillEllipse(x, 25 + x % 23, 27, 6);
+                g.fillStyle(0xbd4432); g.fillEllipse(x + 15, 54 + x % 13, 18, 9);
+            }
+            return;
+        }
         // Açıklık fizik boşluğuyla aynı yerde başlar; yatay şerit veya basamak çizilmez.
         g.fillStyle(theme === 'river' ? 0x244b60 : 0x293c48);
         g.fillRect(12, 8, gap.width, height - 8);

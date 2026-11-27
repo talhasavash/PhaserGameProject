@@ -31,6 +31,21 @@ registerEnemyBehavior('chase', { update(scene, enemy, patrol, delta, options = {
     enemy.setVelocityX(moving ? direction * speed : 0);
 } });
 
+// Havada sabit yükseklikte takip eder; oyuncunun üstüne ışınlanmaz ve güvenli alanlara girmez.
+registerEnemyBehavior('overhead', { update(scene, enemy, patrol, delta, options = {}) {
+    const {speed = 80, minX = patrol.minX, maxX = patrol.maxX, distance = 80} = options;
+    const target = Math.max(minX, Math.min(maxX, scene.player.x + distance));
+    const difference = target - enemy.x;
+    enemy.setVelocityX(Math.abs(difference) < 8 ? 0 : Math.sign(difference) * Math.min(speed, Math.abs(difference) * 2));
+    const visibleY = (scene.cameras?.main.scrollY ?? 0) + (enemy.displayHeight ?? 0) / 2 + 12;
+    enemy.setVelocityY((Math.max(patrol.baseY, visibleY) - enemy.y) * 4);
+} });
+
+registerEnemyBehavior('face-player', {update(scene, enemy, patrol) {
+    patrol.direction = scene.player.x < enemy.x ? -1 : 1;
+    enemy.setFlipX(patrol.direction < 0);
+}});
+
 // Factory: düşman türünün görselini, fizik gövdesini ve ilk kurulumunu tek kayıtta tanımlar.
 
 export const enemyTypes: Map<string, EnemyType> = new Map();
@@ -59,6 +74,11 @@ for (const name of rollingEnemies) registerEnemyType(name, {
     groundOffset: 22
 });
 const specialEnemies = {
+    'ember-bat': {asset: {width: 88, height: 64}, body: {width: 48, height: 30, x: 20, y: 17}},
+    'basalt-crab': {asset: {width: 88, height: 64}, groundOffset: 30, body: {width: 60, height: 35, x: 14, y: 23}},
+    'fire-salamander': {asset: {width: 100, height: 64}, groundOffset: 30, body: {width: 68, height: 34, x: 16, y: 24}},
+    'magma-drake': {asset: {width: 140, height: 120}, groundOffset: 54, body: {width: 85, height: 78, x: 28, y: 30}},
+    'cinder-sun': {asset: {width: 112, height: 112}, body: {width: 70, height: 70, x: 21, y: 21}, groundOffset: 56},
     'snow-hare': {
         asset: {width: 80, height: 64}, groundOffset: 30,
         body: {width: 49, height: 37, x: 15, y: 22}

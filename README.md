@@ -47,23 +47,34 @@ Mola menüsündeki yenileme veya `R`, nesneleri ve toplananları bölüm başın
 Pilot kaydedilmiş bölüm ilerlemesini değiştirmez.
 
 Pilot `src/world/levels/matterPilot.ts` içinde `physics: 'matter', draft: true` olarak
-46. yuvaya bağlıdır. Normal menüde kilitlidir; yerel önizleme düğmesi canlı alan adında
-oluşturulmaz. İlk 45 bölümün numaraları ve Arcade ayarları korunur.
+korunur. Normal bölüm listesinde yer kaplamaz. Yalnızca yerelde `?pilot=matter`
+oturumunda 46'nın yerine konur; canlı alanda bu değişiklik uygulanmaz.
+İlk 45 bölümün numaraları ve Arcade ayarları korunur.
 `src/game/SceneFactory.ts` motoru seçer: Arcade için `GameScene`, Matter için
 `MatterGameScene` açılır. Ortak `sceneRouting.ts` sözleşmesi mola/yenileme ve motor
 değişimlerinde karakter/puan aktarımını sağlar. İki motor aynı bölümde karıştırılmaz.
 
 Matter sahnesi ortak arka plan, platform, meyve/yıldız, anahtar, cami,
-HUD, sonuç ekranı ve yavaş, silahsız devriye düşmanlarını destekler. Silahlar, buz kayganlığı,
+HUD, sonuç ekranı, bir can yenileyen abdest çeşmeleri ve yavaş, silahsız devriye düşmanlarını destekler. Silahlar, buz kayganlığı,
 kolonlar ve özel Arcade senaryoları henüz Matter'a taşınmadı; bu alanlar eklenirse bölüm
 doğrulaması açık bir hata verir. Mevcut bölümler bu sınırlamadan etkilenmez.
+
+## Dünya 4: Ateş ve Çukur
+
+`src/world/levels/world4.ts`, 46–60 arasındaki 15 bölümü tanımlar. 49/54/57 Matter
+bulmacalarıdır; 50/53/58'de iki güvenli kıyı arasındaki tüm zemin lavdır ve yalnızca
+platformlara basılabilir. Diğer parkurlarda ateş canlıları, kolonlar, seyrek ateş
+yağmuru ve yukarıdan takip eden kor güneşi bulunur. Son bölüm zıplayan lav ejderiyle biter.
+Arka plan parçaları `world4Scenery.ts`, yeni SVG'ler `assets/images/enemy/` altındadır.
+`overhead`/`face-player` davranışları ve `flame-orb`/`sun-ember` silahları kayıtlı
+bileşenlerdir; başka bölümlerde de kullanılabilir. Bölüm kilitleri normal sırayla açılır.
 
 ## Dünya 6: Denge Atölyesi
 
 Menüde altıncı dünyayı seç. 76–90 numaralı 15 bölüm Matter kullanır. 76. bölüm,
-75 tamamlanınca açılır; diğerleri de sırayla açılır. Henüz hazırlanmayan 4. ve 5.
-dünyalar tamamlanmadan bu dünya oynanamaz. Ortak `meyve-oyunu-unlocked-levels`
-kaydı kullanılır. Eski ayrı dünya kaydı bu kilidi atlatmaz; pilot 46. yuvada kapalı kalır.
+75 tamamlanınca açılır; diğerleri de sırayla açılır. Henüz hazırlanmayan 5. dünya
+tamamlanmadan bu dünya oynanamaz. Ortak `meyve-oyunu-unlocked-levels`
+kaydı kullanılır. Eski ayrı dünya kaydı bu kilidi atlatmaz; pilot canlıda kapalı kalır.
 
 `src/world/levels/world6.ts` her bölümün üç fizik düzeneğini, renklerini ve camisini
 belirler. `src/world/model/physicsPuzzles.ts` içindeki tipli Factory ile sandık,

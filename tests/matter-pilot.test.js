@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import Matter from '../node_modules/phaser/src/physics/matter-js/CustomMain.js';
 import {levels, isPlayableLevel, worldForLevel} from '../.build/src/world/levels/level.js';
-import {physicsForLevel, restartOrChangeLevel, isLocalMatterPreview} from '../.build/src/game/sceneRouting.js';
+import {physicsForLevel, restartOrChangeLevel, isLocalMatterPreview, installLocalMatterPilot} from '../.build/src/game/sceneRouting.js';
 import {matterWorldForLevel, validateMatterLevel} from '../.build/src/physics/matter/levelWorld.js';
 import {createLabWorld} from '../.build/src/physics/matter/MatterObjects.js';
 import {labMotion} from '../.build/src/physics/matter/movement.js';
@@ -17,10 +17,11 @@ globalThis.Phaser = {Scene: class {}};
 const {createLevelScene, levelPhysicsConfig} = await import('../.build/src/game/SceneFactory.js');
 const {GameScene} = await import('../.build/src/game/GameScene.js');
 const {MatterGameScene} = await import('../.build/src/game/MatterGameScene.js');
-const pilotIndex = levels.findIndex(level => level?.id === 'matter-pilot');
+assert.equal(installLocalMatterPilot({hostname: 'talhasavash.github.io', search: '?pilot=matter'}), undefined);
+const pilotIndex = installLocalMatterPilot({hostname: 'localhost', search: '?pilot=matter'});
 const pilot = levels[pilotIndex];
 
-test('Existing 45 chapters retain Arcade; private pilot is slot 46 and cannot unlock through progress', () => {
+test('Existing 45 chapters retain Arcade; only an explicit local session substitutes the private pilot', () => {
     assert.equal(pilotIndex, 45);
     assert.equal(worldForLevel(pilotIndex).id, 4);
     assert.ok(levels.slice(0, 45).every(level => physicsForLevel(level) === 'arcade'));
@@ -205,4 +206,34 @@ test('Matter collectible sensors deactivate immediately and three distinct stars
     assert.equal(scene.sensors.size, 0);
     assert.equal(opened, 1);
     assert.deepEqual(sounds, ['collect', 'collect', 'collect', 'key']);
+});
+
+test('Matter fountains use non-blocking sensors, heal only once and preserve full-heart uses until needed', () => {
+    const scene = new MatterGameScene('boy', pilotIndex);
+    scene.init();
+    const engine = Matter.Engine.create(), sounds = [];
+    let hudUpdates = 0;
+    const shape = () => ({setDepth() {return this;}, setFillStyle() {return this;}});
+    const graphics = new Proxy({}, {get: () => () => graphics});
+    Object.assign(scene, {runtime: {library: Matter},
+        matter: {world: {add: body => Matter.Composite.add(engine.world, body)}},
+        add: {graphics: () => graphics, rectangle: shape, ellipse: shape},
+        tweens: {add() {}}, sound: {play: key => sounds.push(key)}, updateHud() {hudUpdates++;}});
+    scene.createHealingSpot({id: 'spring', x: 500});
+    const [body, heal] = [...scene.sensors.entries()][0];
+    assert.ok(body.isSensor && body.isStatic);
+    assert.equal(body.position.x, 500);
+    heal();
+    assert.deepEqual(scene.gameState.usedFountains, []);
+    scene.gameState.hearts = 2;
+    scene.paused = true; heal(); scene.paused = false;
+    assert.equal(scene.gameState.hearts, 2);
+    heal(); heal();
+    assert.equal(scene.gameState.hearts, 3);
+    scene.gameState.hearts = 2; heal();
+    assert.equal(scene.gameState.hearts, 2);
+    assert.deepEqual(sounds, ['heal']);
+    assert.equal(hudUpdates, 1);
+    scene.init();
+    assert.deepEqual(scene.gameState.usedFountains, [], 'Restart restores the fountain use');
 });

@@ -8,7 +8,7 @@ import {createBridgeMechanisms} from '../physics/matter/BridgeMechanisms.js';
 import type {BridgeMechanisms} from '../physics/matter/BridgeMechanisms.js';
 import {matterWorldForLevel} from '../physics/matter/levelWorld.js';
 import type {MatterContact} from '../physics/matter/MatterObjects.js';
-import {createGameState, recordFruit, isKeyReady, takeKey, finishLevel} from './rules.js';
+import {createGameState, recordFruit, isKeyReady, takeKey, finishLevel, healAtFountain} from './rules.js';
 import {GAME_SCENE_KEY, restartOrChangeLevel} from './sceneRouting.js';
 import type {ActiveGameScene} from './sceneRouting.js';
 import {loadGameAssets} from '../data/assets.js';
@@ -16,7 +16,7 @@ import {selectCharacterSkin, characterPrefix} from '../data/characters.js';
 import {backgroundMusic} from '../audio/music.js';
 import {unlockWorldNext} from '../data/progress.js';
 import {drawMatterTerrain} from '../physics/matter/terrainArt.js';
-import {createScenery, createMosque} from '../world/scenery/background.js';
+import {createScenery, createMosque, createFountain} from '../world/scenery/background.js';
 import {createPlatformArt} from '../world/terrain/platforms.js';
 import {createPitArt} from '../world/terrain/pits.js';
 import {createHud, centerHud, updateHud} from '../ui/hud.js';
@@ -84,6 +84,7 @@ export class MatterGameScene extends Phaser.Scene implements ActiveGameScene {
             enemy => this.hitEnemy(enemy), this.level.groundY);
         this.mechanisms = createBridgeMechanisms(this, this.runtime.library, this.runtime.world, this.level.mechanisms ?? []);
         for (const item of this.level.fruits) this.createItem(item);
+        for (const fountain of this.level.fountains) this.createHealingSpot(fountain);
         this.keySprite = this.add.image(this.level.key.x, this.level.key.y, 'key').setScale(.75).setDepth(10).setVisible(false);
         this.door = createMosque(this, this.level.exit.x, this.level.theme, this.level.mosqueStyle);
         this.sensor(this.level.exit.x, this.level.exit.y, 70, 100, () => this.reachExit());
@@ -118,6 +119,16 @@ export class MatterGameScene extends Phaser.Scene implements ActiveGameScene {
     private removeSensor(body: MatterJS.BodyType) {
         this.sensors.delete(body);
         this.matter.world.remove(body);
+    }
+    private createHealingSpot(fountain: LevelDefinition['fountains'][number]) {
+        const water = createFountain(this, fountain.x);
+        this.sensor(fountain.x, 480, 85, 80, () => {
+            if (this.paused || this.lost || this.gameState.complete || !healAtFountain(this.gameState, fountain.id)) return;
+            water.setFillStyle(0xd9efda);
+            this.sound.play('heal', {volume: .2});
+            this.tweens.add({targets: water, alpha: .4, duration: 250, yoyo: true, repeat: 2});
+            this.updateHud();
+        });
     }
     private createItem(item: Collectible) {
         const sprite = this.add.image(item.x, item.y, item.type).setScale(.75).setDepth(10);

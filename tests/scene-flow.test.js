@@ -76,7 +76,10 @@ test('Completion waits for Continue, restarts within a world and opens the next 
             tweens: { pauseAll() {}, resumeAll() {} }, announce() {}, updateHud() {},
             showLevelResult() { GameScene.prototype.showLevelResult.call(this); },
             scene: { restart(data) { calls.push(data); } }, restart() { calls.push('replay'); },
-            game: { events: { emit(name, levelIndex) { assert.equal(name, 'world-complete'); calls.push({ worldMenu: levelIndex }); } } }
+            game: { events: { emit(name, data) {
+                if (name === 'level-change') calls.push(data);
+                else { assert.equal(name, 'world-complete'); calls.push({ worldMenu: data }); }
+            } } }
         };
         GameScene.prototype.reachExit.call(scene);
         GameScene.prototype.reachExit.call(scene);
@@ -102,7 +105,9 @@ test('Completion waits for Continue, restarts within a world and opens the next 
         GameScene.prototype.continueAfterResult.call(scene);
         const nextWorld = worldForLevel(index + 1);
         const worldFinished = nextWorld && nextWorld.id !== worldForLevel(index).id;
-        assert.deepEqual(calls, worldFinished ? [{ worldMenu: nextWorld.start }] : final ? ['menu'] : [{ levelIndex: index + 1, score: 120 }]);
+        const transition = {levelIndex: index + 1, score: 120,
+            ...(levels[index + 1]?.physics === 'matter' ? {character: scene.character} : {})};
+        assert.deepEqual(calls, worldFinished ? [{ worldMenu: nextWorld.start }] : final ? ['menu'] : [transition]);
     }
 });
 test('Respawn restores hearts and the original weapon while preserving collected fruit and key', () => {

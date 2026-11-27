@@ -2,7 +2,7 @@
 
 import { element } from './ui/dom.js';
 import './extensions.js';
-import {GAME_SCENE_KEY, isLocalMatterPreview} from './game/sceneRouting.js';
+import {GAME_SCENE_KEY, isLocalMatterPreview, installLocalMatterPilot} from './game/sceneRouting.js';
 import type {ActiveGameScene, GameSessionData} from './game/sceneRouting.js';
 import {createLevelScene, levelPhysicsConfig} from './game/SceneFactory.js';
 import { gameView, setupPwa, enterGameDisplay, releaseGameOrientation, bindDisplayRecovery, bindButtonFeedback } from './ui/browser.js';
@@ -184,8 +184,8 @@ document.addEventListener('keydown', event => {
 bindWelcomeMenu({ enterDisplay: enterGameDisplay, showLoading, hideLoading });
 
 // Yerel önizleme dışında draft bölümler, kayıt değeri ne olursa olsun kapalı kalır.
-const pilotIndex = levels.findIndex(level => level?.id === 'matter-pilot');
-if (pilotIndex >= 0 && isLocalMatterPreview(window.location, levels[pilotIndex])) {
+const pilotIndex = installLocalMatterPilot(window.location);
+if (pilotIndex !== undefined) {
     const preview = document.createElement('button');
     preview.type = 'button';
     preview.textContent = 'Matter pilotunu dene';

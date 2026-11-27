@@ -25,6 +25,9 @@ export const platformThemes = {
     festival: { body: 0x9d78a5, edge: 0xe6c879, detail: 0xf9e6b0 },
     boss: { body: 0x59677f, edge: 0xc7ad70, detail: 0x93a4b4 },
     lava: { body: 0x564252, edge: 0xf5ac67, detail: 0xbf6c59 },
+    magma: { body: 0x453344, edge: 0xffbd60, detail: 0xf47c47 },
+    basalt: { body: 0x343746, edge: 0xb8acaa, detail: 0x737789 },
+    furnace: { body: 0x69484a, edge: 0xe8b265, detail: 0xf18a51 },
     factory: { body: 0x52717f, edge: 0xe2c374, detail: 0xa9c4c7 },
     castle: { body: 0x67627f, edge: 0xb5a8d0, detail: 0x3f3d59 },
     abyss: { body: 0x726a60, edge: 0xe0c99d, detail: 0x4f5960 }
@@ -138,10 +141,17 @@ function drawStep(g, width, theme) {
         g.fillStyle(p.edge); g.fillRoundedRect(x, 0, width, 6, 3); g.fillRect(x + 6, 22, width - 12, 3);
         g.fillStyle(p.detail);
         for (let xx = x + 14; xx < end - 6; xx += 24) { g.fillCircle(xx, 14, 3); g.fillRect(xx - 1, 27, 2, 5); }
-    } else if (theme === 'lava') {
+    } else if (theme === 'lava' || theme === 'magma') {
         g.fillPoints([{ x, y: 0 }, { x: end, y: 0 }, { x: end - 14, y: 25 }, { x: x + 9, y: 30 }], true);
         g.fillStyle(p.edge); g.fillRect(x, 0, width, 5);
         g.lineStyle(2, p.detail); g.lineBetween(x + width / 2, 5, x + width / 2 - 8, 24);
+    } else if (theme === 'furnace') {
+        g.fillRoundedRect(x, 0, width, 26, 3);
+        g.fillStyle(p.edge); g.fillRect(x, 0, width, 5);
+        for (let xx = x + 10; xx < end - 8; xx += 26) {
+            g.fillStyle(p.detail); g.fillRect(xx, 10, 14, 8);
+            g.fillStyle(0xffd98d); g.fillRect(xx + 3, 12, 8, 3);
+        }
     } else if (theme === 'factory') {
         g.fillRect(x, 0, width, 24);
         g.lineStyle(2, p.detail); g.strokeRect(x + 4, 5, width - 8, 15);

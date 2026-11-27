@@ -1,7 +1,7 @@
 // Seçilen arka plan parçalarını Phaser ile kurar; aynı şeklin çizim dokusunu tekrar kullanır.
 import { cacheTexture } from '../../graphics/texture.js';
 
-export type BackgroundPartType = 'sun' | 'moon' | 'cloud' | 'hill' | 'mountain' | 'tree' | 'pine' | 'circle' | 'triangle';
+export type BackgroundPartType = 'sun' | 'moon' | 'cloud' | 'hill' | 'mountain' | 'tree' | 'pine' | 'circle' | 'triangle' | 'volcano' | 'basalt' | 'arch';
 
 export interface BackgroundPart {
     type: BackgroundPartType;
@@ -34,6 +34,32 @@ interface PartFactory extends PartStyle {
 
 // Factory: yeni bir hazır şekil bu listeye eklenir; bölümün çizim kodunu bilmesi gerekmez.
 const factories: Record<BackgroundPartType, PartFactory> = {
+    volcano: {width: 500, height: 320, color: 0x513544, detailColor: 0xff9b45, depth: -70, scrollFactor: .2,
+        draw(g, p) {
+            g.fillStyle(p.color);
+            g.fillTriangle(0, p.height, p.width * .39, 35, p.width * .61, 35);
+            g.fillTriangle(0, p.height, p.width * .61, 35, p.width, p.height);
+            g.fillStyle(p.detailColor); g.fillEllipse(p.width / 2, 35, p.width * .24, 20);
+            g.fillTriangle(p.width * .48, 36, p.width * .57, 36, p.width * .6, p.height * .6);
+            g.fillTriangle(p.width * .55, p.height * .45, p.width * .72, p.height, p.width * .62, p.height);
+            g.fillStyle(0xffe4a0); g.fillEllipse(p.width * .49, 32, p.width * .12, 7);
+        }},
+    basalt: {width: 160, height: 300, color: 0x392f43, detailColor: 0xbb6447, depth: -40, scrollFactor: .65,
+        draw(g, p) {
+            for (let i = 0; i < 4; i++) {
+                const x = i * p.width / 4, top = (i % 3) * p.height * .15;
+                g.fillStyle(p.color); g.fillRect(x, top, p.width / 4 - 3, p.height - top);
+                g.fillStyle(p.detailColor, .5); g.fillRect(x + 3, top + 8, 3, p.height - top - 8);
+            }
+        }},
+    arch: {width: 300, height: 300, color: 0x4c3540, detailColor: 0xa16a50, depth: -50, scrollFactor: .5,
+        draw(g, p) {
+            g.lineStyle(p.width * .16, p.color); g.strokeEllipse(p.width / 2, p.height * .38, p.width * .8, p.height * .6);
+            g.fillStyle(p.color); g.fillRect(p.width * .02, p.height * .35, p.width * .17, p.height * .65);
+            g.fillRect(p.width * .81, p.height * .35, p.width * .17, p.height * .65);
+            g.fillStyle(p.detailColor); g.fillRect(0, p.height * .38, p.width * .21, 10);
+            g.fillRect(p.width * .79, p.height * .38, p.width * .21, 10);
+        }},
     sun: { width: 100, height: 100, color: 0xffdf87, detailColor: 0xfff3b5, depth: -90, scrollFactor: 0.08,
         draw(g, p) {
             g.fillStyle(p.color, 0.18); g.fillEllipse(p.width / 2, p.height / 2, p.width, p.height);

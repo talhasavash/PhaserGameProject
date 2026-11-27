@@ -105,12 +105,14 @@ test('Fire is sparse: one reusable ball per level and at least eight seconds bet
     }
 });
 
-test('Arcade pits have safe respawn areas, clear approaches and widths within a running jump', () => {
+test('Arcade pits have safe respawns and either running-jump widths or authored stepping platforms', () => {
     const jumpRange = 265 * (2 * 590 / 1600);
     for (const level of levels.filter(level => level && level.physics !== 'matter')) {
         let end = 0;
         for (const gap of level.gaps || []) {
-            assert.ok(gap.width >= 80 && gap.width + 30 < jumpRange);
+            assert.ok(gap.width >= 80);
+            assert.ok(gap.width + 30 < jumpRange || level.platforms.some(p =>
+                p.x < gap.x + gap.width && p.x + p.width > gap.x), `${level.name}: wide pit needs a platform route`);
             assert.ok(gap.x - end >= 150);
             assert.ok(gap.x + gap.width < level.key.x);
             for (const point of [level.spawn, level.checkpoint, ...level.fountains.map(f => ({ x: f.x }))]) {

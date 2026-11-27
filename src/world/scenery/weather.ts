@@ -58,7 +58,26 @@ function createSnow(scene, { intensity = 1, wind = 0 } = {}) {
     return snow;
 }
 
-const builtInWeather = { snow: { create: createSnow } } satisfies Record<string, WeatherType>;
+function createEmbers(scene) {
+    cacheTexture(scene, 'floating-ember', 12, 12, g => {
+        g.fillStyle(0xff9c42, .3); g.fillCircle(6, 6, 5);
+        g.fillStyle(0xffd580); g.fillCircle(6, 6, 2);
+    });
+    const config = {x: {min: 0, max: scene.scale.width}, y: scene.scale.height + 8,
+        speedX: {min: -18, max: 10}, speedY: {min: -90, max: -45}, lifespan: 4300,
+        scale: {start: .65, end: .2}, alpha: {start: .65, end: 0}, frequency: 180, maxAliveParticles: 28};
+    const emitter = scene.add.particles(0, 0, 'floating-ember', config).setScrollFactor(0).setDepth(1);
+    const resize = () => {config.x.max = scene.scale.width; config.y = scene.scale.height + 8; emitter.setConfig(config);};
+    const cleanup = () => {
+        scene.scale.off('resize', resize);
+        scene.events.off('shutdown', cleanup); scene.events.off('destroy', cleanup);
+    };
+    scene.scale.on('resize', resize);
+    scene.events.once('shutdown', cleanup); scene.events.once('destroy', cleanup);
+    return emitter;
+}
+
+const builtInWeather = {snow: {create: createSnow}, embers: {create: createEmbers}} satisfies Record<string, WeatherType>;
 
 export type BuiltInWeatherName = keyof typeof builtInWeather;
 for (const [name, definition] of Object.entries(builtInWeather)) registerWeather(name, definition);

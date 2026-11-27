@@ -6,14 +6,14 @@ import { iceExpeditionLevels } from '../.build/src/world/levels/world3Expedition
 import { resolveWeapon } from '../.build/src/actors/enemies/WeaponCatalog.js';
 import { bossLift } from '../.build/src/actors/enemies/EnemyController.js';
 
-test('Chapters 36–45 fill World 3, keep sequential locks and leave World 4 unimplemented', () => {
+test('Chapters 36–45 fill World 3, keep sequential locks and lead to the fire world', () => {
     assert.deepEqual(levels.slice(35, 45), iceExpeditionLevels);
     assert.equal(worlds[2].levels.length, 15);
     for (let index = 35; index < 45; index++) {
         assert.ok(isPlayableLevel(index));
         assert.equal(worldForLevel(index).id, 3);
     }
-    assert.equal(isPlayableLevel(45), false);
+    assert.equal(isPlayableLevel(45), true);
     assert.equal(worldForLevel(45).id, 4);
 });
 

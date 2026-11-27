@@ -41,8 +41,8 @@ test('World 6 publishes 15 different Matter chapters while the local pilot stays
     assert.deepEqual(levels.slice(75), worldSixLevels);
     assert.equal(new Set(worldSixLevels.map(level => level.id)).size, 15);
     assert.equal(new Set(worldSixLevels.map(level => JSON.stringify([level.props, level.gaps, level.platforms]))).size, 15);
-    assert.equal(isPlayableLevel(45), false);
-    assert.equal(levels[45].id, 'matter-pilot');
+    assert.equal(isPlayableLevel(45), true);
+    assert.ok(!levels.some(level => level?.id === 'matter-pilot'), 'The private pilot occupies no public chapter');
     for (const [i, level] of worldSixLevels.entries()) {
         assert.equal(worldForLevel(75 + i).id, 6);
         assert.equal(isPlayableLevel(75 + i), true);

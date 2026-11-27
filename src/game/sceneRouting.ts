@@ -1,7 +1,8 @@
 // Sahne sözleşmesi ve motor seçimi; aynı motor yeniden başlar, motor değişimi ana başlatıcıya bildirilir.
 import type {LevelDefinition} from '../world/model/contracts.js';
 import type {GameState} from './rules.js';
-import {levels} from '../world/levels/level.js';
+import {levels, worlds} from '../world/levels/level.js';
+import {matterPilot} from '../world/levels/matterPilot.js';
 
 export const GAME_SCENE_KEY = 'Garden';
 export interface GameSessionData {levelIndex: number; score?: number; character: string}
@@ -24,4 +25,12 @@ export function restartOrChangeLevel(scene: ActiveGameScene, data: {levelIndex: 
 export function isLocalMatterPreview(location: {hostname: string; search: string}, level: LevelDefinition): boolean {
     return ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname) &&
         new URLSearchParams(location.search).get('pilot') === 'matter' && level.draft === true && level.physics === 'matter';
+}
+
+// Eski pilot menü yuvası kaplamaz; yalnızca açıkça istenen yerel oturumda 46'nın yerine kurulur.
+export function installLocalMatterPilot(location: {hostname: string; search: string}): number | undefined {
+    if (!isLocalMatterPreview(location, matterPilot)) return;
+    const index = worlds.find(world => world.id === 4)!.start;
+    levels[index] = matterPilot;
+    return index;
 }

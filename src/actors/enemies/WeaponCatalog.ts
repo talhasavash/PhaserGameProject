@@ -69,6 +69,29 @@ function aimedLaunch(scene, enemy, config, index) {
 }
 
 const builtInWeapons = {
+    'flame-orb': {
+        texture: 'flame-orb', scale: .75, radius: 12, offset: 10, warningTint: 0xffbf65,
+        defaults: {period: 3200, speed: 205, range: 580},
+        prepare: createFlameOrb,
+        launch(scene, enemy, config, index) {
+            const shot = aimedLaunch(scene, enemy, config, index);
+            // Çenenin ucundan çıkar; farklı boydaki ateş canlıları aynı silahı kullanabilir.
+            return {...shot, x: enemy.x + shot.direction * enemy.displayWidth * .34,
+                y: enemy.y + enemy.displayHeight * .08};
+        },
+        frame: straightFrame
+    },
+    'sun-ember': {
+        texture: 'flame-orb', scale: .65, radius: 12, offset: 10, warningTint: 0xffe8a0,
+        defaults: {period: 3800, initialDelay: 3000, speed: 180, range: 460},
+        prepare: createFlameOrb,
+        launch(scene, enemy, config) {
+            // Atış anındaki konuma nişan alır; sonradan çocuğu takip etmez.
+            const y = enemy.y + enemy.displayHeight * .32;
+            const angle = Math.atan2(Math.max(100, scene.player.y - y), scene.player.x - enemy.x);
+            return {x: enemy.x, y, vx: Math.cos(angle) * config.speed!, vy: Math.sin(angle) * config.speed!};
+        }, frame: straightFrame
+    },
     'ice-axe': {
         texture: 'ice-axe', scale: 0.8, radius: 16, offset: 8, warningTint: 0xb9f5ff,
         defaults: {speed: 170, period: 4300, range: 620},
@@ -165,6 +188,15 @@ const builtInWeapons = {
         }, launch: aimedLaunch, frame: straightFrame
     }
 } satisfies Record<string, WeaponType>;
+
+function createFlameOrb(scene) {
+    cacheTexture(scene, 'flame-orb', 48, 48, g => {
+        g.fillStyle(0xff5d2c, .3); g.fillCircle(24, 24, 23);
+        g.fillStyle(0xe94824); g.fillCircle(24, 24, 17);
+        g.fillStyle(0xffb73e); g.fillCircle(22, 22, 13);
+        g.fillStyle(0xfff1a5); g.fillEllipse(20, 20, 12, 16);
+    });
+}
 
 export type BuiltInWeaponName = keyof typeof builtInWeapons;
 for (const [name, definition] of Object.entries(builtInWeapons)) registerWeaponType(name, definition);

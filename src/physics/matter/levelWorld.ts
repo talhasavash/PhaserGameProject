@@ -6,7 +6,7 @@ import {validateMatterEnemy} from './MatterEnemies.js';
 // Arcade'a bağlı özellikler sessizce yok sayılmaz; Matter desteği eklendiğinde bu sınır genişletilir.
 export function validateMatterLevel(level: LevelDefinition) {
     const fail = (message: string) => { throw new Error(`${level.name}: ${message}`); };
-    const unsupported = ['extraHazards', 'fountains', 'ice', 'belts', 'columns', 'fireRain', 'passages', 'scenarios']
+    const unsupported = ['extraHazards', 'ice', 'belts', 'columns', 'fireRain', 'passages', 'scenarios']
         .filter(name => level[name]?.length);
     if (unsupported.length || level.belt.speed || level.ball || level.boss || level.frozenItems || level.platforms.some(p => p.ice)) {
         fail(`Matter sahnesinde henüz desteklenmeyen Arcade özelliği: ${unsupported.join(', ') || 'özel zemin / tehlike'}`);

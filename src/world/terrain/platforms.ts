@@ -15,6 +15,8 @@ export const platformThemes = {
     journey: { body: 0x708fb3, edge: 0xd6e7fa, detail: 0x456482 },
     garden: { body: 0x98714d, edge: 0x72a65f, detail: 0xc8a16e },
     courtyard: { body: 0xc9d9d3, edge: 0xf4e9ca, detail: 0x729d9e },
+    marble: { body: 0xe0ded1, edge: 0xfff6df, detail: 0xb3b8b1 },
+    mosaic: { body: 0x4f8b8b, edge: 0xf0d694, detail: 0xbadbd0 },
     desert: { body: 0xd6a368, edge: 0xf5d792, detail: 0xb47a4e },
     night: { body: 0x8079b0, edge: 0xc6bce5, detail: 0xf6dfa3 },
     forest: { body: 0x81684b, edge: 0x66916a, detail: 0xb9a17a },
@@ -94,7 +96,16 @@ function drawStep(g, width, theme) {
         g.fillStyle(p.edge); g.fillRoundedRect(x, 0, width, 8, 4);
         g.fillStyle(p.detail);
         for (let xx = x + 12; xx < end - 6; xx += 28) g.fillEllipse(xx, 18, 8, 4);
-    } else if (theme === 'courtyard') {
+    } else if (theme === 'mosaic') {
+        g.fillRoundedRect(x, 0, width, 27, 3);
+        g.fillStyle(p.edge); g.fillRect(x, 0, width, 5);
+        for (let xx = x + 14; xx < end - 9; xx += 26) {
+            g.fillStyle(p.detail);
+            g.fillTriangle(xx, 8, xx - 7, 16, xx + 7, 16);
+            g.fillTriangle(xx, 24, xx - 7, 16, xx + 7, 16);
+            g.fillStyle(p.edge); g.fillCircle(xx, 16, 2);
+        }
+    } else if (theme === 'courtyard' || theme === 'marble') {
         g.fillRect(x, 0, width, 25);
         g.fillStyle(p.edge); g.fillRect(x, 0, width, 5); g.fillRect(x + 4, 24, width - 8, 4);
         g.lineStyle(2, p.detail);

@@ -1,7 +1,7 @@
 // Donmuş nesneleri ilk temasta çözer; toplamak için temastan çıkıp yeniden girmeyi gerektirir.
 
 import { cacheTexture } from '../../graphics/texture.js';
-import { createMosque, createFountain } from '../scenery/background.js';
+import { createReligiousLandmark, createFountain } from '../scenery/background.js';
 import { createWorldGate } from '../scenery/world2Scenery.js';
 
 export function freezeItem(scene, sprite) {
@@ -79,7 +79,7 @@ export function createLandmarks(scene) {
     const exit = scene.level.exit;
     scene.door = scene.level.exitType === 'gate'
         ? createWorldGate(scene, exit.x, scene.level.theme)
-        : createMosque(scene, exit.x, scene.level.theme, scene.level.mosqueStyle);
+        : createReligiousLandmark(scene, exit.x, scene.level.theme, scene.level.mosqueStyle);
     scene.exitZone = scene.add.zone(exit.x, 480, 68, 80);
     scene.physics.add.existing(scene.exitZone, true);
 }

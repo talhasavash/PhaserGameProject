@@ -3,6 +3,12 @@
 import { themeStrategies, isIceTheme } from './themes.js';
 import { createWeather } from './weather.js';
 import { BackgroundBuilder } from './BackgroundBuilder.js';
+import {createKaaba} from './kaaba.js';
+
+// İki fizik motoru da aynı bölüm sonu görselini ve kapı sözleşmesini kullanır.
+export function createReligiousLandmark(scene, x, theme = 'garden', style = {}) {
+    return scene.level?.exitType === 'kaaba' ? createKaaba(scene, x, style) : createMosque(scene, x, theme, style);
+}
 
 export function createScenery(scene, width, theme = 'garden') {
     const composed = scene.level?.environment?.scenery;

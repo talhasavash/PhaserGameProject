@@ -1,7 +1,8 @@
 // Seçilen arka plan parçalarını Phaser ile kurar; aynı şeklin çizim dokusunu tekrar kullanır.
 import { cacheTexture } from '../../graphics/texture.js';
 
-export type BackgroundPartType = 'sun' | 'moon' | 'cloud' | 'hill' | 'mountain' | 'tree' | 'pine' | 'circle' | 'triangle' | 'volcano' | 'basalt' | 'arch';
+export type BackgroundPartType = 'sun' | 'moon' | 'cloud' | 'hill' | 'mountain' | 'tree' | 'pine' | 'circle' | 'triangle' | 'volcano' | 'basalt' | 'arch'
+    | 'crescent' | 'minaret' | 'palm' | 'lantern' | 'rosette' | 'dome';
 
 export interface BackgroundPart {
     type: BackgroundPartType;
@@ -34,6 +35,57 @@ interface PartFactory extends PartStyle {
 
 // Factory: yeni bir hazır şekil bu listeye eklenir; bölümün çizim kodunu bilmesi gerekmez.
 const factories: Record<BackgroundPartType, PartFactory> = {
+    crescent: {width: 100, height: 100, color: 0xffe9ad, detailColor: 0x18294c, depth: -90, scrollFactor: .08,
+        draw(g, p) {
+            g.fillStyle(p.color); g.fillEllipse(p.width * .48, p.height * .5, p.width * .9, p.height * .9);
+            g.fillStyle(p.detailColor); g.fillEllipse(p.width * .66, p.height * .38, p.width * .75, p.height * .75);
+        }},
+    minaret: {width: 65, height: 300, color: 0xe5d7ba, detailColor: 0xd4b469, depth: -55, scrollFactor: .4,
+        draw(g, p) {
+            const mid = p.width / 2;
+            g.fillStyle(p.color); g.fillRect(mid - p.width * .14, p.height * .22, p.width * .28, p.height * .78);
+            g.fillStyle(p.detailColor);
+            g.fillTriangle(mid - p.width * .18, p.height * .22, mid, p.height * .04, mid + p.width * .18, p.height * .22);
+            for (const y of [.3, .52, .75]) g.fillRect(p.width * .2, p.height * y, p.width * .6, 7);
+            g.fillStyle(0x557e83); g.fillRoundedRect(mid - 4, p.height * .38, 8, 18, 4);
+            g.lineStyle(2, p.detailColor); g.lineBetween(mid, 0, mid, p.height * .08);
+        }},
+    palm: {width: 160, height: 220, color: 0x52836a, detailColor: 0xb3865a, depth: -40, scrollFactor: .7,
+        draw(g, p) {
+            const mid = p.width / 2, crown = p.height * .25;
+            g.fillStyle(p.detailColor); g.fillRect(mid - 7, crown, 14, p.height - crown);
+            g.fillStyle(p.color);
+            for (const direction of [-1, 1]) {
+                g.fillTriangle(mid, crown, mid + direction * p.width * .48, crown + 30, mid + direction * p.width * .3, crown - 20);
+                g.fillTriangle(mid, crown, mid + direction * p.width * .35, 2, mid + direction * p.width * .12, crown - 8);
+            }
+            g.fillStyle(0x99704c); g.fillEllipse(mid + 10, crown + 16, 12, 18);
+        }},
+    lantern: {width: 48, height: 110, color: 0xf7d98b, detailColor: 0x98794d, depth: -25, scrollFactor: .8,
+        draw(g, p) {
+            const mid = p.width / 2;
+            g.lineStyle(2, p.detailColor); g.lineBetween(mid, 0, mid, p.height * .25);
+            g.fillStyle(p.color, .15); g.fillEllipse(mid, p.height * .6, p.width, p.height * .65);
+            g.fillStyle(p.color); g.fillRoundedRect(p.width * .24, p.height * .4, p.width * .52, p.height * .35, 4);
+            g.fillStyle(p.detailColor); g.fillTriangle(p.width * .12, p.height * .4, mid, p.height * .24, p.width * .88, p.height * .4);
+            g.fillRect(p.width * .2, p.height * .74, p.width * .6, 6);
+            g.lineStyle(2, p.detailColor); g.lineBetween(mid, p.height * .4, mid, p.height * .74);
+        }},
+    rosette: {width: 90, height: 90, color: 0xe4c77f, detailColor: 0x4b8587, depth: -45, scrollFactor: .55,
+        draw(g, p) {
+            g.fillStyle(p.color); g.fillRect(p.width * .2, p.height * .2, p.width * .6, p.height * .6);
+            g.fillTriangle(p.width / 2, 0, 0, p.height / 2, p.width / 2, p.height);
+            g.fillTriangle(p.width / 2, 0, p.width, p.height / 2, p.width / 2, p.height);
+            g.fillStyle(p.detailColor); g.fillEllipse(p.width / 2, p.height / 2, p.width * .3, p.height * .3);
+        }},
+    dome: {width: 220, height: 170, color: 0xd9e7dc, detailColor: 0x58948d, depth: -60, scrollFactor: .3,
+        draw(g, p) {
+            g.fillStyle(p.color); g.fillRect(p.width * .08, p.height * .5, p.width * .84, p.height * .5);
+            g.fillStyle(p.detailColor); g.fillEllipse(p.width / 2, p.height * .48, p.width * .9, p.height * .75);
+            g.fillStyle(p.color); g.fillRect(p.width * .05, p.height * .65, p.width * .9, p.height * .35);
+            g.lineStyle(3, p.detailColor); g.lineBetween(p.width / 2, 0, p.width / 2, p.height * .2);
+            g.fillStyle(p.detailColor); g.fillRoundedRect(p.width * .44, p.height * .73, p.width * .12, p.height * .27, 8);
+        }},
     volcano: {width: 500, height: 320, color: 0x513544, detailColor: 0xff9b45, depth: -70, scrollFactor: .2,
         draw(g, p) {
             g.fillStyle(p.color);

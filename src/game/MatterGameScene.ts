@@ -16,7 +16,7 @@ import {selectCharacterSkin, characterPrefix} from '../data/characters.js';
 import {backgroundMusic} from '../audio/music.js';
 import {unlockWorldNext} from '../data/progress.js';
 import {drawMatterTerrain} from '../physics/matter/terrainArt.js';
-import {createScenery, createMosque, createFountain} from '../world/scenery/background.js';
+import {createScenery, createReligiousLandmark, createFountain} from '../world/scenery/background.js';
 import {createPlatformArt} from '../world/terrain/platforms.js';
 import {createPitArt} from '../world/terrain/pits.js';
 import {createHud, centerHud, updateHud} from '../ui/hud.js';
@@ -86,7 +86,7 @@ export class MatterGameScene extends Phaser.Scene implements ActiveGameScene {
         for (const item of this.level.fruits) this.createItem(item);
         for (const fountain of this.level.fountains) this.createHealingSpot(fountain);
         this.keySprite = this.add.image(this.level.key.x, this.level.key.y, 'key').setScale(.75).setDepth(10).setVisible(false);
-        this.door = createMosque(this, this.level.exit.x, this.level.theme, this.level.mosqueStyle);
+        this.door = createReligiousLandmark(this, this.level.exit.x, this.level.theme, this.level.mosqueStyle);
         this.sensor(this.level.exit.x, this.level.exit.y, 70, 100, () => this.reachExit());
         const contact = (event: {pairs: MatterContact[]}) => {
             for (const pair of event.pairs) {

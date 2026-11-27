@@ -69,10 +69,24 @@ Arka plan parçaları `world4Scenery.ts`, yeni SVG'ler `assets/images/enemy/` al
 `overhead`/`face-player` davranışları ve `flame-orb`/`sun-ember` silahları kayıtlı
 bileşenlerdir; başka bölümlerde de kullanılabilir. Bölüm kilitleri normal sırayla açılır.
 
+## Dünya 5: Kabe'nin Yolları
+
+`src/world/levels/world5.ts`, 61–75 arasındaki 15 bölümü kurar. Hurmalıklar, hilalli
+geceler, fenerli sokaklar, çinili avlular, su geçitleri ve beyaz revaklar
+`world5Scenery.ts` üzerinden seçilir. 64/66/70/73 Matter kullanır; sandıklar,
+asılı platformlar, kargo köprüleri ve denge parçaları ortak fizik Factory'sinden gelir.
+Her bölümün çeşmesi ve üç yıldızı vardır. Son avludan önce engeller sona erer.
+
+Bütün çıkışlar `exitType: 'kaaba'` kullanır. `src/world/scenery/kaaba.ts` içindeki
+15 ayrı `variant`, bakış yönü, boyut ve altın örtü nakışını belirler. Ortak
+`createReligiousLandmark` Factory'si Arcade ve Matter için aynı kapıyı döndürür;
+anahtar kapıyı açar, varışta mevcut ışık ve ayet kartı çalışır. Eski dünyaların
+cami ve kapı çizimleri değişmez. 75 tamamlanınca 6. dünya menüsü açılır.
+
 ## Dünya 6: Denge Atölyesi
 
 Menüde altıncı dünyayı seç. 76–90 numaralı 15 bölüm Matter kullanır. 76. bölüm,
-75 tamamlanınca açılır; diğerleri de sırayla açılır. Henüz hazırlanmayan 5. dünya
+75 tamamlanınca açılır; diğerleri de sırayla açılır. Önceki dünyalar
 tamamlanmadan bu dünya oynanamaz. Ortak `meyve-oyunu-unlocked-levels`
 kaydı kullanılır. Eski ayrı dünya kaydı bu kilidi atlatmaz; pilot canlıda kapalı kalır.
 

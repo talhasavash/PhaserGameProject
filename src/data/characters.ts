@@ -1,6 +1,7 @@
 // Kıyafet kaydı: Loader ve karakter animasyonları aynı SVG ön adını kullanır.
 const builtInSkins = { boy: 'child', girl: 'girl', ice_girl: 'ice_girl', ice_boy: 'ice_boy',
-    ihram_boy: 'ihram_boy', chador_girl: 'chador_girl', workshop_boy: 'workshop_boy', workshop_girl: 'workshop_girl' };
+    ihram_boy: 'ihram_boy', chador_girl: 'chador_girl', workshop_boy: 'workshop_boy', workshop_girl: 'workshop_girl',
+    lava_boy: 'lava_boy', lava_girl: 'lava_girl' };
 export type BuiltInSkinName = keyof typeof builtInSkins;
 export const characterSkins = new Map<string, string | import('../world/model/contracts.js').CharacterSkin>(Object.entries(builtInSkins));
 

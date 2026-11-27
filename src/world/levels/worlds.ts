@@ -21,6 +21,7 @@ export const worldDefinitions: import('../model/contracts.js').WorldInput[] = [
         menu: { image: 'assets/images/scene/menu-world3.svg', color: '#cbe8f6',
             headingColor: '#2a6281', headingStroke: '2px #f4fdff', headingShadow: '0 3px 0 #2e678633' } },
     { id: 4, title: 'Ateş ve Çukur', levels: worldFourLevels, music: { src: 'assets/audio/music/world4.mpeg', volume: 0.12 },
+        characterSkins: {boy: 'lava_boy', girl: 'lava_girl'},
         menu: { image: 'assets/images/scene/menu-world4.svg', color: '#49657c' } },
     { id: 5, title: "Kabe'nin Yolları", levels: worldFiveLevels, music: { src: 'assets/audio/music/world5.aac', volume: 0.12 },
         characterSkins: {boy: 'ihram_boy', girl: 'chador_girl'},

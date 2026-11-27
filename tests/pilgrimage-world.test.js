@@ -58,11 +58,11 @@ test('World 5 fills 61–75; all 90 chapter slots now contain playable levels wi
     assert.equal(new Set(worldFiveLevels.map(l => JSON.stringify(l.environment.scenery))).size, 15);
 });
 
-test('World costume selections stay scoped to pilgrimage, workshop and winter chapters', () => {
+test('World costume selections stay scoped to pilgrimage, workshop, lava and winter chapters', () => {
     for (const world of worlds) for (const level of world.levels) {
         for (const character of ['boy', 'girl']) {
             const expected = world.id === 5 ? character === 'boy' ? 'ihram_boy' : 'chador_girl'
-                : world.id === 6 ? `workshop_${character}` : world.id === 3 ? `ice_${character}` : character;
+                : world.id === 6 ? `workshop_${character}` : world.id === 4 ? `lava_${character}` : world.id === 3 ? `ice_${character}` : character;
             const selected = selectCharacterSkin(level, world, character);
             assert.equal(selected, expected, `${world.id}: ${level.name}: ${character}`);
             if (world.id === 5) {

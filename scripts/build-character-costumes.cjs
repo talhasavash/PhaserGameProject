@@ -1,4 +1,4 @@
-// Mevcut yüzleri ve hareket pozlarını korur; yolculuk ve atölye kıyafetlerini ayrı çizicilerle üretir.
+// Mevcut yüzleri ve hareket pozlarını korur; dünyalara özel kıyafetleri ayrı çizicilerle üretir.
 const fs = require('node:fs');
 const path = require('node:path');
 const folder = path.resolve(__dirname, '../assets/images/hero');
@@ -12,7 +12,10 @@ function head(source, girl, theme) {
         .replace(/<path\b[^>]*d="M(?:18\.5 12\.5|19 11\.5|25 5\.5|39 41)[^"]*"[^>]*\/>/g, '');
     // Başlık ve örtü rengi kıyafete göre seçilir; mevcut yüz ve ifadesi aynı kalır.
     if (girl) {
-        const colors = theme === 'workshop'
+        const colors = theme === 'lava'
+            ? {'#b990c0': '#963f55', '#785780': '#5c2d43', '#aa7db2': '#79364d', '#a177ab': '#79364d',
+                '#ead3e9': '#f2bd9a', '#d6b4d8': '#cd8290', '#ead19a': '#f5cc85'}
+            : theme === 'workshop'
             ? {'#b990c0': '#4e8685', '#785780': '#315d67', '#aa7db2': '#3c6b72', '#a177ab': '#3c6b72',
                 '#ead3e9': '#b0d7c8', '#d6b4d8': '#8fb9ae', '#ead19a': '#f0d18b'}
             : {'#b990c0': '#303744', '#785780': '#747f8d', '#aa7db2': '#252c38', '#a177ab': '#252c38',
@@ -20,6 +23,14 @@ function head(source, girl, theme) {
         for (const [from, to] of Object.entries(colors)) {
             drawing = drawing.replaceAll(from, to);
         }
+    } else if (theme === 'lava') {
+        drawing += `<g data-headwear="explorer-goggles">
+            <path d="M15 14Q14 2 31 2Q48 1 50 14L48 18Q32 14 16 18Z" fill="#774b42" stroke="#493b40" stroke-width="1.3"/>
+            <path d="M16 12Q33 9 49 12" fill="none" stroke="#d88b58" stroke-width="4"/>
+            <rect x="20" y="7" width="11" height="9" rx="3" fill="#d9b17b" stroke="#39464e" stroke-width="1.6"/>
+            <rect x="33" y="7" width="11" height="9" rx="3" fill="#d9b17b" stroke="#39464e" stroke-width="1.6"/>
+            <path d="M23 9L27 12M36 9L40 12" stroke="#fff0cc" stroke-width="1.7"/>
+        </g>`;
     } else if (theme === 'workshop') {
         drawing += `<g data-headwear="hardhat">
             <path d="M14 14Q14 1 32 1Q50 1 50 14Z" fill="#efbc51" stroke="#a57b38" stroke-width="1.3"/>
@@ -103,18 +114,48 @@ function workshopCostume(frame, girl) {
 }
 
 const outfits = [['child', 'ihram_boy', false, 'pilgrimage'], ['girl', 'chador_girl', true, 'pilgrimage'],
-    ['child', 'workshop_boy', false, 'workshop'], ['girl', 'workshop_girl', true, 'workshop']];
+    ['child', 'workshop_boy', false, 'workshop'], ['girl', 'workshop_girl', true, 'workshop'],
+    ['child', 'lava_boy', false, 'lava'], ['girl', 'lava_girl', true, 'lava']];
+const costumeBuilders = {pilgrimage: pilgrimageCostume, workshop: workshopCostume, lava: lavaCostume};
+let written = 0;
 for (const [base, prefix, girl, theme] of outfits) {
+    if (process.argv[2] && theme !== process.argv[2]) continue;
     for (const expression of ['', 'sad-', 'happy-', 'blink']) {
         for (let frame = 0; frame < (expression === 'blink' ? 1 : 6); frame++) {
             const suffix = expression === 'blink' ? 'blink' : `${expression}${frame}`;
             const source = fs.readFileSync(path.join(folder, `${base}-${suffix}.svg`), 'utf8');
-            const c = (theme === 'workshop' ? workshopCostume : pilgrimageCostume)(frame, girl), lift = frame >= 4 ? -2 : 0;
-            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="80" viewBox="0 0 64 80" data-costume="${theme === 'workshop' ? 'workshop' : girl ? 'chador' : 'ihram'}">
+            const c = costumeBuilders[theme](frame, girl), lift = frame >= 4 ? -2 : 0;
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="80" viewBox="0 0 64 80" data-costume="${theme === 'pilgrimage' ? girl ? 'chador' : 'ihram' : theme}">
 <g stroke-linecap="round" stroke-linejoin="round">${c.legs}${c.shoes}
 <g transform="translate(0 ${lift})">${c.robe}${c.leftArm}${c.rightArm}${head(source, girl, theme)}</g></g></svg>\n`;
             fs.writeFileSync(path.join(folder, `${prefix}-${suffix}.svg`), svg.replace(/[ \t]+$/gm, '').replace(/\n{3,}/g, '\n\n'));
+            written++;
         }
     }
 }
-console.log('Dört kıyafet için 76 SVG üretildi.');
+console.log(`${written} kıyafet SVG'si üretildi.`);
+
+function lavaCostume(frame, girl) {
+    const [left, right] = poses[frame], feet = frame === 3 ? 65 : 74;
+    const cloth = girl ? '#4d465c' : '#435565', seam = '#2b3545', trim = '#db8a58';
+    const legs = `<path d="M27 55L${left} ${feet - 5}M36 55L${right} ${feet - 5}" stroke="${seam}" stroke-width="8"/>`;
+    const shoes = `<path d="M${left - 3} ${feet - 1}h10M${right - 2} ${feet - 1}h10" stroke="#394047" stroke-width="7"/>
+        <path d="M${left - 3} ${feet + 2}h10M${right - 2} ${feet + 2}h10" stroke="${trim}" stroke-width="2"/>`;
+    const hem = girl ? feet - 3 : 58;
+    const robe = `<rect x="28" y="28" width="10" height="12" rx="4" fill="#e6a777"/>
+        <path d="M22 35Q32 32 42 36L${girl ? 48 : 44} ${hem}Q33 ${hem + 2} ${girl ? 15 : 20} ${hem}Z" fill="${cloth}" stroke="${seam}" stroke-width="1.5"/>
+        <path d="M23 38Q32 42 42 38M21 51H44" fill="none" stroke="${trim}" stroke-width="4"/>
+        <path d="M24 37Q32 41 41 37" fill="none" stroke="#ffedbc" stroke-width="1.5"/>
+        <path d="M32 40V${hem - 2}" stroke="#89959d" stroke-width="1.5"/>
+        <path d="M23 55L21 ${hem - 2}M40 55L43 ${hem - 2}" fill="none" stroke="${girl ? '#837287' : '#768693'}" stroke-width="1.2"/>
+        <rect x="22" y="46" width="6" height="4" rx="1" fill="#b5c1c0"/>
+        <rect x="37" y="55" width="7" height="6" rx="1" fill="${trim}" stroke="#9c5f42" stroke-width="1"/>`;
+    const leftArm = `<path d="M22 39L18 49" stroke="${cloth}" stroke-width="8"/>
+        <path d="M18 47L17 51" stroke="${trim}" stroke-width="8"/><circle cx="17" cy="53" r="3.5" fill="#b5c1c0"/>`;
+    const rightArm = frame === 3
+        ? `<path d="M41 40Q48 43 50 38L52 34" fill="none" stroke="${cloth}" stroke-width="7"/>
+            <circle cx="52" cy="32" r="3.5" fill="#b5c1c0"/>`
+        : `<path d="M41 39L46 49" stroke="${cloth}" stroke-width="8"/>
+            <path d="M45 47L47 51" stroke="${trim}" stroke-width="8"/><circle cx="47" cy="53" r="3.5" fill="#b5c1c0"/>`;
+    return {legs, shoes, robe, leftArm, rightArm};
+}
